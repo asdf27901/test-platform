@@ -8,8 +8,10 @@ import com.lmj.platformserver.exception.LoginFailException;
 import com.lmj.platformserver.mapper.UserMapper;
 import com.lmj.platformserver.result.ResultCodeEnum;
 import com.lmj.platformserver.service.LoginService;
+import com.lmj.platformserver.utils.CaptchaUtil;
 import com.lmj.platformserver.utils.JwtUtil;
 import com.lmj.platformserver.vo.UserLoginVo;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +22,20 @@ public class LoginServiceImpl implements LoginService {
     private UserMapper userMapper;
 
     @Override
-    public UserLoginVo login(LoginDTO loginDTO) {
+    public UserLoginVo login(LoginDTO loginDTO, HttpSession httpSession) {
+
+        String code = (String) httpSession.getAttribute("code");
+        if (code == null) {
+            throw new LoginFailException(ResultCodeEnum.CAPTCHA_EXPIRED);
+        }
+        // 检验验证码
+        if (!CaptchaUtil.verifyCaptcha(code, loginDTO.getCaptcha())) {
+            throw new LoginFailException(ResultCodeEnum.CAPTCHA_ERROR);
+        }
+
+        // 检验验证码成功后，需要移除
+        httpSession.removeAttribute("code");
+
         String username = loginDTO.getUsername();
         User user = userMapper.selectOne(
                 new LambdaQueryWrapper<User>()

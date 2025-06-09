@@ -10,6 +10,8 @@ public enum ResultCodeEnum {
     USERNAME_NOT_FOUND(501, "用户名不存在"),
     PASSWORD_ERROR(502, "密码错误"),
     USER_INACTIVE(503, "用户状态无效"),
+    CAPTCHA_ERROR(504, "验证码错误"),
+    CAPTCHA_EXPIRED(505, "验证码失效"),
 
     TOKEN_EXPIRED(601, "token已过期"),
     TOKEN_INVALID(602, "无效token");
