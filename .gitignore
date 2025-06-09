@@ -1,0 +1,14 @@
+# 操作系统相关
+.DS_Store
+Thumbs.db
+
+# IDE 相关
+.idea
+.vscode
+*.iml
+
+# 日志文件
+*.log
+
+# 临时文件
+*.tmp
