@@ -1,0 +1,19 @@
+server:
+  datasource:
+    username: work
+    password: Roger147159,./
+    host: 120.79.227.94
+    port: 3306
+    database: test_platform
+    idle-timeout: 300000
+    max-lifetime: 1800000
+    minimum-idle: 3
+    maximum-pool-size: 10
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+logging:
+  level:
+    org.apache.ibatis: warn
+    com.baomidou.mybatisplus: warn

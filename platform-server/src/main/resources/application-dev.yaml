@@ -1,0 +1,19 @@
+server:
+  datasource:
+    username: root
+    password: root
+    host: localhost
+    port: 3306
+    database: test_platform
+    idle-timeout: 300000
+    max-lifetime: 1800000
+    minimum-idle: 2
+    maximum-pool-size: 10
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+logging:
+  level:
+    org.apache.ibatis: debug
+    com.baomidou.mybatisplus: debug

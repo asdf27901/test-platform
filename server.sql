@@ -1,0 +1,88 @@
+CREATE DATABASE IF NOT EXISTS `test_platform`;
+USE `test_platform`;
+
+CREATE TABLE Users
+(
+    user_id      INT AUTO_INCREMENT PRIMARY KEY COMMENT '用户ID',
+    username     VARCHAR(50)          NOT NULL UNIQUE COMMENT '用户名',
+    password     VARCHAR(255)         NOT NULL COMMENT '用户密码',
+    avatar_url   VARCHAR(255) COMMENT '用户头像地址',
+    nickname     VARCHAR(50) COMMENT '用户昵称',
+    is_active    TINYINT(1) DEFAULT 1 COMMENT '账户是否激活，1表示激活，0表示未激活',
+    is_deleted   TINYINT(1) DEFAULT 0 NOT NULL COMMENT '逻辑删除标志，0表示未删除，1表示已删除',
+    version      INT        DEFAULT 0 NOT NULL COMMENT '乐观锁版本号',
+    created_time TIMESTAMP            NOT NULL COMMENT '创建时间',
+    updated_time TIMESTAMP            NOT NULL COMMENT '更新时间',
+
+    UNIQUE (username, is_deleted) COMMENT '唯一约束'
+);
+
+CREATE INDEX idx_users_is_deleted_is_active ON Users (is_deleted, is_active); -- 组合索引，方便查询有效且未删除用户
+
+insert into Users (username, password, avatar_url, nickname, created_time, updated_time)
+values ('admin', '123456', null, '管理员', '2026-06-06 23:42:42', '2026-06-06 23:42:42');
+
+CREATE TABLE Environments
+(
+    env_id       INT AUTO_INCREMENT PRIMARY KEY COMMENT '环境ID',
+    user_id      INT                  NOT NULL COMMENT '所属用户ID',
+    name         VARCHAR(100)         NOT NULL COMMENT '环境名称',
+    base_url     VARCHAR(255)         NOT NULL COMMENT '环境基础URL',
+    description  TEXT COMMENT '环境描述',
+    variables    JSON COMMENT '环境级别的通用变量',
+    is_deleted   TINYINT(1) DEFAULT 0 NOT NULL COMMENT '逻辑删除标志，0表示未删除，1表示已删除',
+    version      INT        DEFAULT 0 NOT NULL COMMENT '乐观锁版本号',
+    created_time TIMESTAMP            NOT NULL COMMENT '创建时间',
+    updated_time TIMESTAMP            NOT NULL COMMENT '更新时间',
+
+    UNIQUE (user_id, name, is_deleted) COMMENT '唯一约束：同一个用户下的环境名称必须唯一(逻辑删除除外)'
+);
+
+CREATE INDEX idx_environments_user_id_is_deleted ON Environments (user_id, is_deleted); -- 方便查询某个用户下未删除的环境
+
+CREATE TABLE Interfaces
+(
+    interface_id INT AUTO_INCREMENT PRIMARY KEY COMMENT '接口ID',
+    user_id      INT                  NOT NULL COMMENT '所属用户ID',
+    name         VARCHAR(100)         NOT NULL COMMENT '接口名称',
+    method       VARCHAR(10)          NOT NULL COMMENT 'HTTP请求方法',
+    path         VARCHAR(255)         NOT NULL COMMENT '接口路径',
+    description  TEXT COMMENT '接口描述',
+    is_deleted   TINYINT(1) DEFAULT 0 NOT NULL COMMENT '逻辑删除标志，0表示未删除，1表示已删除',
+    version      INT        DEFAULT 0 NOT NULL COMMENT '乐观锁版本号',
+    created_time TIMESTAMP            NOT NULL COMMENT '创建时间',
+    updated_time TIMESTAMP            NOT NULL COMMENT '更新时间',
+
+    UNIQUE (user_id, name, is_deleted) COMMENT '唯一约束：同一个用户下的接口名称建议唯一 (逻辑删除除外)'
+);
+
+CREATE INDEX idx_interfaces_user_id_is_deleted ON Interfaces (user_id, is_deleted);
+
+CREATE TABLE TestCases
+(
+    case_id                           INT AUTO_INCREMENT PRIMARY KEY COMMENT '测试用例ID',
+    interface_id                      INT                  NOT NULL COMMENT '关联的接口ID',
+    user_id                           INT                  NOT NULL COMMENT '创建该用例的用户ID',
+    name                              VARCHAR(150)         NOT NULL COMMENT '测试用例名称',
+    description                       TEXT COMMENT '测试用例描述',
+    priority                          INT        DEFAULT 0 COMMENT '用例优先级，0-高, 1-中, 2-低，数值越小优先级越高',
+    tags                              VARCHAR(150) COMMENT '用例标签)',
+    request_path_params               JSON COMMENT '请求路径参数',
+    request_query_params              JSON COMMENT '请求查询参数',
+    request_headers                   JSON COMMENT '特定于此用例的请求头',
+    request_body                      TEXT COMMENT '特定于此用例的请求体数据',
+    expected_status_code              INT COMMENT '期望的HTTP响应状态码',
+    expected_response_headers         JSON COMMENT '期望的响应头断言规则',
+    expected_response_body_assertions JSON COMMENT '期望的响应体断言规则',
+    pre_request_script                TEXT COMMENT '请求前置脚本',
+    post_request_script               TEXT COMMENT '请求后置脚本/断言脚本',
+    is_deleted                        TINYINT(1) DEFAULT 0 NOT NULL COMMENT '逻辑删除标志，0表示未删除，1表示已删除',
+    version                           INT        DEFAULT 0 NOT NULL COMMENT '乐观锁版本号',
+    created_time                      TIMESTAMP            NOT NULL COMMENT '创建时间',
+    updated_time                      TIMESTAMP            NOT NULL COMMENT '更新时间',
+
+    UNIQUE (interface_id, name, is_deleted) COMMENT '唯一约束：同一个接口下的测试用例名称建议唯一 (逻辑删除除外)'
+);
+
+CREATE INDEX idx_testcases_interface_id_is_deleted ON TestCases (interface_id, is_deleted); -- 方便查询某个接口下未删除的用例
+CREATE INDEX idx_testcases_user_id_is_deleted ON TestCases (user_id, is_deleted); -- 方便查询某个用户创建的未删除用例

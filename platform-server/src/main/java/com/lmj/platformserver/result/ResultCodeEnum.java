@@ -1,0 +1,32 @@
+package com.lmj.platformserver.result;
+
+public enum ResultCodeEnum {
+    SUCCESS(200, "成功"),
+    FAIL(400, "失败"),
+    UNKNOWN_ERROR(401, "未知异常"),
+    PARAMETER_ERROR(402, "参数异常"),
+    REQUEST_METHOD_ERROR(403, "请求方式错误"),
+
+    USERNAME_NOT_FOUND(501, "用户名不存在"),
+    PASSWORD_ERROR(502, "密码错误"),
+    USER_INACTIVE(503, "用户状态无效"),
+
+    TOKEN_EXPIRED(601, "token已过期"),
+    TOKEN_INVALID(602, "无效token");
+
+    private final Integer code;
+    private final String message;
+
+    ResultCodeEnum(Integer code, String message) {
+        this.code = code;
+        this.message = message;
+    }
+
+    public Integer getCode() {
+        return code;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+}
