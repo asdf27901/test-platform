@@ -1,22 +1,21 @@
-import store from '@/store';
-import router, { resetRouter } from '@/router/index';
 import axios from 'axios';
-import { Message, MessageBox } from 'element-ui';
-import { Session } from '@/utils/storage';
+import { Message } from 'element-ui';
+import { Local } from '@/utils/storage';
 
 // 创建 axios 实例
 const service = axios.create({
 	baseURL: process.env.VUE_APP_BASE_API,
 	timeout: 50000,
-	headers: { 'Content-Type': 'application/json' },
+	// headers: { 'Content-Type': 'application/json' },
 });
 
 // 添加请求拦截器
 service.interceptors.request.use(
 	(config) => {
 		// 在发送请求之前做些什么 token
-		if (Session.get('token')) {
-			config.headers.common['Authorization'] = `${Session.get('token')}`;
+		const token = Local.get('token')
+		if (token) {
+			config.headers.common['token'] = token;
 		}
 		return config;
 	},
@@ -31,31 +30,39 @@ service.interceptors.response.use(
 	(response) => {
 		// 对响应数据做点什么
 		const res = response.data;
-		if (res.code && res.code !== 0) {
-			// `token` 过期或者账号已在别处登录
-			if (res.code === 401 || res.code === 4001) {
-				// 清除浏览器全部临时缓存
-				Session.clear();
-				router.push('/login');
-				store.commit('setMenuData', {});
-				resetRouter(); // 重置路由
-				MessageBox.alert('你已被登出，请重新登录', '提示', {})
-					.then(() => {})
-					.catch(() => {});
+		if (res.code && res.code !== 200) {
+			if (res.code === 601 || res.code === 602) {
+				Local.remove('token')
+				window.location.href = '/login'
 			}
-			return Promise.reject(service.interceptors.response.error);
+			return Promise.reject(res);
 		} else {
-			return response.data;
+			return res
 		}
 	},
 	(error) => {
 		// 对响应错误做点什么
-		if (error.message.indexOf('timeout') != -1) {
-			Message.error('网络超时');
-		} else if (error.message == 'Network Error') {
+		if (error.response) {
+			// HTTP状态码非2xx的情况
+			const status = error.response.status;
+			if (status === 401) {
+				Message.error('未授权，请重新登录');
+				// 可以执行登出逻辑，跳转登录页
+			} else if (status === 403) {
+				Message.error('拒绝访问');
+			} else if (status === 404) {
+				Message.error('请求资源不存在');
+			} else if (status >= 500) {
+				Message.error('服务器错误');
+			} else {
+				Message.error(error.response.data.message || '请求出错');
+			}
+		} else if (error.message.includes('timeout')) {
+			Message.error('网络请求超时');
+		} else if (error.message === 'Network Error') {
 			Message.error('网络连接错误');
 		} else {
-			Message.error(error.response.data.message);
+			Message.error(error.message || '未知错误');
 		}
 		return Promise.reject(error);
 	}
