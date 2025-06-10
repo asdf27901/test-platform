@@ -10,7 +10,6 @@ import com.lmj.platformserver.result.ResultCodeEnum;
 import com.lmj.platformserver.service.LoginService;
 import com.lmj.platformserver.utils.CaptchaUtil;
 import com.lmj.platformserver.utils.JwtUtil;
-import com.lmj.platformserver.vo.UserLoginVo;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,7 +21,7 @@ public class LoginServiceImpl implements LoginService {
     private UserMapper userMapper;
 
     @Override
-    public UserLoginVo login(LoginDTO loginDTO, HttpSession httpSession) {
+    public String login(LoginDTO loginDTO, HttpSession httpSession) {
 
         String code = (String) httpSession.getAttribute("code");
         if (code == null) {
@@ -55,11 +54,7 @@ public class LoginServiceImpl implements LoginService {
         }
 
         // 设置Jwt
-        String token = JwtUtil.generateToken(user.getId());
 
-        UserLoginVo userLoginVo = new UserLoginVo();
-        userLoginVo.setId(user.getId());
-        userLoginVo.setToken(token);
-        return userLoginVo;
+        return JwtUtil.generateToken(user.getId());
     }
 }
