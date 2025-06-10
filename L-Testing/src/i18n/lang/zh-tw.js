@@ -1,13 +1,10 @@
 // 定义内容
 export default {
 	router: {
-		home: '資料看板',
-		personal: '個人中心'
-	},
-	staticRoutes: {
+		dataBoard: '資料看板',
+		personal: '個人中心',
 		signIn: '登入',
-		notFound: '找不到此頁面',
-		noPower: '沒有許可權',
+		notFound: '找不到此頁面'
 	},
 	user: {
 		title0: '組件大小',
