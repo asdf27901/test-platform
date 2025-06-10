@@ -64,7 +64,7 @@
 
 <script>
 import screenfull from 'screenfull';
-import { Session, Local } from '@/utils/storage.js';
+import { Local } from '@/utils/storage.js';
 import UserNews from '@/layout/navBars/topBar/userNews.vue';
 import Search from '@/layout/navBars/topBar/search.vue';
 export default {
@@ -198,7 +198,7 @@ export default {
 					})
 						.then(() => {
 							// 清除缓存/token等
-							Session.clear();
+							Local.clear();
 							// 使用 reload 时，不需要调用 resetRoute() 重置路由
 							window.location.reload();
 						})
