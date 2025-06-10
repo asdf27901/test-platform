@@ -20,13 +20,13 @@
 			<div class="login-right">
 				<div class="login-main">
 					<h4 class="login-title">{{ getThemeConfig.globalTitle }}</h4>
-					<el-form class="el-form login-form">
-						<el-form-item style="margin-left: 0px" prop="userName">
+					<el-form class="el-form login-form" :model="ruleForm" ref="ruleForm" :rules="rules">
+						<el-form-item style="margin-left: 0px" prop="username">
 							<el-input
 								type="text"
 								:placeholder="$t('message.login.placeholder1')"
 								prefix-icon="el-icon-user"
-								v-model="ruleForm.userName"
+								v-model="ruleForm.username"
 								clearable
 								autocomplete="off"
 							>
@@ -43,7 +43,7 @@
 							>
 							</el-input>
 						</el-form-item>
-						<el-form-item style="margin-left: 0px" prop="code">
+						<el-form-item style="margin-left: 0px" prop="captcha">
 							<div class="el-row" span="24">
 								<div class="el-col el-col-16">
 									<el-input
@@ -51,14 +51,14 @@
 										maxlength="4"
 										:placeholder="$t('message.login.placeholder3')"
 										prefix-icon="el-icon-position"
-										v-model="ruleForm.code"
+										v-model="ruleForm.captcha"
 										clearable
 										autocomplete="off"
 									></el-input>
 								</div>
 								<div class="el-col el-col-8">
 									<div class="login-code">
-										<span class="login-code-img"><img src="data:image/png;base64,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" alt=""></span>
+										<span class="login-code-img" @click.stop="getCaptcha"><img :src="captcha" alt=""></span>
 									</div>
 								</div>
 							</div>
@@ -79,10 +79,12 @@
 </template>
 
 <script>
-import { Session } from '@/utils/storage';
+import { Local } from '@/utils/storage';
 import { formatDate, formatAxis } from '@/utils/formatTime';
 import { PrevLoading } from '@/utils/loading.js';
 import { quotationsList } from './mock';
+import { useLoginApi } from "@/api/login";
+import {Message} from "element-ui";
 export default {
 	name: 'login',
 	data() {
@@ -94,14 +96,26 @@ export default {
 				loading: false,
 			},
 			ruleForm: {
-				userName: '',
+				username: '',
 				password: '',
-				code: '',
+				captcha: '',
 			},
 			time: {
 				txt: '',
 				fun: null,
 			},
+			rules: {
+				userName: [
+					{ required: true, message: '请输入用户名称', trigger: 'blur' },
+				],
+				password: [
+					{ required: true, message: '请输入用户密码', trigger: 'blur' }
+				],
+				code: [
+					{ required: true, message: '请输入验证码', trigger: 'blur' }
+				]
+			},
+			captcha: ''
 		};
 	},
 	computed: {
@@ -116,6 +130,7 @@ export default {
 	},
 	created() {
 		this.initTime();
+		this.getCaptcha()
 	},
 	mounted() {
 		this.initRandomQuotations();
@@ -134,48 +149,45 @@ export default {
 		},
 		// 登录按钮点击
 		submitForm() {
-			this.submit.loading = true;
-			setTimeout(() => {
-				let defaultRoles = [];
-				let defaultAuthBtnList = [];
-				// admin 页面权限标识，对应路由 meta.roles
-				let adminRoles = ['admin'];
-				// admin 按钮权限标识
-				let adminAuthBtnList = ['btn.add', 'btn.del', 'btn.edit', 'btn.link'];
-				// common 页面权限标识，对应路由 meta.roles
-				let testAuthPageList = ['common'];
-				// test 按钮权限标识
-				let testAuthBtnList = ['btn.add', 'btn.link'];
-				if (this.ruleForm.userName === 'admin') {
-					defaultRoles = adminRoles;
-					defaultAuthBtnList = adminAuthBtnList;
-				} else {
-					defaultRoles = testAuthPageList;
-					defaultAuthBtnList = testAuthBtnList;
+			this.$refs.ruleForm.validate((valid) => {
+				if (valid) {
+					this.submit.loading = true;
+					setTimeout(async () => {
+						try {
+							const {data} = await useLoginApi().login(this.ruleForm)
+							if (data) {
+								Local.set('token', data)
+							}
+							Message.success('登录成功')
+							PrevLoading.start()
+							setTimeout(() => {
+								this.$router.push('/')
+							}, 300)
+						}catch (error) {
+							this.submit.loading = false
+							if (error.code) {
+								Message.error(error.message)
+								this.ruleForm.captcha = ''
+								if (error.code !== 504) {
+									this.getCaptcha()
+								}
+							}
+						}
+					}, 300);
 				}
-				const userInfos = {
-					userName: this.ruleForm.userName === 'admin' ? 'admin' : 'test',
-					photo:
-						this.ruleForm.userName === 'admin'
-							? 'https://img0.baidu.com/it/u=1833472230,3849481738&fm=253&fmt=auto?w=200&h=200'
-							: 'https://img2.baidu.com/it/u=2187913762,2708298335&fm=253&fmt=auto&app=138&f=JPEG?w=200&h=200',
-					time: new Date().getTime(),
-					roles: defaultRoles,
-					authBtnList: defaultAuthBtnList,
-				};
-				// 存储 token 到浏览器缓存
-				Session.set('token', Math.random().toString(36).substr(0));
-				// 存储用户信息到浏览器缓存
-				Session.set('userInfo', userInfos);
-				// 存储用户信息到vuex
-				this.$store.dispatch('userInfos/setUserInfos', userInfos);
-				PrevLoading.start();
-				this.$router.push('/');
-				setTimeout(() => {
-					this.$message.success(`${this.currentTime}，${this.$t('message.login.signInText')}`);
-				}, 300);
-			}, 300);
+			})
 		},
+		// 获取验证码
+		async getCaptcha() {
+			try {
+				const {data} = await useLoginApi().getCaptcha()
+				this.captcha = 'data:image/png;base64,' + data
+			} catch (error) {
+				if (error.code) {
+					Message.error(error.message)
+				}
+			}
+		}
 	},
 	destroyed() {
 		clearInterval(this.time.fun);
