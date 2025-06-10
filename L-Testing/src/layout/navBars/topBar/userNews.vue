@@ -43,6 +43,11 @@ export default {
 			console.log("按钮被点击了")
 		},
 	},
+	watch: {
+		newsList(newVal) {
+			this.$emit('news-updated', newVal)
+		}
+	}
 };
 </script>
 

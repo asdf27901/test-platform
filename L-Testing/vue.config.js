@@ -6,7 +6,7 @@ module.exports = {
 		open: JSON.parse(process.env.VUE_APP_OPEN), // 自动打开浏览器
 		host: '0.0.0.0', // 真机模拟，使用
 		port: process.env.VUE_APP_PORT, // 前台代理端口号
-		https: false, // https： {type: Booleam}
+		https: false, // https： {type: Boolean}
 		hotOnly: false, // 热更新
 		// proxy: {
 		// 	// 设置代理
