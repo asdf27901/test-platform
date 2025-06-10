@@ -2,7 +2,6 @@
 export default {
 	router: {
 		dataBoard: 'dataBoard',
-		personal: 'personal',
 		signIn: 'signIn',
 		notFound: 'notFound'
 	},

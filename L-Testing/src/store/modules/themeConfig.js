@@ -50,11 +50,11 @@ const themeConfigModule = {
 			 * 界面显示
 			 */
 			// 是否开启侧边栏 Logo
-			isShowLogo: false,
+			isShowLogo: true,
 			// 是否开启 Breadcrumb
 			isBreadcrumb: true,
 			// 是否开启 Breadcrumb 图标
-			isBreadcrumbIcon: false,
+			isBreadcrumbIcon: true,
 			// 是否开启 Tagsview
 			isTagsview: true,
 			// 是否开启 Tagsview 图标

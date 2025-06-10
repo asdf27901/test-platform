@@ -49,7 +49,8 @@ export default {
 				this.$nextTick(() => {
 					let webTitle = '';
 					let { globalTitle } = this.$store.state.themeConfig.themeConfig;
-					to.path === '/login' ? (webTitle = to.meta.title) : (webTitle = this.$t(to.meta.title));
+					webTitle = this.$t(to.meta.title)
+					// to.path === '/login' ? (webTitle = to.meta.title) : (webTitle = this.$t(to.meta.title));
 					document.title = `${webTitle} - ${globalTitle}` || globalTitle;
 				});
 			},
