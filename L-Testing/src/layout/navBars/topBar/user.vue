@@ -32,11 +32,11 @@
 		<div class="layout-navbars-breadcrumb-user-icon" @clicks.stop="isShowUserNewsPopover = !isShowUserNewsPopover">
 			<el-popover placement="bottom" trigger="click" v-model="isShowUserNewsPopover" :width="300" popper-class="el-popover-pupop-user-news">
 				<template #reference>
-					<el-badge :is-dot="true">
+					<el-badge :is-dot="hasNews">
 						<i class="el-icon-bell" :title="$t('message.user.title4')"></i>
 					</el-badge>
 				</template>
-				<UserNews v-show="isShowUserNewsPopover" />
+				<UserNews v-show="isShowUserNewsPopover" @news-updated="handleNewsUpdated"/>
 			</el-popover>
 		</div>
 		<div class="layout-navbars-breadcrumb-user-icon mr10" @click="onScreenfullClick">
@@ -76,6 +76,7 @@ export default {
 			isShowUserNewsPopover: false,
 			disabledI18n: 'zh-cn',
 			disabledSize: '',
+			hasNews: false
 		};
 	},
 	computed: {
@@ -207,6 +208,9 @@ export default {
 				this.$router.push(path);
 			}
 		},
+		handleNewsUpdated(newsList) {
+			this.hasNews = newsList.length > 0
+		}
 	},
 };
 </script>
