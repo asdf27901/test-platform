@@ -48,7 +48,7 @@
 		</div>
 		<el-dropdown :show-timeout="70" :hide-timeout="50" @command="onDropdownCommand">
 			<span class="layout-navbars-breadcrumb-user-link">
-				<img :src="getUserInfos.photo" class="layout-navbars-breadcrumb-user-link-photo mr5" alt=""/>
+				<img :src="getUserInfos.avatarUrl ? getUserInfos.avatarUrl : require('@/assets/kun.jpg')" class="layout-navbars-breadcrumb-user-link-photo mr5" alt=""/>
 				{{ getUserInfos.userName === '' ? 'test' : getUserInfos.userName }}
 				<i class="el-icon-arrow-down el-icon--right"></i>
 			</span>
