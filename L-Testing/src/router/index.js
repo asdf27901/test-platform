@@ -3,7 +3,7 @@ import store from '../store';
 import VueRouter from 'vue-router';
 import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
-import { Session } from '@/utils/storage';
+import { Local } from '@/utils/storage';
 import { PrevLoading } from '@/utils/loading.js';
 import { routerMap } from "@/router/routerMap";
 
@@ -107,34 +107,37 @@ export function delayNProgressDone(time = 300) {
 router.beforeEach((to, from, next) => {
 	keepAliveSplice(to);
 	NProgress.configure({ showSpinner: false });
-	if (to.meta.title && to.path !== '/login') NProgress.start();
-	let token = Session.get('token');
-	if (to.path === '/login' && !token) {
+
+	const token = Local.get('token');
+	const isLoginPage = to.path === '/login';
+
+	// 只有当目标页面有title且不是/login时，才显示进度条
+	if (to.meta.title && !isLoginPage) {
 		NProgress.start();
-		next();
-		delayNProgressDone();
-	} else {
-		if (!token) {
-			NProgress.start();
-			next('/login');
-			Session.clear();
-			delayNProgressDone();
-		} else {
-			next()
-			delayNProgressDone()
-		}
-		// else if (token && to.path === '/login') {
-		// 	next('/home');
-		// 	delayNProgressDone();
-		// } else {
-		// 	if (Object.keys(store.state.routesList.routesList).length <= 0) {
-		// 		getRouterList(router, to, next);
-		// 	} else {
-		// 		next();
-		// 		delayNProgressDone(0);
-		// 	}
-		// }
 	}
+
+	if (isLoginPage) {
+		// 如果是登录页，且无token，正常进入登录页
+		if (!token) {
+			next();
+			delayNProgressDone();
+			return;
+		} else {
+			// 已登录，访问登录页，跳回首页或其他默认页面
+			next({ path: '/' });
+			delayNProgressDone();
+			return;
+		}
+	}
+	// 需要登录的页面且无token，强制跳转登录页
+	if (!token) {
+		next({ path: '/login' });
+		delayNProgressDone();
+		return;
+	}
+	// 其他正常页面直接放行
+	next();
+	delayNProgressDone();
 });
 
 // 路由加载后

@@ -2,7 +2,6 @@
 export default {
 	router: {
 		dataBoard: '資料看板',
-		personal: '個人中心',
 		signIn: '登入',
 		notFound: '找不到此頁面'
 	},
