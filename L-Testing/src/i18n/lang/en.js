@@ -1,13 +1,10 @@
 // 定义内容
 export default {
 	router: {
-		home: 'Dashboard',
-		personal: 'personal'
-	},
-	staticRoutes: {
+		dataBoard: 'dataBoard',
+		personal: 'personal',
 		signIn: 'signIn',
-		notFound: 'notFound',
-		noPower: 'noPower',
+		notFound: 'notFound'
 	},
 	user: {
 		title0: 'Component size',
