@@ -7,7 +7,7 @@ export const routerMap = [
         children: [
             {
                 path: '/dataBoard',
-                name: 'dataBoard',
+                name: 'DataBoard',
                 component: () => import('@/views/databoard'),
                 meta: {
                     title: 'message.router.dataBoard',
@@ -21,7 +21,7 @@ export const routerMap = [
             },
             {
                 path: '/user',
-                name: 'user',
+                name: 'UserManagement',
                 component: () => import('@/views/user'),
                 meta: {
                     title: 'message.router.user',
