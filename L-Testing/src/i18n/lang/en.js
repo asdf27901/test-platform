@@ -3,7 +3,8 @@ export default {
 	router: {
 		dataBoard: 'dataBoard',
 		signIn: 'signIn',
-		notFound: 'notFound'
+		notFound: 'notFound',
+		user: 'userManagement'
 	},
 	user: {
 		title0: 'Component size',

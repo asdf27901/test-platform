@@ -3,7 +3,8 @@ export default {
 	router: {
 		dataBoard: '数据看板',
 		signIn: '登录',
-		notFound: '找不到此页面'
+		notFound: '找不到此页面',
+		user: '用户管理'
 	},
 	user: {
 		title0: '组件大小',
