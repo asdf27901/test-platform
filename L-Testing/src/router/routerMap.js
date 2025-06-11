@@ -18,6 +18,20 @@ export const routerMap = [
                     isAffix: true,
                     isIframe: false,
                 }
+            },
+            {
+                path: '/user',
+                name: 'user',
+                component: () => import('@/views/user'),
+                meta: {
+                    title: 'message.router.user',
+                    icon: 'fa fa-users',
+                    isLink: "",
+                    isHide: false,
+                    isKeepAlive: true,
+                    isAffix: false,
+                    isIframe: false,
+                }
             }
         ]
     },
