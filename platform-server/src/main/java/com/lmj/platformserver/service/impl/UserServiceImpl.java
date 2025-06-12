@@ -1,7 +1,9 @@
 package com.lmj.platformserver.service.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.lmj.platformserver.constant.UserConstant;
 import com.lmj.platformserver.context.UserContextHolder;
+import com.lmj.platformserver.dto.UserPageQueryDTO;
 import com.lmj.platformserver.entity.User;
 import com.lmj.platformserver.exception.UserErrorException;
 import com.lmj.platformserver.mapper.UserMapper;
@@ -31,5 +33,10 @@ public class UserServiceImpl implements UserService {
         UserInfoVo userInfoVo = new UserInfoVo();
         BeanUtils.copyProperties(user, userInfoVo);
         return userInfoVo;
+    }
+
+    @Override
+    public IPage<UserInfoVo> getUserList(UserPageQueryDTO userPageQueryDTO) {
+        return userMapper.getUserList(userPageQueryDTO);
     }
 }

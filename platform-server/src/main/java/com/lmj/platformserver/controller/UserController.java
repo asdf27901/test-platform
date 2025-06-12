@@ -1,5 +1,7 @@
 package com.lmj.platformserver.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.lmj.platformserver.dto.UserPageQueryDTO;
 import com.lmj.platformserver.result.Response;
 import com.lmj.platformserver.service.UserService;
 import com.lmj.platformserver.vo.UserInfoVo;
@@ -24,5 +26,12 @@ public class UserController {
         log.info("获取当前token的用户对象");
         UserInfoVo userInfoVo = userService.getUserInfo();
         return Response.success(userInfoVo);
+    }
+
+    @GetMapping("/userList")
+    public Response<IPage<UserInfoVo>> getUserList(UserPageQueryDTO userPageQueryDTO) {
+        log.info("获取用户列表");
+        IPage<UserInfoVo> userInfoVoIPage = userService.getUserList(userPageQueryDTO);
+        return Response.success(userInfoVoIPage);
     }
 }
