@@ -1,4 +1,5 @@
-import { Session } from '@/utils/storage.js';
+import {userApis} from "@/api/user";
+import {Message} from "element-ui";
 
 const userInfosModule = {
 	namespaced: true,
@@ -7,17 +8,22 @@ const userInfosModule = {
 	},
 	mutations: {
 		// 设置用户信息
-		getUserInfos(state, data) {
+		setUserInfos(state, data) {
 			state.userInfos = data;
 		},
 	},
 	actions: {
 		// 设置用户信息
-		async setUserInfos({ commit }, data) {
-			if (data) {
-				commit('getUserInfos', data);
-			} else {
-				if (Session.get('userInfo')) commit('getUserInfos', Session.get('userInfo'));
+		async fetchUserInfos({ commit }) {
+			try {
+				const {data} = await userApis.getUserInfo()
+				if (data) {
+					commit('setUserInfos', data)
+				}
+			}catch (error) {
+				if (error.code) {
+					Message.error(error.message)
+				}
 			}
 		},
 	},
