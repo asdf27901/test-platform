@@ -83,7 +83,7 @@ import { Local } from '@/utils/storage';
 import { formatDate, formatAxis } from '@/utils/formatTime';
 import { PrevLoading } from '@/utils/loading.js';
 import { quotationsList } from './mock';
-import { useLoginApi } from "@/api/login";
+import { useLoginApis } from "@/api/login";
 import {Message} from "element-ui";
 export default {
 	name: 'login',
@@ -154,7 +154,7 @@ export default {
 					this.submit.loading = true;
 					setTimeout(async () => {
 						try {
-							const {data} = await useLoginApi().login(this.ruleForm)
+							const {data} = await useLoginApis.login(this.ruleForm)
 							if (data) {
 								Local.set('token', data)
 							}
@@ -180,7 +180,7 @@ export default {
 		// 获取验证码
 		async getCaptcha() {
 			try {
-				const {data} = await useLoginApi().getCaptcha()
+				const {data} = await useLoginApis.getCaptcha()
 				this.captcha = 'data:image/png;base64,' + data
 			} catch (error) {
 				if (error.code) {
