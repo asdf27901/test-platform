@@ -48,8 +48,8 @@
 		</div>
 		<el-dropdown :show-timeout="70" :hide-timeout="50" @command="onDropdownCommand">
 			<span class="layout-navbars-breadcrumb-user-link">
-				<img :src="getUserInfos.avatarUrl ? getUserInfos.avatarUrl : require('@/assets/kun.jpg')" class="layout-navbars-breadcrumb-user-link-photo mr5" alt=""/>
-				{{ getUserInfos.userName === '' ? 'test' : getUserInfos.userName }}
+				<img :src="userInfos.avatarUrl ? userInfos.avatarUrl : require('@/assets/kun.jpg')" class="layout-navbars-breadcrumb-user-link-photo mr5" alt=""/>
+				{{ userInfos.nickName ? userInfos.nickName : userInfos.username ? userInfos.username : 'undefined' }}
 				<i class="el-icon-arrow-down el-icon--right"></i>
 			</span>
 			<el-dropdown-menu slot="dropdown">
@@ -67,6 +67,7 @@ import screenfull from 'screenfull';
 import { Local } from '@/utils/storage.js';
 import UserNews from '@/layout/navBars/topBar/userNews.vue';
 import Search from '@/layout/navBars/topBar/search.vue';
+import {mapActions, mapState} from "vuex";
 
 export default {
 	name: 'layoutBreadcrumbUser',
@@ -82,9 +83,7 @@ export default {
 	},
 	computed: {
 		// 获取用户信息
-		getUserInfos() {
-			return this.$store.state.userInfos.userInfos;
-		},
+		...mapState('userInfos', ['userInfos']),
 		// 设置弹性盒子布局 flex
 		layoutUserFlexNum() {
 			let { layout, isClassicSplitMenu } = this.$store.state.themeConfig.themeConfig;
@@ -99,6 +98,9 @@ export default {
 			this.initI18n();
 			this.initComponentSize();
 		}
+	},
+	created() {
+		this.fetchUserInfos()
 	},
 	methods: {
 		// 搜索点击
@@ -211,7 +213,8 @@ export default {
 		},
 		handleNewsUpdated(newsList) {
 			this.hasNews = newsList.length > 0
-		}
+		},
+		...mapActions('userInfos', ['fetchUserInfos'])
 	},
 };
 </script>
