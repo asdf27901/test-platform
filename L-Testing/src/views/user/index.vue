@@ -34,6 +34,7 @@
             icon="el-icon-plus"
             @click="handleAdd"
             style="margin-bottom: 20px;"
+            v-if="username === 'admin'"
         >
             新增用户
         </el-button>
@@ -173,6 +174,11 @@ export default {
         handleCurrentChange(val) {
             this.pagination.current = val;
             this.fetchUserList();
+        }
+    },
+    computed: {
+        username() {
+            return this.$store.state.userInfos.userInfos.username
         }
     }
 };
