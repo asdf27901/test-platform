@@ -54,11 +54,18 @@
 			</span>
 			<el-dropdown-menu slot="dropdown">
 				<el-dropdown-item command="/dataBoard">{{ $t('message.user.dropdown1') }}</el-dropdown-item>
-<!--				<el-dropdown-item command="/personal">{{ $t('message.user.dropdown2') }}</el-dropdown-item>-->
+				<el-dropdown-item command="edit">{{ $t('message.user.dropdown2') }}</el-dropdown-item>
 				<el-dropdown-item divided command="logOut">{{ $t('message.user.dropdown5') }}</el-dropdown-item>
 			</el-dropdown-menu>
 		</el-dropdown>
 		<Search ref="searchRef" />
+		<!-- 4. 新增/编辑用户的抽屉组件 -->
+		<user-form-drawer
+				:visible.sync="drawerVisible"
+				:mode="drawerMode"
+				:initial-data="currentUser"
+				@success="handleFormSuccess"
+		></user-form-drawer>
 	</div>
 </template>
 
@@ -68,17 +75,23 @@ import { Local } from '@/utils/storage.js';
 import UserNews from '@/layout/navBars/topBar/userNews.vue';
 import Search from '@/layout/navBars/topBar/search.vue';
 import {mapActions, mapState} from "vuex";
+import userFormDrawer from "@/views/user/components/userFormDrawer.vue";
 
 export default {
 	name: 'layoutBreadcrumbUser',
-	components: { UserNews, Search },
+	components: { UserNews, Search, userFormDrawer },
 	data() {
 		return {
 			isScreenFull: false,
 			isShowUserNewsPopover: false,
 			disabledI18n: 'zh-cn',
 			disabledSize: '',
-			hasNews: false
+			hasNews: false,
+
+			// 为抽屉组件管理状态
+			drawerVisible: false,
+			drawerMode: 'edit', // 'add' 或 'edit'
+			currentUser: null,  // 存储当前正在编辑的用户数据
 		};
 	},
 	computed: {
@@ -174,45 +187,54 @@ export default {
 		},
 		// `dropdown 下拉菜单` 当前项点击
 		onDropdownCommand(path) {
-			if (path === 'logOut') {
-				setTimeout(() => {
-					this.$msgbox({
-						closeOnClickModal: false,
-						closeOnPressEscape: false,
-						title: this.$t('message.user.logOutTitle'),
-						message: this.$t('message.user.logOutMessage'),
-						showCancelButton: true,
-						confirmButtonText: this.$t('message.user.logOutConfirm'),
-						cancelButtonText: this.$t('message.user.logOutCancel'),
-						beforeClose: (action, instance, done) => {
-							if (action === 'confirm') {
-								instance.confirmButtonLoading = true;
-								instance.confirmButtonText = this.$t('message.user.logOutExit');
-								setTimeout(() => {
-									done();
+			switch (path) {
+				case 'logOut':
+					setTimeout(() => {
+						this.$msgbox({
+							closeOnClickModal: false,
+							closeOnPressEscape: false,
+							title: this.$t('message.user.logOutTitle'),
+							message: this.$t('message.user.logOutMessage'),
+							showCancelButton: true,
+							confirmButtonText: this.$t('message.user.logOutConfirm'),
+							cancelButtonText: this.$t('message.user.logOutCancel'),
+							beforeClose: (action, instance, done) => {
+								if (action === 'confirm') {
+									instance.confirmButtonLoading = true;
+									instance.confirmButtonText = this.$t('message.user.logOutExit');
 									setTimeout(() => {
-										instance.confirmButtonLoading = false;
-									}, 300);
-								}, 700);
-							} else {
-								done();
-							}
-						},
-					})
-						.then(() => {
-							// 清除缓存/token等
-							Local.clear();
-							// 使用 reload 时，不需要调用 resetRoute() 重置路由
-							window.location.reload();
+										done();
+										setTimeout(() => {
+											instance.confirmButtonLoading = false;
+										}, 300);
+									}, 700);
+								} else {
+									done();
+								}
+							},
 						})
-						.catch(() => {});
-				}, 150);
-			} else {
-				this.$router.push(path);
+								.then(() => {
+									// 清除缓存/token等
+									Local.clear();
+									// 使用 reload 时，不需要调用 resetRoute() 重置路由
+									window.location.reload();
+								})
+								.catch(() => {});
+					}, 150);
+					break
+				case 'edit':
+					this.drawerVisible = true
+						this.currentUser = this.$store.state.userInfos.userInfos
+					break
+				default:
+					this.$router.push(path);
 			}
 		},
 		handleNewsUpdated(newsList) {
 			this.hasNews = newsList.length > 0
+		},
+		handleFormSuccess() {
+			this.fetchUserInfos()
 		},
 		...mapActions('userInfos', ['fetchUserInfos'])
 	},

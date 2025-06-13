@@ -72,6 +72,13 @@
                 :total="pagination.total">
             </el-pagination>
         </div>
+        <!-- 4. 新增/编辑用户的抽屉组件 -->
+        <user-form-drawer
+            :visible.sync="drawerVisible"
+            :mode="drawerMode"
+            :initial-data="currentUser"
+            @success="handleFormSuccess"
+        ></user-form-drawer>
     </div>
 </template>
 
@@ -79,9 +86,13 @@
 import { userApis } from "@/api/user";
 import { Message } from "element-ui";
 import { debounce } from 'lodash';
+import UserFormDrawer from "@/views/user/components/userFormDrawer.vue";
 
 export default {
     name: 'UserManagement',
+    components: {
+        UserFormDrawer
+    },
     data() {
         return {
             loading: false,
@@ -97,7 +108,12 @@ export default {
                 total: 0
             },
             tableHeight: 400,
-            debouncedResizeHandler: null
+            debouncedResizeHandler: null,
+
+            // 为抽屉组件管理状态
+            drawerVisible: false,
+            drawerMode: 'add', // 'add' 或 'edit'
+            currentUser: null,  // 存储当前正在编辑的用户数据
         };
     },
     created() {
@@ -164,7 +180,8 @@ export default {
             this.fetchUserList();
         },
         handleAdd() {
-            this.$message.success('触发了新增用户操作！');
+            this.currentUser = null;
+            this.drawerVisible = true;
         },
         handleSizeChange(val) {
             this.pagination.size = val;
@@ -173,6 +190,10 @@ export default {
         },
         handleCurrentChange(val) {
             this.pagination.current = val;
+            this.fetchUserList();
+        },
+        handleFormSuccess() {
+            this.pagination.current = 1;
             this.fetchUserList();
         }
     },
