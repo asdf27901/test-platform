@@ -13,5 +13,19 @@ export const userApis = {
             method: 'get',
             params
         })
+    },
+    addUser: (params) => {
+        return request({
+            url: '/user/add',
+            method: 'post',
+            data: params
+        })
+    },
+    updateUser: (params) => {
+        return request({
+            url: '/user/update',
+            method: 'post',
+            data: params
+        })
     }
 }
