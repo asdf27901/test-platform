@@ -19,7 +19,7 @@ export default {
 		dropdownSmall: '小型',
 		dropdownMini: '超小',
 		dropdown1: '数据看板',
-		dropdown2: '个人中心',
+		dropdown2: '修改信息',
 		dropdown5: '退出登录',
 		searchPlaceholder: '菜单搜索：支持中文、路由路径',
 		newTitle: '通知',
