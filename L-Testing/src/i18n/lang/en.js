@@ -19,7 +19,7 @@ export default {
 		dropdownSmall: 'small',
 		dropdownMini: 'mini',
 		dropdown1: 'Dashboard',
-		dropdown2: 'Personal Center',
+		dropdown2: 'Modify information',
 		dropdown5: 'Log out',
 		searchPlaceholder: 'Menu search: support Chinese, routing path',
 		newTitle: 'notice',
