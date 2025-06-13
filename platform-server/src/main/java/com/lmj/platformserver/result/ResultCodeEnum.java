@@ -15,7 +15,9 @@ public enum ResultCodeEnum {
     USER_NOT_FOUND(506, "用户不存在"),
 
     TOKEN_EXPIRED(601, "token已过期"),
-    TOKEN_INVALID(602, "无效token");
+    TOKEN_INVALID(602, "无效token"),
+
+    FILE_UPLOAD_FAIL(701, "文件上传失败");
 
     private final Integer code;
     private final String message;
