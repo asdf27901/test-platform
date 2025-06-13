@@ -13,16 +13,16 @@
 				</el-dropdown-menu>
 			</template>
 		</el-dropdown>
-		<el-dropdown :show-timeout="70" :hide-timeout="50" trigger="click" @command="onLanguageChange">
-			<div class="layout-navbars-breadcrumb-user-icon">
-				<i class="iconfont" :class="disabledI18n === 'en' ? 'icon-fuhao-yingwen' : 'icon-fuhao-zhongwen'" :title="$t('message.user.title1')"></i>
-			</div>
-			<el-dropdown-menu slot="dropdown">
-				<el-dropdown-item command="zh-cn" :disabled="disabledI18n === 'zh-cn'">简体中文</el-dropdown-item>
-				<el-dropdown-item command="en" :disabled="disabledI18n === 'en'">English</el-dropdown-item>
-				<el-dropdown-item command="zh-tw" :disabled="disabledI18n === 'zh-tw'">繁體中文</el-dropdown-item>
-			</el-dropdown-menu>
-		</el-dropdown>
+<!--		<el-dropdown :show-timeout="70" :hide-timeout="50" trigger="click" @command="onLanguageChange">-->
+<!--			<div class="layout-navbars-breadcrumb-user-icon">-->
+<!--				<i class="iconfont" :class="disabledI18n === 'en' ? 'icon-fuhao-yingwen' : 'icon-fuhao-zhongwen'" :title="$t('message.user.title1')"></i>-->
+<!--			</div>-->
+<!--			<el-dropdown-menu slot="dropdown">-->
+<!--				<el-dropdown-item command="zh-cn" :disabled="disabledI18n === 'zh-cn'">简体中文</el-dropdown-item>-->
+<!--				<el-dropdown-item command="en" :disabled="disabledI18n === 'en'">English</el-dropdown-item>-->
+<!--				<el-dropdown-item command="zh-tw" :disabled="disabledI18n === 'zh-tw'">繁體中文</el-dropdown-item>-->
+<!--			</el-dropdown-menu>-->
+<!--		</el-dropdown>-->
 		<div class="layout-navbars-breadcrumb-user-icon" @click="onSearchClick">
 			<i class="el-icon-search" :title="$t('message.user.title2')"></i>
 		</div>
