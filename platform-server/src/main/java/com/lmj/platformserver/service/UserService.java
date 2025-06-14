@@ -1,6 +1,7 @@
 package com.lmj.platformserver.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.lmj.platformserver.dto.ChangeUserActiveDTO;
 import com.lmj.platformserver.dto.UserDTO;
 import com.lmj.platformserver.dto.UserPageQueryDTO;
 import com.lmj.platformserver.vo.UserInfoVo;
@@ -13,4 +14,6 @@ public interface UserService {
     void addUser(UserDTO userDTO);
 
     void updateUser(UserDTO userDTO);
+
+    void changeUserActive(ChangeUserActiveDTO changeUserActiveDTO);
 }

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.lmj.platformserver.constant.UserConstant;
 import com.lmj.platformserver.context.UserContextHolder;
+import com.lmj.platformserver.dto.ChangeUserActiveDTO;
 import com.lmj.platformserver.dto.UserDTO;
 import com.lmj.platformserver.dto.UserPageQueryDTO;
 import com.lmj.platformserver.entity.User;
@@ -90,6 +91,20 @@ public class UserServiceImpl implements UserService {
             userDTO.setAvatarUrl(user.getAvatarUrl());
         }
         BeanUtils.copyProperties(userDTO, user);
+        userMapper.updateById(user);
+    }
+
+    @Override
+    public void changeUserActive(ChangeUserActiveDTO changeUserActiveDTO) {
+        Long currentLoginUserId = UserContextHolder.getUserId();
+        if (currentLoginUserId != 1 || changeUserActiveDTO.getId() == 1) {
+            throw new BaseException(ResultCodeEnum.NO_PERMISSION);
+        }
+        User user = userMapper.selectById(changeUserActiveDTO.getId());
+        if (user == null) {
+            throw new UserErrorException(ResultCodeEnum.USER_NOT_FOUND);
+        }
+        user.setActive(changeUserActiveDTO.getActive());
         userMapper.updateById(user);
     }
 }
