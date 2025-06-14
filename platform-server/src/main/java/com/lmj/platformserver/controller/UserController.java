@@ -1,6 +1,7 @@
 package com.lmj.platformserver.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.lmj.platformserver.dto.ChangeUserActiveDTO;
 import com.lmj.platformserver.dto.UserDTO;
 import com.lmj.platformserver.dto.UserPageQueryDTO;
 import com.lmj.platformserver.groups.Add;
@@ -47,6 +48,13 @@ public class UserController {
     public Response<?> updateUser(@RequestBody @Validated(Update.class) UserDTO userDTO) {
         log.info("更新用户：{}", userDTO);
         userService.updateUser(userDTO);
+        return Response.success();
+    }
+
+    @PostMapping("/changeUserActive")
+    public Response<?> changeUserActive(@RequestBody @Validated ChangeUserActiveDTO changeUserActiveDTO) {
+        log.info("修改用户状态: {}", changeUserActiveDTO);
+        userService.changeUserActive(changeUserActiveDTO);
         return Response.success();
     }
 }
