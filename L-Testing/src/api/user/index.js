@@ -27,5 +27,12 @@ export const userApis = {
             method: 'post',
             data: params
         })
+    },
+    changeActive: (params) => {
+        return request({
+            url: '/user/changeUserActive',
+            method: 'post',
+            data: params
+        })
     }
 }
