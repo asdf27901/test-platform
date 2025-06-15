@@ -11,7 +11,7 @@ export const routerMap = [
                 component: () => import('@/views/databoard'),
                 meta: {
                     title: 'message.router.dataBoard',
-                    icon: 'fa fa-database',
+                    icon: 'fa fa-bar-chart-o',
                     isLink: "",
                     isHide: false,
                     isKeepAlive: true,
