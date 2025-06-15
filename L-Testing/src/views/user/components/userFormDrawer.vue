@@ -115,7 +115,8 @@ export default {
         rules() {
             const baseRules = {
                 username: [
-                    { required: true, message: '请输入用户名', trigger: 'blur' }
+                    { required: true, message: '请输入用户名', trigger: 'blur' },
+                    { pattern: /^[a-z0-9]+$/, message: '用户名只能包含小写字母和数字', trigger: 'blur' }
                 ],
                 nickName: [
                     { required: true, message: '请输入用户昵称', trigger: 'blur' }
