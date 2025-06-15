@@ -217,3 +217,11 @@
 .el-alert__title {
 	word-break: break-all;
 }
+
+/* 统一所有 el-input 内部的字体 */
+.el-input__inner,
+.el-textarea__inner {
+	font-family: Arial, sans-serif !important;
+	font-size: 14px !important;
+	line-height: 1.5 !important;
+}
