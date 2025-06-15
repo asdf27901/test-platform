@@ -2,7 +2,9 @@ package com.lmj.platformserver.handler;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.lmj.platformserver.entity.Interface;
 import com.lmj.platformserver.exception.BaseException;
+import com.lmj.platformserver.exception.InterfaceErrorException;
 import com.lmj.platformserver.result.Response;
 import com.lmj.platformserver.result.ResultCodeEnum;
 import jakarta.validation.ConstraintViolationException;
@@ -17,7 +19,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.StringJoiner;
 
 @RestControllerAdvice
 @Slf4j
@@ -123,5 +127,17 @@ public class GlobalExceptionHandler {
     public Response<?> exceptionHandler(Exception e) {
         log.error("异常信息：", e);
         return Response.fail(ResultCodeEnum.UNKNOWN_ERROR);
+    }
+
+    @ExceptionHandler(InterfaceErrorException.class)
+    public Response<?> exceptionHandler(InterfaceErrorException e) {
+        log.error("请求异常:", e);
+        List<Interface> duplicateInterfaces = e.getDuplicateInterfaces();
+        if (duplicateInterfaces != null && !duplicateInterfaces.isEmpty()) {
+            StringJoiner sj = new StringJoiner(", ", "接口名存在重复：", "");
+            duplicateInterfaces.forEach(i -> sj.add(i.getName()));
+            return Response.fail(e.getResultCodeEnum(), sj.toString());
+        }
+        return Response.fail(e.getResultCodeEnum());
     }
 }

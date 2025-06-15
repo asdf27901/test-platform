@@ -15,6 +15,7 @@ public enum ResultCodeEnum {
     CAPTCHA_EXPIRED(505, "验证码失效"),
     USER_NOT_FOUND(506, "用户不存在"),
     USERNAME_HAS_EXIST(507, "用户名已存在"),
+    DUPLICATE_INTERFACE_NAME(508, "接口名重复"),
 
     TOKEN_EXPIRED(601, "token已过期"),
     TOKEN_INVALID(602, "无效token"),
