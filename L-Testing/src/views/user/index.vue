@@ -55,8 +55,26 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="nickName" label="用户昵称" min-width="100" align="center"></el-table-column>
+                <el-table-column prop="active" label="用户状态" align="center">
+                    <template #default="{row}">
+                        <el-tag :type="row.active === 1 ? 'success' : 'danger'">{{ row.active === 1 ? '激活' : '禁用' }}</el-tag>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="createdTime" label="创建时间" align="center"></el-table-column>
                 <el-table-column prop="updatedTime" label="更新时间" align="center"></el-table-column>
+                <el-table-column label="操作" align="center" v-if="username === 'admin'">
+                    <template #default="{row}">
+                        <el-link
+                            :type="row.active === 1 ? 'danger' : 'success'"
+                            :icon="row.active === 1 ? 'el-icon-delete' : 'el-icon-refresh'"
+                            :underline="false"
+                            @click.stop="changeUserStatus(row.id, row.active === 1 ? 0 : 1)"
+                            v-if="row.username !== 'admin'"
+                        >
+                            {{ row.active === 1 ? '禁用' : '激活' }}
+                        </el-link>
+                    </template>
+                </el-table-column>
             </el-table>
         </div>
 
@@ -195,6 +213,17 @@ export default {
         handleFormSuccess() {
             this.pagination.current = 1;
             this.fetchUserList();
+        },
+        async changeUserStatus(id, active) {
+            try {
+                await userApis.changeActive({id, active})
+                Message.success("修改成功");
+                this.fetchUserList()
+            }catch (e) {
+                if (e.code) {
+                    Message.error(e.message)
+                }
+            }
         }
     },
     computed: {
