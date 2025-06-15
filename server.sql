@@ -3,7 +3,7 @@ USE `test_platform`;
 
 CREATE TABLE Users
 (
-    user_id      INT AUTO_INCREMENT PRIMARY KEY COMMENT '用户ID',
+    id      INT AUTO_INCREMENT PRIMARY KEY COMMENT '用户ID',
     username     VARCHAR(50)          NOT NULL UNIQUE COMMENT '用户名',
     password     VARCHAR(255)         NOT NULL COMMENT '用户密码',
     avatar_url   VARCHAR(255) COMMENT '用户头像地址',
@@ -24,7 +24,7 @@ values ('admin', '123456', null, '管理员', '2026-06-06 23:42:42', '2026-06-06
 
 CREATE TABLE Environments
 (
-    env_id       INT AUTO_INCREMENT PRIMARY KEY COMMENT '环境ID',
+    id       INT AUTO_INCREMENT PRIMARY KEY COMMENT '环境ID',
     user_id      INT                  NOT NULL COMMENT '所属用户ID',
     name         VARCHAR(100)         NOT NULL COMMENT '环境名称',
     base_url     VARCHAR(255)         NOT NULL COMMENT '环境基础URL',
@@ -42,7 +42,7 @@ CREATE INDEX idx_environments_user_id_is_deleted ON Environments (user_id, is_de
 
 CREATE TABLE Interfaces
 (
-    interface_id INT AUTO_INCREMENT PRIMARY KEY COMMENT '接口ID',
+    id INT AUTO_INCREMENT PRIMARY KEY COMMENT '接口ID',
     user_id      INT                  NOT NULL COMMENT '所属用户ID',
     name         VARCHAR(100)         NOT NULL COMMENT '接口名称',
     method       VARCHAR(10)          NOT NULL COMMENT 'HTTP请求方法',
@@ -51,6 +51,8 @@ CREATE TABLE Interfaces
     is_deleted   TINYINT(1) DEFAULT 0 NOT NULL COMMENT '逻辑删除标志，0表示未删除，1表示已删除',
     version      INT        DEFAULT 0 NOT NULL COMMENT '乐观锁版本号',
     created_time TIMESTAMP            NOT NULL COMMENT '创建时间',
+    create_user  int                  not null comment '创建用户ID',
+    update_user  int                  not null comment '更新用户ID',
     updated_time TIMESTAMP            NOT NULL COMMENT '更新时间',
 
     UNIQUE (user_id, name, is_deleted) COMMENT '唯一约束：同一个用户下的接口名称建议唯一 (逻辑删除除外)'
@@ -60,7 +62,7 @@ CREATE INDEX idx_interfaces_user_id_is_deleted ON Interfaces (user_id, is_delete
 
 CREATE TABLE TestCases
 (
-    case_id                           INT AUTO_INCREMENT PRIMARY KEY COMMENT '测试用例ID',
+    id                           INT AUTO_INCREMENT PRIMARY KEY COMMENT '测试用例ID',
     interface_id                      INT                  NOT NULL COMMENT '关联的接口ID',
     user_id                           INT                  NOT NULL COMMENT '创建该用例的用户ID',
     name                              VARCHAR(150)         NOT NULL COMMENT '测试用例名称',
