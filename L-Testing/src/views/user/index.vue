@@ -159,16 +159,22 @@ export default {
         },
         async fetchUserList() {
             this.loading = true;
-            const { username, nickName } = this.searchForm;
-            const { current, size } = this.pagination;
             const params = {
-                username,
-                nickName,
-                begin: this.searchForm.creationTimeRange ? this.searchForm.creationTimeRange[0] : null,
-                end: this.searchForm.creationTimeRange ? this.searchForm.creationTimeRange[1] : null,
-                current,
-                size
+                current: this.pagination.current,
+                size: this.pagination.size
             };
+            // 清理搜索表单中的空值
+            for (const key in this.searchForm) {
+                if (this.searchForm[key] !== '' && this.searchForm[key] !== null && this.searchForm[key].length !== 0) {
+                    params[key] = this.searchForm[key];
+                }
+            }
+
+            if (params.creationTimeRange && params.creationTimeRange.length === 2) {
+                params.begin = params.creationTimeRange[0];
+                params.end = params.creationTimeRange[1];
+            }
+            delete params.creationTimeRange;
             try {
                 const { data } = await userApis.getUserList(params);
                 this.userList = data.records;
