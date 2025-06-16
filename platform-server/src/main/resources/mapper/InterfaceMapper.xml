@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lmj.platformserver.mapper.InterfaceMapper">
+
+    <select id="getInterfaceList" resultType="com.lmj.platformserver.vo.InterfaceVo">
+        select i.id,
+               i.name,
+               i.method,
+               i.path,
+               i.description,
+               i.created_time,
+               (select nickname from users where id = i.create_user) as create_user,
+               (select nickname from users where id = i.update_user) as update_user,
+               i.updated_time
+        from interfaces i
+        <where>
+            <if test="interfacePageQueryDTO.userId != null">
+                and create_user = #{interfacePageQueryDTO.userId}
+            </if>
+            <if test="interfacePageQueryDTO.name != null and interfacePageQueryDTO.name != ''">
+                and name like concat('%', #{interfacePageQueryDTO.name}, '%')
+            </if>
+            <if test="interfacePageQueryDTO.method != null and interfacePageQueryDTO.method != ''">
+                and method = #{interfacePageQueryDTO.method}
+            </if>
+            <if test="interfacePageQueryDTO.path != null and interfacePageQueryDTO.path != ''">
+                and path like concat('%', #{interfacePageQueryDTO.path}, '%')
+            </if>
+            <if test="interfacePageQueryDTO.description != null and interfacePageQueryDTO.description != ''">
+                and description like concat('%', #{interfacePageQueryDTO.description}, '%')
+            </if>
+            <if test="interfacePageQueryDTO.begin != null">
+                and created_time &gt;= #{interfacePageQueryDTO.begin}
+            </if>
+            <if test="interfacePageQueryDTO.end != null">
+                and created_time &lt;= #{interfacePageQueryDTO.end}
+            </if>
+        </where>
+    </select>
+</mapper>
