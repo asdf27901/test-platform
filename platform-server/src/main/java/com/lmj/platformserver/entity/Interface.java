@@ -15,9 +15,6 @@ public class Interface extends BaseEntity{
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @TableField("user_id")
-    private Long userId;
-
     private String name;
 
     private String method;

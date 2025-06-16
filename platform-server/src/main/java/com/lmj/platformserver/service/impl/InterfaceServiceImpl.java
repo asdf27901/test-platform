@@ -1,7 +1,6 @@
 package com.lmj.platformserver.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.lmj.platformserver.context.UserContextHolder;
 import com.lmj.platformserver.dto.SaveInterfacesDTO;
 import com.lmj.platformserver.entity.Interface;
 import com.lmj.platformserver.exception.InterfaceErrorException;
@@ -37,7 +36,6 @@ public class InterfaceServiceImpl implements InterfaceService {
         if (duplicateInterfaceList != null && !duplicateInterfaceList.isEmpty()) {
             throw new InterfaceErrorException(ResultCodeEnum.DUPLICATE_INTERFACE_NAME, duplicateInterfaceList);
         }
-        interfaces.forEach(i -> i.setUserId(UserContextHolder.getUserId()));
         interfaceMapper.insert(interfaces);
     }
 }
