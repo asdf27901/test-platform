@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.lmj.platformserver.dto.ChangeUserActiveDTO;
 import com.lmj.platformserver.dto.UserDTO;
 import com.lmj.platformserver.dto.UserPageQueryDTO;
+import com.lmj.platformserver.entity.User;
 import com.lmj.platformserver.groups.Add;
 import com.lmj.platformserver.groups.Update;
 import com.lmj.platformserver.result.Response;
@@ -13,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @Validated
@@ -56,5 +59,12 @@ public class UserController {
         log.info("修改用户状态: {}", changeUserActiveDTO);
         userService.changeUserActive(changeUserActiveDTO);
         return Response.success();
+    }
+
+    @GetMapping("/getActiveUserList")
+    public Response<List<User>> getActiveUserList() {
+        log.info("获取所有有效状态的用户");
+        List<User> users = userService.getActiveUserList();
+        return Response.success(users);
     }
 }
