@@ -54,7 +54,7 @@ CREATE TABLE Interfaces
     update_user  int                  not null comment '更新用户ID',
     updated_time TIMESTAMP            NOT NULL COMMENT '更新时间',
 
-    UNIQUE (name, is_deleted, create_user) COMMENT '唯一约束：同一个用户下的接口名称建议唯一 (逻辑删除除外)'
+    UNIQUE (name, is_deleted) COMMENT '唯一约束：接口名唯一(逻辑删除除外)'
 );
 
 CREATE INDEX idx_interfaces_user_id_is_deleted ON Interfaces (create_user, is_deleted);
