@@ -15,6 +15,7 @@
                i.updated_time
         from interfaces i
         <where>
+            i.is_deleted = 0
             <if test="interfacePageQueryDTO.userId != null">
                 and create_user = #{interfacePageQueryDTO.userId}
             </if>
@@ -37,5 +38,6 @@
                 and created_time &lt;= #{interfacePageQueryDTO.end}
             </if>
         </where>
+        order by i.id asc
     </select>
 </mapper>
