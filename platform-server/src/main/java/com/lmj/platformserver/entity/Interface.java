@@ -3,6 +3,8 @@ package com.lmj.platformserver.entity;
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -15,10 +17,14 @@ public class Interface extends BaseEntity{
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @NotBlank(message = "接口名称不能为空")
     private String name;
 
+    @NotBlank(message = "请求方法不能为空")
+    @Pattern(regexp = "(?i)GET|POST|PUT|DELETE|PATCH", message = "请求方法错误")
     private String method;
 
+    @NotBlank(message = "请求路径不能为空")
     private String path;
 
     private String description;
