@@ -48,4 +48,9 @@ public class InterfaceServiceImpl implements InterfaceService {
         IPage<InterfaceVo> voIPage = new Page<>(interfacePageQueryDTO.getCurrent(), interfacePageQueryDTO.getSize());
         return interfaceMapper.getInterfaceList(voIPage, interfacePageQueryDTO);
     }
+
+    @Override
+    public void deleteBatch(List<Long> ids) {
+        interfaceMapper.deleteByIds(ids);
+    }
 }

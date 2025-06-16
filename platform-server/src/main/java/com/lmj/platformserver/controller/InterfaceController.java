@@ -1,6 +1,7 @@
 package com.lmj.platformserver.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.lmj.platformserver.dto.DeleteInterfaceDTO;
 import com.lmj.platformserver.dto.InterfacePageQueryDTO;
 import com.lmj.platformserver.dto.SaveInterfacesDTO;
 import com.lmj.platformserver.groups.Add;
@@ -33,5 +34,12 @@ public class InterfaceController {
         log.info("获取接口列表");
         IPage<InterfaceVo> interfaceVoIPage = interfaceService.getInterfaceList(interfacePageQueryDTO);
         return Response.success(interfaceVoIPage);
+    }
+
+    @PostMapping("/deleteBatch")
+    public Response<?> deleteBatch(@RequestBody DeleteInterfaceDTO dto) {
+        log.info("批量删除接口");
+        interfaceService.deleteBatch(dto.getIds());
+        return Response.success();
     }
 }
