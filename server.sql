@@ -43,7 +43,6 @@ CREATE INDEX idx_environments_user_id_is_deleted ON Environments (user_id, is_de
 CREATE TABLE Interfaces
 (
     id INT AUTO_INCREMENT PRIMARY KEY COMMENT '接口ID',
-    user_id      INT                  NOT NULL COMMENT '所属用户ID',
     name         VARCHAR(100)         NOT NULL COMMENT '接口名称',
     method       VARCHAR(10)          NOT NULL COMMENT 'HTTP请求方法',
     path         VARCHAR(255)         NOT NULL COMMENT '接口路径',
@@ -55,10 +54,10 @@ CREATE TABLE Interfaces
     update_user  int                  not null comment '更新用户ID',
     updated_time TIMESTAMP            NOT NULL COMMENT '更新时间',
 
-    UNIQUE (user_id, name, is_deleted) COMMENT '唯一约束：同一个用户下的接口名称建议唯一 (逻辑删除除外)'
+    UNIQUE (name, is_deleted, create_user) COMMENT '唯一约束：同一个用户下的接口名称建议唯一 (逻辑删除除外)'
 );
 
-CREATE INDEX idx_interfaces_user_id_is_deleted ON Interfaces (user_id, is_deleted);
+CREATE INDEX idx_interfaces_user_id_is_deleted ON Interfaces (create_user, is_deleted);
 
 CREATE TABLE TestCases
 (
