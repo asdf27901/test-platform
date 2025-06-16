@@ -1,12 +1,16 @@
 package com.lmj.platformserver.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.lmj.platformserver.dto.InterfacePageQueryDTO;
 import com.lmj.platformserver.dto.SaveInterfacesDTO;
 import com.lmj.platformserver.entity.Interface;
 import com.lmj.platformserver.exception.InterfaceErrorException;
 import com.lmj.platformserver.mapper.InterfaceMapper;
 import com.lmj.platformserver.result.ResultCodeEnum;
 import com.lmj.platformserver.service.InterfaceService;
+import com.lmj.platformserver.vo.InterfaceVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -37,5 +41,11 @@ public class InterfaceServiceImpl implements InterfaceService {
             throw new InterfaceErrorException(ResultCodeEnum.DUPLICATE_INTERFACE_NAME, duplicateInterfaceList);
         }
         interfaceMapper.insert(interfaces);
+    }
+
+    @Override
+    public IPage<InterfaceVo> getInterfaceList(InterfacePageQueryDTO interfacePageQueryDTO) {
+        IPage<InterfaceVo> voIPage = new Page<>(interfacePageQueryDTO.getCurrent(), interfacePageQueryDTO.getSize());
+        return interfaceMapper.getInterfaceList(voIPage, interfacePageQueryDTO);
     }
 }
