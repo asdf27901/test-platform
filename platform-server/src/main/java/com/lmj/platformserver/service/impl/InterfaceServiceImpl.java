@@ -53,4 +53,23 @@ public class InterfaceServiceImpl implements InterfaceService {
     public void deleteBatch(List<Long> ids) {
         interfaceMapper.deleteByIds(ids);
     }
+
+    @Override
+    public void updateInterface(Interface i) {
+        Long id = i.getId();
+        Interface ii = interfaceMapper.selectById(id);
+        if (ii == null) {
+            throw new InterfaceErrorException(ResultCodeEnum.INTERFACE_ID_NOT_FOUND);
+        }
+        if (!i.getName().equals(ii.getName())) {
+            Interface one = interfaceMapper.selectOne(
+                    new LambdaQueryWrapper<Interface>()
+                            .eq(Interface::getName, i.getName())
+            );
+            if (one != null) {
+                throw new InterfaceErrorException(ResultCodeEnum.DUPLICATE_INTERFACE_NAME);
+            }
+        }
+        interfaceMapper.updateById(i);
+    }
 }

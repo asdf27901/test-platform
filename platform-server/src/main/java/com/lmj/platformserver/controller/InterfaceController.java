@@ -4,7 +4,9 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.lmj.platformserver.dto.DeleteInterfaceDTO;
 import com.lmj.platformserver.dto.InterfacePageQueryDTO;
 import com.lmj.platformserver.dto.SaveInterfacesDTO;
+import com.lmj.platformserver.entity.Interface;
 import com.lmj.platformserver.groups.Add;
+import com.lmj.platformserver.groups.Update;
 import com.lmj.platformserver.result.Response;
 import com.lmj.platformserver.service.InterfaceService;
 import com.lmj.platformserver.vo.InterfaceVo;
@@ -40,6 +42,13 @@ public class InterfaceController {
     public Response<?> deleteBatch(@RequestBody DeleteInterfaceDTO dto) {
         log.info("批量删除接口");
         interfaceService.deleteBatch(dto.getIds());
+        return Response.success();
+    }
+
+    @PostMapping("/update")
+    public Response<?> updateInterface(@RequestBody @Validated(Update.class) Interface i) {
+        log.info("更新接口: {}", i);
+        interfaceService.updateInterface(i);
         return Response.success();
     }
 }
