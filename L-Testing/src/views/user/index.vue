@@ -8,7 +8,7 @@
                     <el-input v-model="searchForm.username" placeholder="请输入用户名" clearable @keyup.enter.native="handleQuery"></el-input>
                 </el-form-item>
                 <el-form-item label="用户昵称">
-                    <el-input v-model="searchForm.nickname" placeholder="请输入用户昵称" clearable @keyup.enter.native="handleQuery"></el-input>
+                    <el-input v-model="searchForm.nickName" placeholder="请输入用户昵称" clearable @keyup.enter.native="handleQuery"></el-input>
                 </el-form-item>
                 <el-form-item label="创建时间">
                     <el-date-picker
