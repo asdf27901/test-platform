@@ -3,6 +3,7 @@ package com.lmj.platformserver.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.lmj.platformserver.dto.InterfacePageQueryDTO;
 import com.lmj.platformserver.dto.SaveInterfacesDTO;
+import com.lmj.platformserver.groups.Add;
 import com.lmj.platformserver.result.Response;
 import com.lmj.platformserver.service.InterfaceService;
 import com.lmj.platformserver.vo.InterfaceVo;
@@ -21,7 +22,7 @@ public class InterfaceController {
     private InterfaceService interfaceService;
 
     @PostMapping("/saveInterfaces")
-    public Response<?> saveInterfaces(@RequestBody @Validated SaveInterfacesDTO saveInterfacesDTO) {
+    public Response<?> saveInterfaces(@RequestBody @Validated(Add.class) SaveInterfacesDTO saveInterfacesDTO) {
         log.info("批量添加接口: {}", saveInterfacesDTO);
         interfaceService.saveInterfaces(saveInterfacesDTO);
         return Response.success();

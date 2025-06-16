@@ -1,6 +1,8 @@
 package com.lmj.platformserver.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.lmj.platformserver.groups.Update;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.io.Serial;
@@ -13,6 +15,7 @@ public class BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
+    @NotNull(groups = Update.class, message = "ID不能为空")
     private Long id;
 
     @TableField(value = "created_time", fill = FieldFill.INSERT)
