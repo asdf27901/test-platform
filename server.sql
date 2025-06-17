@@ -52,9 +52,7 @@ CREATE TABLE Interfaces
     created_time TIMESTAMP            NOT NULL COMMENT '创建时间',
     create_user  int                  not null comment '创建用户ID',
     update_user  int                  not null comment '更新用户ID',
-    updated_time TIMESTAMP            NOT NULL COMMENT '更新时间',
-
-    UNIQUE (name, is_deleted) COMMENT '唯一约束：接口名唯一(逻辑删除除外)'
+    updated_time TIMESTAMP            NOT NULL COMMENT '更新时间'
 );
 
 CREATE INDEX idx_interfaces_user_id_is_deleted ON Interfaces (create_user, is_deleted);
