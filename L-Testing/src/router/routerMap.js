@@ -32,6 +32,37 @@ export const routerMap = [
                     isAffix: false,
                     isIframe: false,
                 }
+            },
+            {
+                path: "/interfaces-test",
+                name: "interfaces-test",
+                component: () => import('@/layout/routerView/parent.vue'),
+                redirect: "/interfaces-test/interfaces",
+                meta: {
+                    title: "message.router.interfacesTest",
+                    isLink: "",
+                    isHide: false,
+                    isKeepAlive: true,
+                    isAffix: false,
+                    isIframe: false,
+                    icon: "iconfont icon-caidan"
+                },
+                children: [
+                    {
+                        path: "/interfaces-test/interfaces",
+                        name: "InterfaceList",
+                        component: () => import('@/views/interface-test/interfaces.vue'),
+                        meta: {
+                            title: "message.router.interfaces",
+                            isLink: "",
+                            isHide: false,
+                            isKeepAlive: true,
+                            isAffix: false,
+                            isIframe: false,
+                            icon: "fa fa-usb"
+                        }
+                    }
+                ]
             }
         ]
     },

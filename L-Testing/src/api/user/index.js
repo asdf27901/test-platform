@@ -34,5 +34,11 @@ export const userApis = {
             method: 'post',
             data: params
         })
+    },
+    getActiveUserList: () => {
+        return request({
+            url: '/user/getActiveUserList',
+            method: 'get'
+        })
     }
 }
