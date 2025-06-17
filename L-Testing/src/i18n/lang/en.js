@@ -4,7 +4,9 @@ export default {
 		dataBoard: 'dataBoard',
 		signIn: 'signIn',
 		notFound: 'notFound',
-		user: 'userManagement'
+		user: 'userManagement',
+		interfacesTest: 'interfacesTest',
+		interfaces: 'interfacesManagement'
 	},
 	user: {
 		title0: 'Component size',

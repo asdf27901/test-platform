@@ -4,7 +4,9 @@ export default {
 		dataBoard: '数据看板',
 		signIn: '登录',
 		notFound: '找不到此页面',
-		user: '用户管理'
+		user: '用户管理',
+		interfacesTest: '接口测试',
+		interfaces: '接口管理'
 	},
 	user: {
 		title0: '组件大小',
