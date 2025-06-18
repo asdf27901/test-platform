@@ -61,11 +61,8 @@ CREATE TABLE TestCases
 (
     id                           INT AUTO_INCREMENT PRIMARY KEY COMMENT '测试用例ID',
     interface_id                      INT                  NOT NULL COMMENT '关联的接口ID',
-    user_id                           INT                  NOT NULL COMMENT '创建该用例的用户ID',
     name                              VARCHAR(150)         NOT NULL COMMENT '测试用例名称',
-    description                       TEXT COMMENT '测试用例描述',
     priority                          INT        DEFAULT 0 COMMENT '用例优先级，0-高, 1-中, 2-低，数值越小优先级越高',
-    tags                              VARCHAR(150) COMMENT '用例标签)',
     request_path_params               JSON COMMENT '请求路径参数',
     request_query_params              JSON COMMENT '请求查询参数',
     request_headers                   JSON COMMENT '特定于此用例的请求头',
@@ -77,11 +74,11 @@ CREATE TABLE TestCases
     post_request_script               TEXT COMMENT '请求后置脚本/断言脚本',
     is_deleted                        TINYINT(1) DEFAULT 0 NOT NULL COMMENT '逻辑删除标志，0表示未删除，1表示已删除',
     version                           INT        DEFAULT 0 NOT NULL COMMENT '乐观锁版本号',
+    create_user                       int                  not null comment '创建用户ID',
     created_time                      TIMESTAMP            NOT NULL COMMENT '创建时间',
-    updated_time                      TIMESTAMP            NOT NULL COMMENT '更新时间',
-
-    UNIQUE (interface_id, name, is_deleted) COMMENT '唯一约束：同一个接口下的测试用例名称建议唯一 (逻辑删除除外)'
+    update_user                       int                  not null comment '更新用户ID',
+    updated_time                      TIMESTAMP            NOT NULL COMMENT '更新时间'
 );
 
 CREATE INDEX idx_testcases_interface_id_is_deleted ON TestCases (interface_id, is_deleted); -- 方便查询某个接口下未删除的用例
-CREATE INDEX idx_testcases_user_id_is_deleted ON TestCases (user_id, is_deleted); -- 方便查询某个用户创建的未删除用例
+CREATE INDEX idx_testcases_user_id_is_deleted ON TestCases (create_user, is_deleted); -- 方便查询某个用户创建的未删除用例
