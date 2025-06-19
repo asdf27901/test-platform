@@ -327,10 +327,17 @@ export default {
         },
 
         // 编辑接口
-        handleEdit(row) {
-            // 使用深拷贝或浅拷贝，防止弹窗中的修改直接影响表格行数据
-            this.currentEditingInterface = { ...row };
-            this.editDialogVisible = true;
+        async handleEdit(row) {
+            try {
+                const { data } = await interfaceApis.getInterfaceDetail(row.id)
+                this.currentEditingInterface = data
+                this.editDialogVisible = true;
+            }catch (e) {
+                if (e.code) {
+                    Message.error(e.message)
+                }
+            }
+
         },
 
         // 删除接口
