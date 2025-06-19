@@ -31,7 +31,7 @@
                                     :label="item.label"
                                     :value="item.value"
                                 >
-                                    <el-tag :type="getMethodTagType(item.value)" effect="dark">{{ item.label }}</el-tag>
+                                    <el-tag :type="getMethodTagType(item.value)" effect="light">{{ item.label }}</el-tag>
                                 </el-option>
                             </el-select>
                         </el-form-item>
@@ -104,7 +104,7 @@
                 <el-table-column prop="name" label="接口名称" width="200" show-overflow-tooltip align="center"></el-table-column>
                 <el-table-column prop="method" label="请求方法" width="120" align="center">
                     <template #default="{row}">
-                        <el-tag :type="getMethodTagType(row.method)" effect="dark">{{ row.method }}</el-tag>
+                        <el-tag :type="getMethodTagType(row.method)" effect="light">{{ row.method }}</el-tag>
                     </template>
                 </el-table-column>
                 <el-table-column prop="path" label="接口路径" width="250" show-overflow-tooltip align="center"></el-table-column>
@@ -116,11 +116,11 @@
 
                 <el-table-column label="操作" width="290" fixed="right" align="center">
                     <template #default="{row}">
-                        <el-button size="mini" type="primary" icon="el-icon-edit" @click="handleEdit(row)">编辑
+                        <el-button size="small" type="text" icon="el-icon-edit" @click="handleEdit(row)">编辑
                         </el-button>
-                        <el-button size="mini" type="danger" icon="el-icon-delete" @click="handleDelete(row)">删除
+                        <el-button size="small" type="text" icon="el-icon-delete" style="color: #F56C6C;" @click="handleDelete(row)">删除
                         </el-button>
-                        <el-button size="mini" type="success" icon="el-icon-document-add"
+                        <el-button size="small" type="text" icon="el-icon-document-add" style="color: #5ec35f;"
                                    @click="handleGenerateCase(row)">生成用例
                         </el-button>
                     </template>
@@ -212,12 +212,12 @@ export default {
             currentEditingInterface: {},
         };
     },
-    async created() {
+    created() {
         // [修改] 初始化 debounced handler
         this.debouncedResizeHandler = debounce(this.resizeTableHeight, 100);
 
-        await this.fetchActiveUser();
-        await this.fetchData();
+        this.fetchActiveUser();
+        this.fetchData();
     },
     // [修改] 新增 mounted 和 beforeDestroy 生命周期钩子
     mounted() {
@@ -285,7 +285,6 @@ export default {
                     Message.error(error.message)
                 }
             }
-
         },
 
         // 搜索
