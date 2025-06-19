@@ -21,8 +21,8 @@ export default {
 	created() {
 		// 页面加载前，处理缓存，页面刷新时路由缓存处理
 		this.keepAliveNameList = this.getKeepAliveNames();
-		this.bus.$on('onTagsViewRefreshRouterView', (path) => {
-			if (this.$route.path !== path) return false;
+		this.bus.$on('onTagsViewRefreshRouterView', () => {
+			// if (this.$route.path !== path) return false;
 			this.keepAliveNameList = this.getKeepAliveNames().filter((name) => this.$route.name !== name);
 			this.refreshRouterViewKey = this.$route.path;
 			this.$nextTick(() => {
