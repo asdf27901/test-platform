@@ -33,5 +33,20 @@ export const interfaceApis = {
             method: 'post',
             data: params
         })
+    },
+    getActiveInterfaceList: () => {
+        return request({
+            url: '/interface/getActiveInterfaceList',
+            method: 'get'
+        })
+    },
+    getInterfaceDetail: (id) => {
+        return request({
+            url: '/interface/detail',
+            method: 'get',
+            params: {
+                id
+            }
+        })
     }
 }
