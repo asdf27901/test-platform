@@ -72,4 +72,18 @@ public class InterfaceServiceImpl implements InterfaceService {
         }
         interfaceMapper.updateById(i);
     }
+
+    @Override
+    public List<Interface> getActiveInterfaceList() {
+        return interfaceMapper.selectList(null);
+    }
+
+    @Override
+    public Interface getInterfaceDetail(Long id) {
+        Interface i = interfaceMapper.selectById(id);
+        if (i == null) {
+            throw new InterfaceErrorException(ResultCodeEnum.INTERFACE_ID_NOT_FOUND);
+        }
+        return i;
+    }
 }

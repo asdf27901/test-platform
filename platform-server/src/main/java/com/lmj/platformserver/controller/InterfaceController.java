@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @Slf4j
 @Validated
@@ -50,5 +52,19 @@ public class InterfaceController {
         log.info("更新接口: {}", i);
         interfaceService.updateInterface(i);
         return Response.success();
+    }
+
+    @GetMapping("/getActiveInterfaceList")
+    public Response<List<Interface>> getActiveInterfaceList() {
+        log.info("获取所有可用接口");
+        List<Interface> interfaces = interfaceService.getActiveInterfaceList();
+        return Response.success(interfaces);
+    }
+
+    @GetMapping("/detail")
+    public Response<Interface> getInterfaceDetail(Long id) {
+        log.info("获取接口详情: {}", id);
+        Interface i = interfaceService.getInterfaceDetail(id);
+        return Response.success(i);
     }
 }
