@@ -16,4 +16,8 @@ public interface InterfaceService {
     void deleteBatch(List<Long> ids);
 
     void updateInterface(Interface i);
+
+    List<Interface> getActiveInterfaceList();
+
+    Interface getInterfaceDetail(Long id);
 }
