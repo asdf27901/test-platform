@@ -247,7 +247,7 @@ export default {
 		},
 		// 当前项右键菜单点击
 		onCurrentContextmenuClick(data) {
-			let { id, path } = data;
+			let { id, path, redirect } = data;
 			let currentTag = this.tagsViewList.find((v) => v.path === path);
 			switch (id) {
 				case 0:
@@ -255,7 +255,7 @@ export default {
 					this.$router.push({ path, query: currentTag.query });
 					break;
 				case 1:
-					this.closeCurrentTagsView(path);
+					this.closeCurrentTagsView(path, redirect);
 					break;
 				case 2:
 					this.$router.push({ path, query: currentTag.query });
@@ -271,11 +271,15 @@ export default {
 			this.bus.$emit('onTagsViewRefreshRouterView', path);
 		},
 		// 2、关闭当前 tagsView：当前项 `tags-view` icon 关闭时点击，如果是设置了固定的（isAffix），不可以关闭
-		closeCurrentTagsView(path) {
+		closeCurrentTagsView(path, redirect) {
 			this.tagsViewList.map((v, k, arr) => {
 				if (!v.meta.isAffix) {
 					if (v.path === path) {
 						this.tagsViewList.splice(k, 1);
+						if (redirect) {
+							this.$router.push(redirect)
+							return
+						}
 						setTimeout(() => {
 							// 最后一个
 							if (this.tagsViewList.length === k) this.$router.push({ path: arr[arr.length - 1].path, query: arr[arr.length - 1].query });
