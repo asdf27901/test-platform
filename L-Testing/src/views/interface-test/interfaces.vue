@@ -429,6 +429,7 @@ export default {
         },
 
         async afterDeleteRefresh() {
+            this.$refs.table.clearSelection()
             await this.fetchData();
 
             const lastPage = Math.max(1, Math.ceil(this.pagination.total / this.pagination.size));
