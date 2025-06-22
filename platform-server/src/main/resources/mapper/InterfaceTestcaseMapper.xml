@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lmj.platformserver.mapper.InterfaceTestcaseMapper">
+
+    <select id="getInterfaceTestcaseList" resultType="com.lmj.platformserver.vo.InterfaceTestcaseVo">
+        select its.id,
+               its.interface_id,
+               its.name,
+               its.priority,
+               its.request_method as method,
+                (select nickname from users where id = its.create_user) as create_user_name,
+               its.created_time,
+                (select nickname from users where id = its.update_user) as update_user_name,
+               its.updated_time,
+               i.path
+        from interface_testcases its
+                 left join interfaces i on its.interface_id = i.id
+        <where>
+            its.is_deleted = 0
+            <if test="dto.id != null">
+                and its.id = #{dto.id}
+            </if>
+            <if test="dto.path != null and dto.path != ''">
+                and i.path like concat('%', #{dto.path}, '%')
+            </if>
+            <if test="dto.method != null and dto.method != ''">
+                and upper(its.request_method) = upper(#{dto.method})
+            </if>
+            <if test="dto.name != null and dto.name != ''">
+                and its.name like concat('%', #{dto.name}, '%')
+            </if>
+            <if test="dto.interfaceId != null">
+                and its.interface_id = #{dto.interfaceId}
+            </if>
+            <if test="dto.userId != null">
+                and its.create_user = #{dto.userId}
+            </if>
+            <if test="dto.priority != null">
+                and its.priority = #{dto.priority}
+            </if>
+            <if test="dto.begin != null">
+                and its.created_time &gt;= #{dto.begin}
+            </if>
+            <if test="dto.end != null">
+                and its.created_time &lt;= #{dto.end}
+            </if>
+        </where>
+        order by its.interface_id, its.id
+    </select>
+
+</mapper>
