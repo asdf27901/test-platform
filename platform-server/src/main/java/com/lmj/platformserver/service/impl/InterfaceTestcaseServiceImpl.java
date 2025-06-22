@@ -1,6 +1,9 @@
 package com.lmj.platformserver.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.lmj.platformserver.dto.InterfaceTestcaseListQueryDTO;
 import com.lmj.platformserver.entity.BaseEntity;
 import com.lmj.platformserver.entity.Interface;
 import com.lmj.platformserver.entity.InterfaceTestcase;
@@ -9,6 +12,7 @@ import com.lmj.platformserver.mapper.InterfaceMapper;
 import com.lmj.platformserver.mapper.InterfaceTestcaseMapper;
 import com.lmj.platformserver.result.ResultCodeEnum;
 import com.lmj.platformserver.service.InterfaceTestcaseService;
+import com.lmj.platformserver.vo.InterfaceTestcaseVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -37,5 +41,11 @@ public class InterfaceTestcaseServiceImpl implements InterfaceTestcaseService {
         }
 
         interfaceTestcaseMapper.insert(interfaceTestcases);
+    }
+
+    @Override
+    public IPage<InterfaceTestcaseVo> getInterfaceTestcaseList(InterfaceTestcaseListQueryDTO interfaceTestcaseListQueryDTO) {
+        Page<InterfaceTestcaseVo> page = new Page<>(interfaceTestcaseListQueryDTO.getCurrent(), interfaceTestcaseListQueryDTO.getSize());
+        return interfaceTestcaseMapper.getInterfaceTestcaseList(page, interfaceTestcaseListQueryDTO);
     }
 }
