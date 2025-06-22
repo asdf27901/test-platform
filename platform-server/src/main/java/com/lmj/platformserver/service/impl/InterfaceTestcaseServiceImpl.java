@@ -48,4 +48,9 @@ public class InterfaceTestcaseServiceImpl implements InterfaceTestcaseService {
         Page<InterfaceTestcaseVo> page = new Page<>(interfaceTestcaseListQueryDTO.getCurrent(), interfaceTestcaseListQueryDTO.getSize());
         return interfaceTestcaseMapper.getInterfaceTestcaseList(page, interfaceTestcaseListQueryDTO);
     }
+
+    @Override
+    public void deleteInterfaceTestcaseBatch(List<Long> ids) {
+        interfaceTestcaseMapper.deleteByIds(ids);
+    }
 }

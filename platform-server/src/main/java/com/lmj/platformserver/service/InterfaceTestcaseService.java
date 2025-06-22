@@ -11,4 +11,6 @@ public interface InterfaceTestcaseService {
     void save(List<InterfaceTestcase> interfaceTestcases);
 
     IPage<InterfaceTestcaseVo> getInterfaceTestcaseList(InterfaceTestcaseListQueryDTO interfaceTestcaseListQueryDTO);
+
+    void deleteInterfaceTestcaseBatch(List<Long> ids);
 }

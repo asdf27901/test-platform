@@ -1,6 +1,7 @@
 package com.lmj.platformserver.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.lmj.platformserver.dto.DeleteInterfaceTestcaseDTO;
 import com.lmj.platformserver.dto.InterfaceTestcaseDTO;
 import com.lmj.platformserver.dto.InterfaceTestcaseListQueryDTO;
 import com.lmj.platformserver.groups.Add;
@@ -33,5 +34,12 @@ public class InterfaceTestcaseController {
         log.info("获取接口用例列表");
         IPage<InterfaceTestcaseVo> voIPage = interfaceTestcaseService.getInterfaceTestcaseList(interfaceTestcaseListQueryDTO);
         return Response.success(voIPage);
+    }
+
+    @PostMapping("/delete")
+    public Response<?> deleteInterfaceTestcase(@RequestBody DeleteInterfaceTestcaseDTO dto) {
+        log.info("删除接口用例");
+        interfaceTestcaseService.deleteInterfaceTestcaseBatch(dto.getIds());
+        return Response.success();
     }
 }
