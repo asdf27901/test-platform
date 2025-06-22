@@ -15,7 +15,7 @@
                its.updated_time,
                i.path
         from interface_testcases its
-                 left join interfaces i on its.interface_id = i.id
+                    join interfaces i on its.interface_id = i.id and i.is_deleted = 0
         <where>
             its.is_deleted = 0
             <if test="dto.id != null">
