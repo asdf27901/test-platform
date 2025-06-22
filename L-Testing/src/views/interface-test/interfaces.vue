@@ -97,9 +97,9 @@
                 cell-class-name="table-cell-center"
                 :row-key="getRowKey"
                 :height="tableHeight"
-                reserve-selection
+                ref="table"
             >
-                <el-table-column type="selection" width="55" align="center"></el-table-column>
+                <el-table-column type="selection" width="55" align="center" reserve-selection></el-table-column>
                 <el-table-column prop="id" label="接口ID" width="80" align="center"></el-table-column>
                 <el-table-column prop="name" label="接口名称" width="200" show-overflow-tooltip align="center"></el-table-column>
                 <el-table-column prop="method" label="请求方法" width="120" align="center">
@@ -295,6 +295,7 @@ export default {
 
         // 重置搜索表单
         handleReset() {
+            this.$refs.table.clearSelection()
             // this.$refs.searchForm.resetFields(); // el-row/el-col 嵌套下 resetFields 可能失效
             // 手动重置更可靠
             this.searchForm = {
@@ -385,7 +386,10 @@ export default {
 
         // 生成测试用例
         handleGenerateCase(row) {
-            this.$message.success(`开始为接口 "${row.name}" 生成测试用例`);
+            this.$router.push({
+                name: 'AddTestCase',
+                query: { interfaceId: row.id } // 通过 query 参数传递ID
+            });
         },
 
         // 根据请求方法返回不同的Tag类型
