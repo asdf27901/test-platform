@@ -8,7 +8,7 @@ import com.lmj.platformserver.vo.InterfaceTestcaseVo;
 import java.util.List;
 
 public interface InterfaceTestcaseService {
-    void save(List<InterfaceTestcase> interfaceTestcases);
+    void save(List<InterfaceTestcase> interfaceTestcases, Long interfaceId);
 
     IPage<InterfaceTestcaseVo> getInterfaceTestcaseList(InterfaceTestcaseListQueryDTO interfaceTestcaseListQueryDTO);
 

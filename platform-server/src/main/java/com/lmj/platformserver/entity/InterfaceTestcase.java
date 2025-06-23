@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.lmj.platformserver.annotation.validation.MultiFieldAssociationCheck;
-import com.lmj.platformserver.groups.Update;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -21,23 +20,22 @@ import java.util.Map;
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "interface_testcases", autoResultMap = true)
 @MultiFieldAssociationCheck(
-        when = "requestPathVariables != '' && requestPathVariables != null",
-        must = "requestQueryParams.size() == 0 || requestQueryParams == null",
+        when = "pathParam != '' && pathParam != null",
+        must = "queryParams.size() == 0 || queryParams == null",
         message = "路径参数和查询参数只能存在其中一个",
-        errorField = "requestQueryParams"
+        errorField = "queryParams"
 )
 @MultiFieldAssociationCheck(
-        when = "requestQueryParams.size() != 0",
-        must = "requestPathVariables == '' || requestPathVariables == null",
+        when = "queryParams.size() != 0",
+        must = "pathParam == '' || pathParam == null",
         message = "路径参数和查询参数只能存在其中一个",
-        errorField = "requestPathVariables"
+        errorField = "pathParam"
 )
 public class InterfaceTestcase extends BaseEntity{
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @NotNull(message = "关联的接口ID不能为空", groups = Update.class)
     @TableField("interface_id")
     private Long interfaceId;
 
@@ -62,7 +60,7 @@ public class InterfaceTestcase extends BaseEntity{
     @NotBlank(message = "请求方法不能为空")
     @Pattern(regexp = "(?i)GET|POST|PUT|DELETE|PATCH", message = "请求方法错误")
     @TableField("request_method")
-    private String requestMethod;
+    private String method;
 
     @NotBlank(message = "请求体类型不能为空")
     @Pattern(regexp = "(?i)none|form-data|x-www-form-urlencoded|json", message = "请求体类型错误")
@@ -70,13 +68,13 @@ public class InterfaceTestcase extends BaseEntity{
     private String requestBodyType;
 
     @TableField("request_path_variables")
-    private String requestPathVariables;
+    private String pathParam;
 
     @TableField(value = "request_query_params", typeHandler = JacksonTypeHandler.class)
-    private List<Map<String, Object>> requestQueryParams;
+    private List<Map<String, Object>> queryParams;
 
     @TableField(value = "request_headers", typeHandler = JacksonTypeHandler.class)
-    private List<Map<String, Object>> requestHeaders;
+    private List<Map<String, Object>> headers;
 
     @TableField(value = "request_body", typeHandler = JacksonTypeHandler.class)
     private Map<String, Object> requestBody;
