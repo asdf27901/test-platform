@@ -25,7 +25,7 @@ public class InterfaceTestcaseController {
     @PostMapping("/save")
     public Response<?> saveInterfaceTestcase(@RequestBody @Validated(Add.class) InterfaceTestcaseDTO interfaceTestcaseDTO) {
         log.info("添加接口测试用例：{}", interfaceTestcaseDTO);
-        interfaceTestcaseService.save(interfaceTestcaseDTO.getInterfaceTestcases());
+        interfaceTestcaseService.save(interfaceTestcaseDTO.getInterfaceTestcases(), interfaceTestcaseDTO.getInterfaceId());
         return Response.success();
     }
 

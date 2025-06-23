@@ -17,8 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class InterfaceTestcaseServiceImpl implements InterfaceTestcaseService {
@@ -30,17 +28,14 @@ public class InterfaceTestcaseServiceImpl implements InterfaceTestcaseService {
     private InterfaceMapper interfaceMapper;
 
     @Override
-    public void save(List<InterfaceTestcase> interfaceTestcases) {
-        Set<Long> interfaceIds = interfaceTestcases.stream().map(InterfaceTestcase::getInterfaceId).collect(Collectors.toSet());
-        List<Long> ids = interfaceMapper.selectList(
-                new LambdaQueryWrapper<Interface>()
-                        .in(Interface::getId, interfaceIds)
-        ).stream().map(BaseEntity::getId).toList();
-        if (ids.size() != interfaceIds.size()) {
+    public void save(List<InterfaceTestcase> interfaceTestcases, Long interfaceId) {
+        Interface i = interfaceMapper.selectById(interfaceId);
+        if (i == null) {
             throw new InterfaceErrorException(ResultCodeEnum.INTERFACE_ID_NOT_FOUND);
         }
+        interfaceTestcases.forEach(ii -> ii.setInterfaceId(interfaceId));
 
-        interfaceTestcaseMapper.insert(interfaceTestcases);
+        interfaceTestcaseMapper.insertOrUpdate(interfaceTestcases);
     }
 
     @Override
