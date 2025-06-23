@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.lmj.platformserver.dto.DeleteInterfaceTestcaseDTO;
 import com.lmj.platformserver.dto.InterfaceTestcaseDTO;
 import com.lmj.platformserver.dto.InterfaceTestcaseListQueryDTO;
+import com.lmj.platformserver.entity.InterfaceTestcase;
 import com.lmj.platformserver.groups.Add;
 import com.lmj.platformserver.result.Response;
 import com.lmj.platformserver.service.InterfaceTestcaseService;
@@ -42,4 +43,11 @@ public class InterfaceTestcaseController {
         interfaceTestcaseService.deleteInterfaceTestcaseBatch(dto.getIds());
         return Response.success();
     }
-}
+
+    @GetMapping("/detail")
+    public Response<InterfaceTestcase> getInterfaceTestcaseDetail(Long id) {
+        log.info("获取接口测试用例详情: {}", id);
+        InterfaceTestcase interfaceTestcase = interfaceTestcaseService.getInterfaceTestcaseDetail(id);
+        return Response.success(interfaceTestcase);
+    }
+ }

@@ -1,13 +1,12 @@
 package com.lmj.platformserver.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lmj.platformserver.dto.InterfaceTestcaseListQueryDTO;
-import com.lmj.platformserver.entity.BaseEntity;
 import com.lmj.platformserver.entity.Interface;
 import com.lmj.platformserver.entity.InterfaceTestcase;
 import com.lmj.platformserver.exception.InterfaceErrorException;
+import com.lmj.platformserver.exception.InterfaceTestcaseErrorException;
 import com.lmj.platformserver.mapper.InterfaceMapper;
 import com.lmj.platformserver.mapper.InterfaceTestcaseMapper;
 import com.lmj.platformserver.result.ResultCodeEnum;
@@ -47,5 +46,14 @@ public class InterfaceTestcaseServiceImpl implements InterfaceTestcaseService {
     @Override
     public void deleteInterfaceTestcaseBatch(List<Long> ids) {
         interfaceTestcaseMapper.deleteByIds(ids);
+    }
+
+    @Override
+    public InterfaceTestcase getInterfaceTestcaseDetail(Long id) {
+        InterfaceTestcase interfaceTestcase = interfaceTestcaseMapper.selectById(id);
+        if (interfaceTestcase == null) {
+            throw new InterfaceTestcaseErrorException(ResultCodeEnum.INTERFACE_TESTCASE_ID_NOT_FOUND);
+        }
+        return interfaceTestcase;
     }
 }
