@@ -9,9 +9,14 @@ import 'element-ui/lib/theme-chalk/index.css';
 import '@/theme/index.scss';
 import { i18n } from '@/i18n/index.js';
 import { globalComponentSize } from '@/utils/componentSize.js';
+import 'vue-json-pretty/lib/styles.css'
+import VueJsonPretty from 'vue-json-pretty'
+import JsonEditor from 'vue-json-editor'
 
 Vue.use(Particles);
 Vue.use(Element, { i18n: (key, value) => i18n.t(key, value), size: globalComponentSize });
+Vue.component('vue-json-pretty', VueJsonPretty)
+Vue.component('json-editor', JsonEditor)
 
 Vue.config.productionTip = false;
 Vue.prototype.bus = new Vue();

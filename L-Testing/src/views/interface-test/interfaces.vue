@@ -387,7 +387,7 @@ export default {
         // 生成测试用例
         handleGenerateCase(row) {
             this.$router.push({
-                name: 'AddTestCase',
+                name: 'AddInterfaceTestCase',
                 query: { interfaceId: row.id } // 通过 query 参数传递ID
             });
         },

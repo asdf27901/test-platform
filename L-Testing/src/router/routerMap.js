@@ -37,7 +37,7 @@ export const routerMap = [
                 path: "/interfaces-test",
                 name: "interfaces-test",
                 component: () => import('@/layout/routerView/parent.vue'),
-                redirect: "/interfaces-test/interfaces",
+                // redirect: "/interfaces-test/interfaces",
                 meta: {
                     title: "message.router.interfacesTest",
                     isLink: "",
@@ -59,7 +59,57 @@ export const routerMap = [
                             isKeepAlive: true,
                             isAffix: false,
                             isIframe: false,
-                            icon: "fa fa-usb"
+                            icon: "fa fa-plug"
+                        }
+                    },
+                    {
+                        path: "/interfaces-test/testcaseList",
+                        name: "InterfaceTestcaseList",
+                        component: () => import('@/views/interface-test/interfaceTestcaseList.vue'),
+                        meta: {
+                            title: "message.router.interfaceTestcaseList",
+                            isLink: "",
+                            isHide: false,
+                            isKeepAlive: true,
+                            isAffix: false,
+                            isIframe: false,
+                            icon: 'fa fa-hand-peace-o'
+                        },
+                    },
+                    {
+                        path: "/interfaces-test/testcaseList/addTestcase",
+                        name: "AddInterfaceTestCase",
+                        component: () => import('@/views/interface-test/components/interfaceTestcaseEditor.vue'),
+                        props: {
+                           mode: 'add'
+                        },
+                        meta: {
+                            title: "message.router.addInterfaceTestcase",
+                            isLink: "",
+                            isHide: true,
+                            isKeepAlive: false,
+                            isAffix: false,
+                            isIframe: false,
+                            isHideInTagsView: false,
+                            icon: 'fa fa-plus'
+                        }
+                    },
+                    {
+                        path: "/interfaces-test/testcaseList/editTestcase",
+                        name: "EditInterfaceTestCase",
+                        component: () => import('@/views/interface-test/components/interfaceTestcaseEditor.vue'),
+                        props: {
+                            mode: 'edit'
+                        },
+                        meta: {
+                            title: "message.router.editInterfaceTestcase",
+                            isLink: "",
+                            isHide: true,
+                            isKeepAlive: false,
+                            isAffix: false,
+                            isIframe: false,
+                            isHideInTagsView: false,
+                            icon: 'fa fa-plus'
                         }
                     }
                 ]

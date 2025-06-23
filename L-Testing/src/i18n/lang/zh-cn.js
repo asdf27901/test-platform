@@ -6,7 +6,10 @@ export default {
 		notFound: '找不到此页面',
 		user: '用户管理',
 		interfacesTest: '接口测试',
-		interfaces: '接口管理'
+		interfaces: '接口管理',
+		interfaceTestcaseList: '测试用例',
+		addInterfaceTestcase: '添加用例',
+		editInterfaceTestcase: '编辑用例'
 	},
 	user: {
 		title0: '组件大小',
