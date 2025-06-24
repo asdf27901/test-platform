@@ -20,14 +20,14 @@ import java.util.Map;
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "interface_testcases", autoResultMap = true)
 @MultiFieldAssociationCheck(
-        when = "pathParam != '' && pathParam != null",
-        must = "queryParams.size() == 0 || queryParams == null",
+        when = "pathParam != null && !pathParam.equals('')",
+        must = "queryParams == null || queryParams.?[#this['enabled'] == true].size() == 0",
         message = "路径参数和查询参数只能存在其中一个",
         errorField = "queryParams"
 )
 @MultiFieldAssociationCheck(
-        when = "queryParams.size() != 0",
-        must = "pathParam == '' || pathParam == null",
+        when = "queryParams == null || queryParams.?[#this['enabled'] == true].size() > 0",
+        must = "pathParam == null || pathParam.equals('')",
         message = "路径参数和查询参数只能存在其中一个",
         errorField = "pathParam"
 )
