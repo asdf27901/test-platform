@@ -49,8 +49,9 @@ export function prepareDataForSave(testCase) {
         formDataParams: testCase.formDataParams
             .map(p => ({
                 key: p.key.trim(),
-                value: p.type === 'file' ? p.file?.name || '' : p.value, // 对文件类型，只保存文件名
+                value: p.value?.trim() || null,
                 type: p.type,
+                fileUrl: p.type === 'file' ? p?.fileUrl || '' : null,
                 description: p.description,
                 enabled: p.enabled
             })),
