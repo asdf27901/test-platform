@@ -554,11 +554,6 @@ export default {
                     const {data} = await interfaceApis.getInterfaceDetail(interfaceId)
                     this.interfacePath = data.path
 
-                } catch (error) {
-                    if (error.code) {
-                        Message.error(error.message)
-                    }
-                }finally {
                     // 判断加载后的逻辑
                     if (this.testCases.length > 0) {
                         // 如果有已有用例，默认选中第一个
@@ -570,7 +565,14 @@ export default {
                         this.testCases.push(newCase);
                         this.selectTestCase(newCase);
                     }
+
                     this.pageLoading = false;
+
+                } catch (error) {
+                    if (error.code) {
+                        Message.error(error.message)
+                        this.goBack()
+                    }
                 }
             } else if (this.mode === 'edit') {
                 const testcaseId = this.$route.query.testcaseId;
@@ -599,14 +601,15 @@ export default {
                         path: this.interfacePath
                     }
                     delete this.currentTestCase.requestBody
-                } catch (e) {
-                    if (e.code) {
-                        Message.error(e.message)
-                    }
-                } finally {
+
                     this.testCases.push(this.currentTestCase)
                     this.selectTestCase(this.currentTestCase)
                     this.pageLoading = false
+                } catch (e) {
+                    if (e.code) {
+                        Message.error(e.message)
+                        this.goBack()
+                    }
                 }
             }
         },
