@@ -77,7 +77,7 @@
 
             <!-- 右侧主操作区 -->
             <el-col :span="mode === 'add' ? 18 : 24">
-                <el-card class="box-card" shadow="never">
+                <el-card class="box-card" shadow="never"  v-loading="isUploading" element-loading-text="文件上传中...">
                     <!-- 顶部操作区 -->
                     <div class="top-bar">
                         <div class="case-name-edit-wrapper" style="display: flex; align-items: center;">
@@ -309,19 +309,26 @@
                                             <el-input v-if="scope.row.type === 'text'" v-model="scope.row.value" placeholder="Value"></el-input>
                                             <el-upload
                                                 v-else
-                                                :file-list="scope.row.file ? [scope.row.file] : []"
-                                                :auto-upload="false"
-                                                :show-file-list="true"
-                                                :on-remove="file => onRemoveFile(scope.row)"
-                                                :before-upload="file => onBeforeUpload(file, scope.row)"
-                                                :on-change="file => onFileChange(file, scope.row)"
+                                                :show-file-list="false"
+                                                :http-request="(options) => handleFileUpload(options, scope.row, scope.$index)"
+                                                :on-remove="() => onRemoveFile(scope.row)"
+                                                :before-upload="file => onBeforeUpload(file)"
                                                 :multiple="false"
                                                 :limit="1"
-                                                :action="''"
-                                                :http-request="() => {}"
-                                                list-type="text"
+                                                action=""
+                                                :ref="`uploadRef_${scope.$index}`"
                                             >
-                                                <el-button size="small" type="primary">选择文件</el-button>
+                                                <div style="display: flex; align-items: center; width: 100%;">
+                                                    <el-input
+                                                        :value="scope.row.value"
+                                                        placeholder="请选择文件"
+                                                        readonly
+                                                        style="flex-grow: 1;"
+                                                    >
+                                                        <el-button slot="append" icon="el-icon-close" @click.stop.prevent="onRemoveFile(scope.row)" v-if="scope.row.value"></el-button>
+                                                    </el-input>
+                                                    <el-button size="small" type="primary" style="margin-left: 8px;">选择文件</el-button>
+                                                </div>
                                             </el-upload>
                                         </template>
                                     </el-table-column>
@@ -481,6 +488,7 @@ import {Message} from "element-ui";
 import {validateTestCase} from "@/utils/testcaseValidator";
 import Vue from "vue";
 import {interfaceTestcaseApis} from "@/api/interface/interfaceTestcase";
+import {fileApis} from "@/api/file";
 
 export default {
     name: "InterfaceTestcaseEditor",
@@ -498,6 +506,7 @@ export default {
         return {
             // 左侧用例列表数据
             pageLoading: true,
+            isUploading: false,
             interfaceId: this.$route.query.interfaceId,
             testCases: [],
             interfacePath: '',
@@ -783,7 +792,7 @@ export default {
                 key: '',
                 value: '',
                 type: 'text',
-                file: null,
+                fileUrl: '',
                 description: '',
                 enabled: true,
             }
@@ -797,24 +806,41 @@ export default {
             row.enabled = !row.enabled;
         },
         onFormDataTypeChange(row) {
-            if (row.type === 'text') {
-                row.file = null;
-            } else if (row.type === 'file') {
-                row.value = '';
+            row.value = ''
+            row.fileUrl = ''
+        },
+        onBeforeUpload(file) {
+            const isLt10M = file.size / 1024 / 1024 < 10;
+            if (!isLt10M) {
+              this.$message.error('上传文件大小不能超过 10MB!');
+              return false;
+            }
+            return isLt10M;
+        },
+        async handleFileUpload(options, row, index) {
+            this.isUploading = true;
+            try {
+                // 调用后端接口上传文件
+                const { data: ossUrl } = await fileApis.uploadTestcaseFile(options.file);
+                // 上传成功
+                row.value = options.file.name; // 更新UI，显示文件名
+                row.fileUrl = ossUrl; // 存储返回的URL
+                this.$message.success(`文件 '${options.file.name}' 上传成功！`);
+            } catch (error) {
+                this.$message.error(`文件 '${options.file.name}' 上传失败，请重试！`);
+                // 上传失败，清空选择
+                this.onRemoveFile(row);
+            } finally {
+                const uploadComponent = this.$refs[`uploadRef_${index}`]
+                if (uploadComponent) {
+                    uploadComponent.clearFiles()
+                }
+                this.isUploading = false;
             }
         },
-        onBeforeUpload(file, row) {
-            row.file = file;
-            row.value = file.name;
-            return false;
-        },
-        onFileChange(file, row) {
-            row.file = file.raw || file;
-            row.value = row.file.name;
-        },
         onRemoveFile(row) {
-            row.file = null;
             row.value = '';
+            row.fileUrl = ''
         },
 
         // x-www-form-urlencoded
