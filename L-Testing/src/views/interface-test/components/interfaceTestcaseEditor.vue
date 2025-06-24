@@ -480,7 +480,7 @@ import {interfaceApis} from "@/api/interface";
 import {Message} from "element-ui";
 import {validateTestCase} from "@/utils/testcaseValidator";
 import Vue from "vue";
-import {interfaceTestcaseApis} from "@/api/interface/testcase";
+import {interfaceTestcaseApis} from "@/api/interface/interfaceTestcase";
 
 export default {
     name: "InterfaceTestcaseEditor",

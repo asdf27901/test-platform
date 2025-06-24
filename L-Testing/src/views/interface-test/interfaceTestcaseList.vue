@@ -160,7 +160,7 @@ import { debounce } from 'lodash';
 import {userApis} from "@/api/user";
 import {Message} from "element-ui";
 import SelectInterfaceDialog from "@/views/interface-test/components/selectInterfaceDialog.vue";
-import {interfaceTestcaseApis} from "@/api/interface/testcase";
+import {interfaceTestcaseApis} from "@/api/interface/interfaceTestcase";
 
 export default {
     name: 'InterfaceTestcaseList',
