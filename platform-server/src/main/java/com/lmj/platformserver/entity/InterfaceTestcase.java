@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.lmj.platformserver.annotation.validation.MultiFieldAssociationCheck;
+import com.lmj.platformserver.groups.Add;
+import com.lmj.platformserver.groups.Update;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -39,15 +41,16 @@ public class InterfaceTestcase extends BaseEntity{
     @TableField("interface_id")
     private Long interfaceId;
 
-    @NotBlank(message = "接口用例名称不能为空")
+    @NotBlank(message = "接口用例名称不能为空", groups = {Add.class, Update.class})
     @Pattern(
             regexp = "^(?!\\s*未命名用例\\s*$).*$", // 在Java字符串中, \s需要转义成\\s
-            message = "用例名称不能是'未命名用例'"
+            message = "用例名称不能是'未命名用例'",
+            groups = {Add.class, Update.class}
     )
     private String name;
 
-    @Range(max = 2L, message = "优先级错误")
-    @NotNull(message = "优先级不能为空")
+    @Range(max = 2L, message = "优先级错误", groups = {Add.class, Update.class})
+    @NotNull(message = "优先级不能为空", groups = {Add.class, Update.class})
     private Byte priority;
 
     @NotBlank(message = "域名不能为空")
