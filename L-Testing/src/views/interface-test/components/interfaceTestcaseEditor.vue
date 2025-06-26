@@ -1,6 +1,6 @@
 <template>
     <div class="api-test-container">
-        <el-row :gutter="8" v-if="!pageLoading">
+        <el-row :gutter="8" v-show="!pageLoading && !isSendingRequest">
             <!-- 左侧用例列表 -->
             <el-col :span="6" v-if="mode === 'add'">
                 <el-card class="box-card test-cases-card" shadow="never">
@@ -477,9 +477,9 @@
             </el-col>
         </el-row>
 
-        <el-card v-else class="box-card loading-card" shadow="never"
-                 v-loading="true"
-                 element-loading-text="正在加载用例数据..."
+        <el-card v-show="isSendingRequest || pageLoading" class="box-card loading-card" shadow="never"
+                 v-loading="isSendingRequest || pageLoading"
+                 :element-loading-text="mainCardLoadingText"
                  element-loading-spinner="el-icon-loading">
         </el-card>
     </div>
@@ -511,6 +511,7 @@ export default {
             // 左侧用例列表数据
             pageLoading: true,
             isUploading: false,
+            isSendingRequest: false,
             interfaceId: this.$route.query.interfaceId,
             testCases: [],
             interfacePath: '',
@@ -538,7 +539,16 @@ export default {
                 }
                 return prev
             }, 0) || 0
-        }
+        },
+        mainCardLoadingText() {
+            if (this.pageLoading) {
+                return '正在加载用例数据...'
+            }
+            if (this.isSendingRequest) {
+                return '正在发送请求...';
+            }
+            return ''; // 默认无文案
+        },
     },
     created() {
         this.initializePage();
