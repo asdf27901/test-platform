@@ -495,6 +495,9 @@
 </template>
 
 <script>
+import 'vue-json-pretty/lib/styles.css'
+import VueJsonPretty from 'vue-json-pretty'
+import JsonEditor from 'vue-json-editor'
 import {prepareDataForSave} from "@/utils/testcaseRequest";
 import {interfaceApis} from "@/api/interface";
 import {Message} from "element-ui";
@@ -505,6 +508,10 @@ import {fileApis} from "@/api/file";
 
 export default {
     name: "InterfaceTestcaseEditor",
+    components: {
+        VueJsonPretty,
+        JsonEditor
+    },
     props: {
         mode: {
             type: String,
