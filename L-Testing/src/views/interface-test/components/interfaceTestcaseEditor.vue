@@ -711,21 +711,28 @@ export default {
                 this.goBack()
                 return
             }
-            this.isSendingRequest = true
             const requestData = prepareDataForSave(this.currentTestCase)
-            try {
-                const {data} = await interfaceTestcaseApis.sendInterfaceTestcaseRequest({
-                    ...requestData,
-                    interfaceId: this.interfaceId
-                })
-                data.response.body = JSON.parse(data.response.body)
-                this.currentTestCase.response = data.response
-            } catch (e) {
-                if (e.code) {
-                    Message.error(e.message)
+            if (requestData) {
+                this.isSendingRequest = true
+                try {
+                    const {data} = await interfaceTestcaseApis.sendInterfaceTestcaseRequest({
+                        ...requestData,
+                        interfaceId: this.interfaceId
+                    })
+                    data.response.body = JSON.parse(data.response.body)
+                    this.currentTestCase.response = data.response
+                } catch (e) {
+                    if (e.code) {
+                        Message.error(e.message)
+                    }
+                    this.currentTestCase.response = {
+                        body: null,
+                        cookies: [],
+                        headers: {},
+                    }
+                } finally {
+                    this.isSendingRequest = false
                 }
-            } finally {
-                this.isSendingRequest = false
             }
         },
 
