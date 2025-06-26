@@ -718,9 +718,7 @@ export default {
                     Message.error(e.message)
                 }
             } finally {
-                setTimeout(() => {
-                    this.isSendingRequest = false
-                }, 2000)
+                this.isSendingRequest = false
             }
         },
 
