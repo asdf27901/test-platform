@@ -11,11 +11,14 @@ import com.lmj.platformserver.mapper.InterfaceMapper;
 import com.lmj.platformserver.mapper.InterfaceTestcaseMapper;
 import com.lmj.platformserver.result.ResultCodeEnum;
 import com.lmj.platformserver.service.InterfaceTestcaseService;
+import com.lmj.platformserver.utils.HttpUtil;
 import com.lmj.platformserver.vo.InterfaceTestcaseVo;
+import com.lmj.platformserver.vo.RequestResultVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class InterfaceTestcaseServiceImpl implements InterfaceTestcaseService {
@@ -25,6 +28,9 @@ public class InterfaceTestcaseServiceImpl implements InterfaceTestcaseService {
 
     @Autowired
     private InterfaceMapper interfaceMapper;
+
+    @Autowired
+    private HttpUtil httpUtil;
 
     @Override
     public void save(List<InterfaceTestcase> interfaceTestcases, Long interfaceId) {
@@ -55,5 +61,21 @@ public class InterfaceTestcaseServiceImpl implements InterfaceTestcaseService {
             throw new InterfaceTestcaseErrorException(ResultCodeEnum.INTERFACE_TESTCASE_ID_NOT_FOUND);
         }
         return interfaceTestcase;
+    }
+
+    @Override
+    public RequestResultVo sendInterfaceTestcaseRequest(Map<String, Object> requestData) {
+        Long interfaceId = (Long) requestData.get("interfaceId");
+        Interface i = interfaceMapper.selectById(interfaceId);
+        if (i == null) {
+            throw new InterfaceErrorException(ResultCodeEnum.INTERFACE_ID_NOT_FOUND);
+        }
+
+        String path = i.getPath();
+        Map<String, Object> response = httpUtil.sendCustomizeHttpRequest(requestData, path);
+
+        RequestResultVo requestResultVo = new RequestResultVo();
+        requestResultVo.setResponse(response);
+        return requestResultVo;
     }
 }
