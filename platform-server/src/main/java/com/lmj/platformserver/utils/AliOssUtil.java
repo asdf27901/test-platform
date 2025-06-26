@@ -1,12 +1,13 @@
 package com.lmj.platformserver.utils;
 
 import com.aliyun.oss.OSS;
-import com.aliyun.oss.model.DeleteObjectsRequest;
-import com.aliyun.oss.model.ObjectMetadata;
+import com.aliyun.oss.model.*;
 import com.lmj.platformserver.exception.FileUploadException;
 import com.lmj.platformserver.properties.AliOssProperties;
 import com.lmj.platformserver.result.ResultCodeEnum;
 import jakarta.annotation.PreDestroy;
+import lombok.Cleanup;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -99,6 +101,22 @@ public class AliOssUtil {
         } catch (Exception e) {
             log.error("异常信息：", e);
         }
+    }
+
+    @SneakyThrows
+    public byte[] getFileBytes(String url) {
+        String objectName = parseObjectNameFromUrl(url);
+        @Cleanup OSSObject ossObject = ossClient.getObject(aliOssProperties.getBucketName(), objectName);
+        @Cleanup InputStream inputStream = ossObject.getObjectContent();
+        return inputStream.readAllBytes();
+    }
+
+    private String parseObjectNameFromUrl(String url) {
+        String bucketUrlPrefix = "https://" + aliOssProperties.getBucketName() + "." + aliOssProperties.getEndpoint() + "/";
+        if (!url.startsWith(bucketUrlPrefix)) {
+            throw new IllegalArgumentException("提供的URL不是有效的OSS文件路径或与配置不符: " + url);
+        }
+        return url.substring(bucketUrlPrefix.length());
     }
 
     // 在对象销毁前关闭客户端连接
