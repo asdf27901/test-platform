@@ -4,7 +4,9 @@ import cn.hutool.core.net.url.UrlBuilder;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.Method;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Cleanup;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -20,6 +22,7 @@ public class HttpUtil {
     @Autowired
     private AliOssUtil aliOssUtil;
 
+    @SneakyThrows
     @SuppressWarnings("unchecked")
     public Map<String, Object> sendCustomizeHttpRequest(Map<String, Object> requestData, String path) {
 
@@ -109,8 +112,10 @@ public class HttpUtil {
                 }
             }
             case "json" -> {
-                String jsonBody = (String) requestBody.get("jsonBody");
-                httpRequest.body(jsonBody);
+                ObjectMapper objectMapper = new ObjectMapper();
+                Object jsonBodyObject = requestBody.get("jsonBody");
+                String jsonBodyAsString = objectMapper.writeValueAsString(jsonBodyObject);
+                httpRequest.body(jsonBodyAsString);
             }
             default -> {}
         }
