@@ -444,7 +444,7 @@
                                     <el-table-column prop="value" label="Value" align="center"/>
                                     <el-table-column prop="domain" label="Domain" align="center"/>
                                     <el-table-column prop="path" label="Path" align="center"/>
-                                    <el-table-column prop="expires" label="Expires" align="center"/>
+                                    <el-table-column prop="maxAge" label="MaxAge" align="center"/>
                                     <el-table-column label="HttpOnly" align="center">
                                         <template #default="{ row }">
                                             <el-tag type="success" v-if="row.httpOnly">是</el-tag>
@@ -462,7 +462,16 @@
                             <el-tab-pane label="响应头" name="headers">
                                 <el-table :data="responseHeadersArray" style="width: 100%">
                                     <el-table-column prop="key" label="Header" width="180" />
-                                    <el-table-column prop="value" label="Value" />
+                                    <el-table-column label="Value">
+                                        <template slot-scope="scope">
+                                            <span v-if="Array.isArray(scope.row.value)">
+                                                {{ scope.row.value.join(', ') }}
+                                            </span>
+                                            <span v-else>
+                                                {{ scope.row.value }}
+                                            </span>
+                                        </template>
+                                    </el-table-column>
                                 </el-table>
                             </el-tab-pane>
                         </el-tabs>
@@ -686,7 +695,33 @@ export default {
         },
         // 模拟发送请求
         async sendRequest() {
-
+            if (!this.currentTestCase.host) {
+                Message.error('请填写Host')
+                return
+            }
+            if (!this.currentTestCase.path || this.currentTestCase.path.includes('无法获取')) {
+                Message.error('请重新获取接口请求地址')
+                this.goBack()
+                return
+            }
+            this.isSendingRequest = true
+            const requestData = prepareDataForSave(this.currentTestCase)
+            try {
+                const {data} = await interfaceTestcaseApis.sendInterfaceTestcaseRequest({
+                    ...requestData,
+                    interfaceId: this.interfaceId
+                })
+                data.response.body = JSON.parse(data.response.body)
+                this.currentTestCase.response = data.response
+            } catch (e) {
+                if (e.code) {
+                    Message.error(e.message)
+                }
+            } finally {
+                setTimeout(() => {
+                    this.isSendingRequest = false
+                }, 2000)
+            }
         },
 
         // 选择一个用例
