@@ -181,6 +181,7 @@
                                 style="width: 100%; font-size: 14px"
                                 ref="paramsTable"
                                 @select="handleParamsSelect"
+                                @select-all="handleParamsSelectAll"
                             >
                                 <el-table-column width="55" type="selection" align="center"/>
                                 <el-table-column prop="key" label="Key">
@@ -226,6 +227,7 @@
                                 style="width: 100%; font-size: 14px"
                                 ref="headersTable"
                                 @select="handleHeaderSelect"
+                                @select-all="handleHeaderSelectAll"
                             >
                                 <el-table-column width="55" align="center" type="selection">
                                 </el-table-column>
@@ -289,6 +291,7 @@
                                     style="width: 100%; font-size: 14px"
                                     ref="formDataTable"
                                     @select="handleFormDataSelect"
+                                    @select-all="handleFormDataSelectAll"
                                 >
                                     <el-table-column width="55" type="selection" align="center"></el-table-column>
                                     <el-table-column prop="key" label="Key">
@@ -360,6 +363,7 @@
                                     style="width: 100%; font-size: 14px"
                                     ref="urlEncodedTable"
                                     @select="handleUrlEncodedSelect"
+                                    @select-all="handleUrlEncodedSelectAll"
                                 >
                                     <el-table-column width="55" type="selection" align="center"></el-table-column>
                                     <el-table-column prop="key" label="Key">
@@ -786,8 +790,20 @@ export default {
                 this.currentTestCase.pathParam = ''
             }
         },
+        handleParamsSelectAll(selection) {
+            const selectionSet = new Set(selection);
+            this.currentTestCase.queryParams.forEach(param => {
+                param.enabled = selectionSet.has(param);
+            });
+        },
         handleHeaderSelect(selection, row) {
             row.enabled = !row.enabled
+        },
+        handleHeaderSelectAll(selection) {
+            const selectionSet = new Set(selection);
+            this.currentTestCase.headers.forEach(header => {
+                header.enabled = selectionSet.has(header);
+            });
         },
         // form-data
         addFormDataParam() {
@@ -807,6 +823,12 @@ export default {
         },
         handleFormDataSelect(selection, row) {
             row.enabled = !row.enabled;
+        },
+        handleFormDataSelectAll(selection) {
+            const selectionSet = new Set(selection);
+            this.currentTestCase.formDataParams.forEach(param => {
+                param.enabled = selectionSet.has(param);
+            });
         },
         onFormDataTypeChange(row) {
             row.value = ''
@@ -862,6 +884,12 @@ export default {
         },
         handleUrlEncodedSelect(selection, row) {
             row.enabled = !row.enabled;
+        },
+        handleUrlEncodedSelectAll(selection) {
+            const selectionSet = new Set(selection);
+            this.currentTestCase.urlEncodedParams.forEach(param => {
+                param.enabled = selectionSet.has(param);
+            });
         },
         handleRadioChange(label) {
             // 将当前选中的testcase中body中form-data为enabled的表单参数自动勾选上
