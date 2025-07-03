@@ -1,8 +1,7 @@
 package com.lmj.platformserver.controller;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lmj.platformserver.dto.DeleteInterfaceTestcaseDTO;
 import com.lmj.platformserver.dto.InterfaceTestcaseDTO;
 import com.lmj.platformserver.dto.InterfaceTestcaseListQueryDTO;
@@ -59,8 +58,7 @@ public class InterfaceTestcaseController {
     @PostMapping("/sendRequest")
     public Response<RequestResultVo> sendTestcaseRequest(@RequestBody @Validated InterfaceTestcase interfaceTestcase) {
         log.info("发送测试用例请求");
-        ObjectMapper objectMapper = new ObjectMapper();
-        Map<String, Object> requestData = objectMapper.convertValue(interfaceTestcase, new TypeReference<>() {});
+        Map<String, Object> requestData = BeanUtil.beanToMap(interfaceTestcase);
         RequestResultVo resultVo = interfaceTestcaseService.sendInterfaceTestcaseRequest(requestData);
         return Response.success(resultVo);
     }
