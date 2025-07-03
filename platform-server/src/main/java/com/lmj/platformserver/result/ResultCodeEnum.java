@@ -22,7 +22,9 @@ public enum ResultCodeEnum {
     TOKEN_EXPIRED(601, "token已过期"),
     TOKEN_INVALID(602, "无效token"),
 
-    FILE_UPLOAD_FAIL(701, "文件上传失败");
+    FILE_UPLOAD_FAIL(701, "文件上传失败"),
+
+    REQUEST_INVALID(801, "请检查请求方式和请求体是否匹配");
 
     private final Integer code;
     private final String message;
