@@ -1,8 +1,11 @@
 package com.lmj.platformserver.service.impl;
 
+import cn.hutool.http.HttpRequest;
+import cn.hutool.http.HttpResponse;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lmj.platformserver.assertion.PostAssertionTool;
+import com.lmj.platformserver.assertion.PreAssertionTool;
 import com.lmj.platformserver.dto.InterfaceTestcaseListQueryDTO;
 import com.lmj.platformserver.entity.Interface;
 import com.lmj.platformserver.entity.InterfaceTestcase;
@@ -17,6 +20,7 @@ import com.lmj.platformserver.utils.HttpUtil;
 import com.lmj.platformserver.vo.InterfaceTestcaseVo;
 import com.lmj.platformserver.vo.RequestResultVo;
 import com.lmj.platformserver.vo.ScriptExecutionResultVo;
+import lombok.Cleanup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -78,9 +82,25 @@ public class InterfaceTestcaseServiceImpl implements InterfaceTestcaseService {
         }
 
         String path = i.getPath();
-        Map<String, Object> response = httpUtil.sendCustomizeHttpRequest(requestData, path);
-
         RequestResultVo requestResultVo = new RequestResultVo();
+        Map<String, Object> map = httpUtil.processRequestDataForHttp(requestData);
+
+        String preRequestScript = (String) requestData.get("preRequestScript");
+        if (preRequestScript != null && !preRequestScript.equals("")) {
+            ScriptExecutionResultVo executionResultVo = jsScriptExecutionService.executeJsScript(
+                    preRequestScript,
+                    new PreAssertionTool(map)
+            );
+            requestResultVo.setPreExecutionResult(executionResultVo);
+        }
+        HttpRequest httpRequest = httpUtil.createHttpRequest(map, path);
+
+        long start = System.currentTimeMillis();
+        @Cleanup HttpResponse httpResponse = httpUtil.sendCustomizeHttpRequest(httpRequest);
+        long end = System.currentTimeMillis();
+
+        Map<String, Object> response = httpUtil.getHttpResponseDataMap(httpResponse, end - start);
+
         requestResultVo.setResponse(response);
 
         String postRequestScript = (String) requestData.get("postRequestScript");
