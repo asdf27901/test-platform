@@ -122,6 +122,28 @@
             <artifactId>jaxb-runtime</artifactId>
             <version>2.3.3</version>
         </dependency>
+
+        <!-- 1. GraalVM SDK: 提供了多语言互操作性的核心API (Context, Value等) -->
+        <dependency>
+            <groupId>org.graalvm.sdk</groupId>
+            <artifactId>graal-sdk</artifactId>
+            <version>24.2.1</version>
+        </dependency>
+        <!-- 2. GraalJS Engine: 这是JavaScript语言的具体实现 -->
+        <dependency>
+            <groupId>org.graalvm.js</groupId>
+            <artifactId>js</artifactId>
+            <version>24.2.1</version>
+            <type>pom</type>
+        </dependency>
+        <!-- 3. GraalJS ScriptEngine Wrapper:
+             提供了对标准JSR 223 (javax.script) API的封装，让代码更简洁，
+             也方便我们使用 ScriptEngineManager。 -->
+        <dependency>
+            <groupId>org.graalvm.js</groupId>
+            <artifactId>js-scriptengine</artifactId>
+            <version>24.2.1</version>
+        </dependency>
     </dependencies>
 
     <build>
