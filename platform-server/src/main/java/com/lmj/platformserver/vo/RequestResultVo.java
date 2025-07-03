@@ -14,4 +14,5 @@ public class RequestResultVo implements Serializable {
     private Map<String, Object> response;
 
     private ScriptExecutionResultVo postExecutionResult;
+    private ScriptExecutionResultVo preExecutionResult;
 }
