@@ -2,6 +2,7 @@ package com.lmj.platformserver.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.lmj.platformserver.assertion.PostAssertionTool;
 import com.lmj.platformserver.dto.InterfaceTestcaseListQueryDTO;
 import com.lmj.platformserver.entity.Interface;
 import com.lmj.platformserver.entity.InterfaceTestcase;
@@ -11,9 +12,11 @@ import com.lmj.platformserver.mapper.InterfaceMapper;
 import com.lmj.platformserver.mapper.InterfaceTestcaseMapper;
 import com.lmj.platformserver.result.ResultCodeEnum;
 import com.lmj.platformserver.service.InterfaceTestcaseService;
+import com.lmj.platformserver.service.JsScriptExecutionService;
 import com.lmj.platformserver.utils.HttpUtil;
 import com.lmj.platformserver.vo.InterfaceTestcaseVo;
 import com.lmj.platformserver.vo.RequestResultVo;
+import com.lmj.platformserver.vo.ScriptExecutionResultVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +34,9 @@ public class InterfaceTestcaseServiceImpl implements InterfaceTestcaseService {
 
     @Autowired
     private HttpUtil httpUtil;
+
+    @Autowired
+    private JsScriptExecutionService jsScriptExecutionService;
 
     @Override
     public void save(List<InterfaceTestcase> interfaceTestcases, Long interfaceId) {
@@ -76,6 +82,16 @@ public class InterfaceTestcaseServiceImpl implements InterfaceTestcaseService {
 
         RequestResultVo requestResultVo = new RequestResultVo();
         requestResultVo.setResponse(response);
+
+        String postRequestScript = (String) requestData.get("postRequestScript");
+        if (postRequestScript != null && !postRequestScript.equals("")) {
+            ScriptExecutionResultVo executionResultVo = jsScriptExecutionService.executeJsScript(
+                    postRequestScript,
+                    new PostAssertionTool(response)
+            );
+            requestResultVo.setPostExecutionResult(executionResultVo);
+        }
+
         return requestResultVo;
     }
 }

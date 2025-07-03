@@ -12,4 +12,6 @@ public class RequestResultVo implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Map<String, Object> response;
+
+    private ScriptExecutionResultVo postExecutionResult;
 }
