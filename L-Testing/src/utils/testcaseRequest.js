@@ -36,7 +36,7 @@ export function prepareDataForSave(testCase) {
     // 清洗和过滤 Headers
     const filteredHeaders = testCase.headers
         .map(h => ({
-            key: h.key.trim(),
+            key: h.key.trim().toLowerCase() === 'content-type' ? 'Content-Type' : h.key.trim(),
             value: h.value,
             description: h.description,
             enabled: h.enabled
@@ -87,6 +87,9 @@ export function prepareDataForSave(testCase) {
         // 请求体核心部分
         requestBodyType: testCase.requestBodyType,
         requestBody: compositeBody, // 直接存储复合对象
+
+        preRequestScript: testCase.preRequestScript ? testCase.preRequestScript.trim() : null,
+        postRequestScript: testCase.postRequestScript ? testCase.postRequestScript.trim() : null,
 
         // 断言和其他高级功能（如果前端有相应输入框，则在这里添加）
         // expected_status_code: testCase.expectedStatusCode || null,
