@@ -412,6 +412,34 @@
                                 />
                             </div>
                         </el-tab-pane>
+
+                        <el-tab-pane label="前置脚本 (Pre-Script)" name="preRequestScript">
+                            <span slot="label">
+                                前置脚本 (Pre-Script)
+                                <i v-if="hasPreScript" class="script-indicator-dot"></i>
+                            </span>
+                            <ScriptEditor
+                                v-if="currentTestCase.requestTabsActive === 'preRequestScript'"
+                                v-model="currentTestCase.preRequestScript"
+                                scriptType="preRequestScript"
+                                ref="preRequestScript"
+                            />
+                        </el-tab-pane>
+
+                        <el-tab-pane label="后置脚本 (Tests)" name="postRequestScript">
+                            <span slot="label">
+                                <span class="tab-label-content">
+                                    后置脚本 (Tests)
+                                    <i v-if="hasAssertionScript" class="script-indicator-dot"></i>
+                                </span>
+                            </span>
+                            <ScriptEditor
+                                v-if="currentTestCase.requestTabsActive === 'postRequestScript'"
+                                v-model="currentTestCase.postRequestScript"
+                                scriptType="postRequestScript"
+                                ref="postRequestScript"
+                            />
+                        </el-tab-pane>
                     </el-tabs>
 
                     <!-- 响应区 -->
@@ -505,12 +533,14 @@ import {validateTestCase} from "@/utils/testcaseValidator";
 import Vue from "vue";
 import {interfaceTestcaseApis} from "@/api/interface/interfaceTestcase";
 import {fileApis} from "@/api/file";
+import ScriptEditor from "@/views/interface-test/components/scriptEditor.vue";
 
 export default {
     name: "InterfaceTestcaseEditor",
     components: {
         VueJsonPretty,
-        JsonEditor
+        JsonEditor,
+        ScriptEditor
     },
     props: {
         mode: {
@@ -668,6 +698,8 @@ export default {
                 formDataParams: [],        // form-data 类型的参数列表
                 urlEncodedParams: [],      // x-www-form-urlencoded 类型的参数列表
                 jsonBody: null,              // json 类型的文本内容
+                preRequestScript: '',              // 前置脚本
+                postRequestScript: '',        // 断言脚本
                 // 响应数据
                 response: {
                     body: null,
@@ -1052,6 +1084,25 @@ export default {
                 this.$nextTick(() => {
                     this.$refs.headersTable.toggleRowSelection(newHeader, true);
                 })
+            }
+        },
+        'currentTestCase.requestTabsActive'(newVal) {
+            if (newVal === 'preRequestScript') {
+                this.$nextTick(() => {
+                    // 通过 ref 调用子组件的 refresh 方法
+                    if (this.$refs.preRequestScript) {
+                        this.$refs.preRequestScript.refresh();
+                    }
+                });
+            }
+            else if (newVal === 'postRequestScript') {
+                this.$nextTick(() => {
+                    // 通过 ref 调用子组件的 refresh 方法
+                    if (this.$refs.postRequestScript) {
+                        this.$refs.postRequestScript.refresh();
+                    }
+                });
+
             }
         }
     }
