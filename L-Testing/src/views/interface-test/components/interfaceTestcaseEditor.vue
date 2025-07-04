@@ -1034,6 +1034,9 @@ export default {
             this.currentTestCase.queryParams.forEach(param => {
                 param.enabled = selectionSet.has(param);
             });
+            if (selectionSet) {
+                this.currentTestCase.pathParam = ''
+            }
         },
         handleHeaderSelect(selection, row) {
             row.enabled = !row.enabled
