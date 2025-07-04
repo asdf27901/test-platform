@@ -732,53 +732,48 @@ export default {
                     }
                 } finally {
                     this.isSendingRequest = false
+                    this.syncTableSelection()
                 }
             }
+        },
+        syncTableSelection() {
+            // 使用 $nextTick 确保DOM已经更新完毕
+            this.$nextTick(() => {
+                // 恢复 queryParams 表格的勾选
+                if (this.currentTestCase.queryParams && this.$refs.paramsTable) {
+                    this.currentTestCase.queryParams.forEach(row => {
+                        // 如果数据模型中 enabled 为 true，就勾选它
+                        this.$refs.paramsTable.toggleRowSelection(row, row.enabled);
+                    });
+                }
+
+                // 恢复 headers 表格的勾选
+                if (this.currentTestCase.headers && this.$refs.headersTable) {
+                    this.currentTestCase.headers.forEach(row => {
+                        this.$refs.headersTable.toggleRowSelection(row, row.enabled);
+                    });
+                }
+
+                // 恢复 formDataParams 表格的勾选
+                if (this.currentTestCase.requestBodyType === 'form-data' && this.currentTestCase.formDataParams && this.$refs.formDataTable) {
+                    this.currentTestCase.formDataParams.forEach(row => {
+                        this.$refs.formDataTable.toggleRowSelection(row, row.enabled);
+                    });
+                }
+
+                // 恢复 urlEncodedParams 表格的勾选
+                if (this.currentTestCase.requestBodyType === 'x-www-form-urlencoded' && this.currentTestCase.urlEncodedParams && this.$refs.urlEncodedTable) {
+                    this.currentTestCase.urlEncodedParams.forEach(row => {
+                        this.$refs.urlEncodedTable.toggleRowSelection(row, row.enabled);
+                    });
+                }
+            });
         },
 
         // 选择一个用例
         selectTestCase(testCase) {
             this.currentTestCase = testCase;
-            // 将当前选中的testcase中请求参数为enabled的请求参数自动勾选上
-            if (this.currentTestCase.queryParams) {
-                this.currentTestCase.queryParams.forEach(param => {
-                    if (param.enabled) {
-                        this.$nextTick(() => {
-                            this.$refs.paramsTable.toggleRowSelection(param, true)
-                        })
-                    }
-                })
-            }
-            // 将当前选中的testcase中headers为enabled的headers自动勾选上
-            if (this.currentTestCase.headers) {
-                this.currentTestCase.headers.forEach(header => {
-                    if (header.enabled) {
-                        this.$nextTick(() => {
-                            this.$refs.headersTable.toggleRowSelection(header, true)
-                        })
-                    }
-                })
-            }
-            // 将当前选中的testcase中body中form-data为enabled的表单参数自动勾选上
-            if (this.currentTestCase.formDataParams && this.currentTestCase.requestBodyType === 'form-data') {
-                this.currentTestCase.formDataParams.forEach(formData => {
-                    if (formData.enabled) {
-                        this.$nextTick(() => {
-                            this.$refs.formDataTable.toggleRowSelection(formData, true)
-                        })
-                    }
-                })
-            }
-            // 将当前选中的testcase中body中x-www-form-urlencoded为enabled的表单参数自动勾选上
-            if (this.currentTestCase.urlEncodedParams && this.currentTestCase.requestBodyType === 'x-www-form-urlencoded') {
-                this.currentTestCase.urlEncodedParams.forEach(formData => {
-                    if (formData.enabled) {
-                        this.$nextTick(() => {
-                            this.$refs.urlEncodedTable.toggleRowSelection(formData, true)
-                        })
-                    }
-                })
-            }
+            this.syncTableSelection()
         },
         // 新增用例
         addTestCase() {
