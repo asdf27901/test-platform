@@ -82,15 +82,6 @@ public class InterfaceTestcase extends BaseEntity{
     @TableField(value = "request_body", typeHandler = JacksonTypeHandler.class)
     private Map<String, Object> requestBody;
 
-    @TableField("expected_status_code")
-    private Integer expectedStatusCode;  // 预留字段
-
-    @TableField(value = "expected_response_headers", typeHandler = JacksonTypeHandler.class)
-    private Map<String, Object> expectedResponseHeaders;  // 预留字段
-
-    @TableField(value = "expected_response_body_assertions", typeHandler = JacksonTypeHandler.class)
-    private Map<String, Object> expectedResponseBodyAssertions;  // 预留字段
-
     @TableField("pre_request_script")
     private String preRequestScript;
 
