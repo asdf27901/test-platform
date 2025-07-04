@@ -1,6 +1,6 @@
 <template>
     <div class="api-test-container">
-        <el-row :gutter="8" v-show="!pageLoading && !isSendingRequest">
+        <el-row :gutter="8" v-if="!pageLoading && !isSendingRequest">
             <!-- 左侧用例列表 -->
             <el-col :span="6" v-if="mode === 'add'">
                 <el-card class="box-card test-cases-card" shadow="never">
@@ -486,8 +486,8 @@
             </el-col>
         </el-row>
 
-        <el-card v-show="isSendingRequest || pageLoading" class="box-card loading-card" shadow="never"
-                 v-loading="isSendingRequest || pageLoading"
+        <el-card v-else class="box-card loading-card" shadow="never"
+                 v-loading="true"
                  :element-loading-text="mainCardLoadingText"
                  element-loading-spinner="el-icon-loading">
         </el-card>
