@@ -109,7 +109,7 @@ export const routerMap = [
                             isAffix: false,
                             isIframe: false,
                             isHideInTagsView: false,
-                            icon: 'fa fa-plus'
+                            icon: 'fa fa-edit'
                         }
                     }
                 ]
