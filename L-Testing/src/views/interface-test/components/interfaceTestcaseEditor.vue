@@ -444,7 +444,22 @@
 
                     <!-- 响应区 -->
                     <div class="response-section">
-                        <h3 class="section-title">响应</h3>
+                        <div class="section-title-bar">
+                            <h3 class="section-title">响应</h3>
+                            <div class="response-meta-info">
+                                <!-- 状态码显示 -->
+                                <div v-if="currentTestCase.response.statusCode" class="meta-item">
+                                    <span class="meta-label">code:</span>
+                                    <span class="meta-value" :style="{ color: statusCodeColor }">{{ currentTestCase.response.statusCode }}</span>
+                                </div>
+                                <!-- 耗时显示 -->
+                                <div v-if="currentTestCase.response.responseTime" class="meta-item">
+                                    <span class="meta-label">timeout:</span>
+                                    <span class="meta-value" :style="{ color: responseTimeColor }">{{ currentTestCase.response.responseTime }} ms</span>
+                                </div>
+                            </div>
+                        </div>
+
                         <el-tabs v-model="currentTestCase.responseTabsActive" type="border-card" class="response-tabs">
                             <el-tab-pane label="响应体" name="body">
                                 <template v-if="currentTestCase.response.body !== null && currentTestCase.response.body !== undefined">
@@ -501,6 +516,52 @@
                                         </template>
                                     </el-table-column>
                                 </el-table>
+                            </el-tab-pane>
+                            <el-tab-pane label="控制台" name="console">
+                                <!-- 使用 v-if 判断是否有日志内容 -->
+                                <div v-if="consoleLogs" class="console-output-wrapper">
+                                    <pre>{{ consoleLogs }}</pre>
+                                </div>
+                                <div v-else class="empty-placeholder">
+                                    <p>没有控制台输出</p>
+                                </div>
+                            </el-tab-pane>
+                            <el-tab-pane name="testResults">
+                                <!-- 使用 slot="label" 来自定义标签，并显示通过/失败的数量 -->
+                                <span slot="label">
+                                    测试结果
+                                     <span v-if="testResultsSummary.total > 0"
+                                           :class="{ 'all-passed': testResultsSummary.allPassed, 'has-failures': !testResultsSummary.allPassed }">
+                                        ({{ testResultsSummary.passed }}/{{ testResultsSummary.total }})
+                                    </span>
+                                </span>
+
+                                <div v-if="testResultList && testResultList.length > 0">
+                                    <div class="test-results-container">
+                                        <div v-for="(result, index) in testResultList" :key="index" class="test-result-item">
+                                            <div class="result-status-wrapper">
+                                                <span :class="['result-status', result.result ? 'status-passed' : 'status-failed']">
+                                                    {{ result.result ? 'PASS' : 'FAIL' }}
+                                                </span>
+                                            </div>
+
+                                            <!-- 右侧的内容区 -->
+                                            <div class="test-result-content">
+                                                <!-- 头部：现在包含名称和来源标签 -->
+                                                <div class="test-result-header">
+                                                    <span class="test-name">{{ result.testName }}</span>
+                                                    <el-tag size="mini" type="info" class="script-source-tag">{{ result.source }}</el-tag>
+                                                </div>
+                                                <div v-if="!result.result" class="test-message-wrapper">
+                                                    <pre class="test-message">{{ result.message }}</pre>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div v-else class="empty-placeholder">
+                                    <p>没有执行任何测试</p>
+                                </div>
                             </el-tab-pane>
                         </el-tabs>
                     </div>
@@ -595,6 +656,93 @@ export default {
             }
             return ''; // 默认无文案
         },
+        hasPreScript() {
+            // 检查脚本是否存在且去除空格后不为空
+            return this.currentTestCase.preRequestScript && this.currentTestCase.preRequestScript.trim() !== '';
+        },
+        hasAssertionScript() {
+            return this.currentTestCase.postRequestScript && this.currentTestCase.postRequestScript.trim() !== '';
+        },
+        consoleLogs() {
+            // 1. 分别获取前置和后置脚本的执行结果
+            const preResult = this.currentTestCase.response?.preExecutionResult;
+            const postResult = this.currentTestCase.response?.postExecutionResult;
+
+            let finalLogs = '';
+
+            // 2. 处理前置脚本的日志和错误
+            if (preResult) {
+                // 先添加logs
+                if (preResult.logs) {
+                    finalLogs += '--- Pre-request Script ---\n' + preResult.logs.trim() + '\n';
+                }
+                // 再添加error
+                if (preResult.error) {
+                    finalLogs += '--- Pre-request Script Errors ---\n' + preResult.error.trim() + '\n';
+                }
+            }
+
+            // 3. 处理后置脚本的日志和错误
+            if (postResult) {
+                // 如果前面已经有日志了，加一个分隔符
+                if (finalLogs) {
+                    finalLogs += '\n\n';
+                }
+                // 先添加logs
+                if (postResult.logs) {
+                    finalLogs += '--- Tests Script ---\n' + postResult.logs.trim() + '\n';
+                }
+                // 再添加error
+                if (postResult.error) {
+                    finalLogs += '--- Tests Script Errors ---\n' + postResult.error.trim() + '\n';
+                }
+            }
+
+            // 4. 返回最终拼接好的、去除了首尾多余空白的字符串
+            return finalLogs.trim();
+        },
+        testResultList() {
+            const preResults = this.currentTestCase.response?.preExecutionResult?.results || [];
+            const postResults = this.currentTestCase.response?.postExecutionResult?.results || [];
+
+            // 为结果添加一个来源标记，方便UI区分
+            const formattedPreResults = preResults.map(r => ({ ...r, source: 'Pre-Script' }));
+            const formattedPostResults = postResults.map(r => ({ ...r, source: 'Tests' }));
+
+            return [...formattedPreResults, ...formattedPostResults];
+        },
+        testResultsSummary() {
+            const results = this.testResultList;
+            if (!results || results.length === 0) {
+                return { passed: 0, failed: 0, total: 0 };
+            }
+
+            const passed = results.filter(r => r.result).length;
+            const total = results.length;
+
+            return {
+                passed: passed,
+                failed: total - passed,
+                total: total,
+                allPassed: passed === total
+            };
+        },
+        statusCodeColor() {
+            const code = this.currentTestCase.response?.statusCode;
+            if (!code) return '#909399'; // 默认灰色
+            if (code >= 200 && code < 300) return '#67c23a'; // 成功绿色
+            if (code >= 300 && code < 400) return '#e6a23c'; // 重定向橙色
+            if (code >= 400 && code < 500) return '#f56c6c'; // 客户端错误红色
+            if (code >= 500) return '#f56c6c'; // 服务器错误红色
+            return '#909399';
+        },
+        responseTimeColor() {
+            const time = this.currentTestCase.response?.responseTime;
+            if (time === undefined || time === null) return '#909399'; // 默认灰色
+            if (time < 100) return '#67c23a';  // 绿色
+            if (time < 500) return '#e6a23c';  // 橙色
+            return '#f56c6c'; // 红色
+        },
     },
     created() {
         this.initializePage();
@@ -650,6 +798,10 @@ export default {
                         body: null,
                         cookies: [],
                         headers: {},
+                        statusCode: null,
+                        responseTime: null,
+                        preExecutionResult: null,
+                        postExecutionResult: null
                     }
                     this.currentTestCase = {
                         ...data,
@@ -705,6 +857,10 @@ export default {
                     body: null,
                     cookies: [],
                     headers: {},
+                    statusCode: null,
+                    responseTime: null,
+                    preExecutionResult: null,
+                    postExecutionResult: null
                 },
                 hasJsonFlag: true
             }
@@ -752,15 +908,14 @@ export default {
                         interfaceId: this.interfaceId
                     })
                     data.response.body = JSON.parse(data.response.body)
-                    this.currentTestCase.response = data.response
+                    this.currentTestCase.response = {
+                        ...data.response,
+                        postExecutionResult: data.postExecutionResult,
+                        preExecutionResult: data.preExecutionResult
+                    }
                 } catch (e) {
                     if (e.code) {
                         Message.error(e.message)
-                    }
-                    this.currentTestCase.response = {
-                        body: null,
-                        cookies: [],
-                        headers: {},
                     }
                 } finally {
                     this.isSendingRequest = false
@@ -1398,5 +1553,208 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+.tab-label-content {
+    position: relative;
+    display: inline-block; /* 让她表现得像一个块级元素，以便计算宽度和应用定位 */
+    padding-right: 15px;  /* 给小绿点留出空间，防止文字和点重叠 */
+}
+.script-indicator-dot {
+    position: absolute;
+    top: 50%; /* 垂直居中 */
+    right: 0; /* 定位到容器的最右边 */
+    transform: translateY(-50%); /* 精确垂直居中 */
+    width: 8px;
+    height: 8px;
+    background-color: #67c23a;
+    border-radius: 50%;
+    animation: blink 1.5s infinite ease-in-out;
+}
+
+/* 闪烁动画 (可选) */
+@keyframes blink {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.4;
+    }
+}
+
+/* 响应区的标题栏，使用flex布局 */
+.section-title-bar {
+    display: flex;
+    justify-content: space-between; /* 核心：让子元素两端对齐 */
+    align-items: center;
+    margin-bottom: 10px; /* 标题栏和Tabs之间的间距 */
+}
+
+/* 响应区的标题，移除默认的margin-bottom */
+.section-title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #303133;
+}
+
+.response-meta-info {
+    display: flex;
+    align-items: center;
+    gap: 20px; /* code和timeout之间的间距 */
+    font-size: 14px;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace; /* 使用等宽字体，效果更佳 */
+}
+
+.meta-item {
+    display: inline-flex;  /* 使用 inline-flex，让它表现得像行内元素但拥有flex能力 */
+    align-items: baseline; /* 核心：让内部元素的文字基线对齐 */
+    gap: 6px;           /* 标签和值之间的间距 */
+}
+
+/* 元信息的标签文字（'Code:', 'Time:'） */
+.meta-label {
+    color: #606266;
+}
+
+.meta-value {
+    font-weight: bold; /* 只给值设置粗体 */
+}
+
+/* 元信息的值（状态码、耗时） */
+.meta-item span:last-child {
+    font-weight: bold;
+    font-family: 'Courier New', Courier, monospace; /* 让数字更好看 */
+}
+
+/* 响应区Tabs的内边距可以适当减小 */
+.response-tabs >>> .el-tabs__content {
+    padding: 15px;
+}
+
+/* 控制台输出样式 */
+.console-output-wrapper {
+    background-color: #2d2d2d;
+    color: #f0f0f0;
+    padding: 15px;
+    border-radius: 4px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    min-height: 250px;
+    overflow-x: auto; /* 内容过长时可以横向滚动 */
+}
+
+.console-output-wrapper pre {
+    margin: 0;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+.all-passed {
+    color: #67c23a; /* 成功绿色 */
+    font-weight: bold;
+    margin-left: 5px;
+}
+
+.has-failures {
+    color: #f56c6c; /* 失败红色 */
+    font-weight: bold;
+    margin-left: 5px;
+}
+
+.test-results-container {
+    border: 1px solid #ebeef5;
+    border-radius: 4px;
+}
+
+/* 测试结果列表项样式 */
+.test-result-item {
+    display: flex; /* 使用Flexbox布局 */
+    padding: 12px 15px;
+    border-bottom: 1px solid #ebeef5;
+    align-items: flex-start; /* 顶部对齐 */
+}
+.test-result-item:last-child {
+    border-bottom: none;
+}
+
+.test-result-header {
+    display: flex;
+    align-items: center; /* 垂直居中对齐 */
+    gap: 10px;          /* 测试名和标签之间的间距 */
+}
+
+.script-source-tag {
+    font-weight: normal;
+}
+
+/* 左侧状态标签的容器 */
+.result-status-wrapper {
+    flex-shrink: 0; /* 防止被压缩 */
+    margin-right: 15px;
+}
+
+.result-status {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 12px;
+    font-weight: bold;
+    min-width: 50px;
+    text-align: center;
+}
+
+/* PASS 标签的颜色 */
+.status-passed {
+    background-color: #67c23a;
+}
+
+/* FAIL 标签的颜色 */
+.status-failed {
+    background-color: #f56c6c;
+}
+
+.test-result-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.test-name {
+    color: #303133;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.script-source-tag {
+    font-weight: normal;
+}
+
+.test-message-wrapper {
+    margin-top: 8px;
+    /* 让容器不占满整行，宽度由内容决定 */
+    display: inline-block;
+}
+
+.test-message {
+    display: block;
+    margin: 0;
+    padding: 8px 12px; /* 调整内边距 */
+    background-color: #fef0f0;
+    color: #c45656;
+    border-radius: 4px;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+    font-size: 13px;
+    white-space: pre-wrap;
+    word-break: break-all;
+    border-left: 3px solid #f56c6c;
+}
+
+/* 通用的空状态占位符样式 */
+.empty-placeholder {
+    color: #909399;
+    text-align: center;
+    padding: 40px 0;
+    font-size: 14px;
 }
 </style>
