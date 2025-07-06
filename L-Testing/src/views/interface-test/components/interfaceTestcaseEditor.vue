@@ -1168,8 +1168,7 @@ export default {
         },
         goBack() {
             const path = this.$route.path
-            this.bus.$emit('onCurrentContextmenuClick', {
-                id: 1,
+            this.bus.$emit('closeTagsView', {
                 path,
                 redirect: '/interfaces-test/testcaseList'
             });
