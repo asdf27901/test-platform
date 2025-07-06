@@ -42,7 +42,7 @@ export const routerMap = [
                     title: "message.router.interfacesTest",
                     isLink: "",
                     isHide: false,
-                    isKeepAlive: true,
+                    isKeepAlive: false,
                     isAffix: false,
                     isIframe: false,
                     icon: "iconfont icon-caidan"
