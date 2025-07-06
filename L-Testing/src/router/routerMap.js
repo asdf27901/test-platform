@@ -78,7 +78,7 @@ export const routerMap = [
                     },
                     {
                         path: "/interfaces-test/testcaseList/addTestcase",
-                        name: "AddInterfaceTestCase",
+                        name: "InterfaceTestcaseEditor",
                         component: () => import('@/views/interface-test/components/interfaceTestcaseEditor.vue'),
                         props: {
                            mode: 'add'
@@ -87,16 +87,17 @@ export const routerMap = [
                             title: "message.router.addInterfaceTestcase",
                             isLink: "",
                             isHide: true,
-                            isKeepAlive: false,
+                            isKeepAlive: true,
                             isAffix: false,
                             isIframe: false,
                             isHideInTagsView: false,
-                            icon: 'fa fa-plus'
+                            icon: 'fa fa-plus',
+                            activeMenu: "/interfaces-test/testcaseList"
                         }
                     },
                     {
                         path: "/interfaces-test/testcaseList/editTestcase",
-                        name: "EditInterfaceTestCase",
+                        name: "InterfaceTestcaseEditor",
                         component: () => import('@/views/interface-test/components/interfaceTestcaseEditor.vue'),
                         props: {
                             mode: 'edit'
@@ -105,11 +106,12 @@ export const routerMap = [
                             title: "message.router.editInterfaceTestcase",
                             isLink: "",
                             isHide: true,
-                            isKeepAlive: false,
+                            isKeepAlive: true,
                             isAffix: false,
                             isIframe: false,
                             isHideInTagsView: false,
-                            icon: 'fa fa-edit'
+                            icon: 'fa fa-edit',
+                            activeMenu: "/interfaces-test/testcaseList"
                         }
                     }
                 ]
