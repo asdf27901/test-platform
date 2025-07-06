@@ -101,7 +101,8 @@ export default {
 		onTagsClick(v, k) {
 			this.tagsRoutePath = v.path;
 			this.tagsRefsIndex = k;
-			this.$router.push(v);
+			// this.$router.push(v);
+			this.$router.push({path: v.path, query: v.query});
 		},
 		// 获取 tagsView 的下标：用于处理 tagsView 点击时的横向滚动
 		getTagsRefsIndex(path) {
