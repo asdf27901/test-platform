@@ -3,39 +3,40 @@
 		<el-scrollbar ref="scrollbarRef" @wheel.native.prevent="onHandleScroll">
 			<ul class="layout-navbars-tagsview-ul" :class="setTagsStyle" ref="tagsUlRef">
 				<!-- :class="{ 'is-active': v.path === tagsRoutePath } 被修改了，修改为当跳转到内部隐藏路由时，activeMenu为v.path匹配时，也需要高亮 -->
+<!--				:class="{ 'is-active': v.path === activeTagsViewPath }"-->
 				<li
 					v-for="(v, k) in tagsViewList"
 					:key="k"
 					class="layout-navbars-tagsview-ul-li"
 					:data-name="v.name"
-					:class="{ 'is-active': v.path === activeTagsViewPath }"
+					:class="{ 'is-active': v.path === tagsRoutePath }"
 					@contextmenu.prevent="onContextmenu(v, $event)"
 					@click="onTagsClick(v, k)"
 					ref="tagsRefs"
 				>
-<!--					<i class="iconfont icon-webicon318 layout-navbars-tagsview-ul-li-iconfont font14" v-if="v.path === tagsRoutePath"></i>-->
-					<i class="iconfont icon-webicon318 layout-navbars-tagsview-ul-li-iconfont font14" v-if="v.path === activeTagsViewPath"/>
-<!--					<i-->
-<!--						class="layout-navbars-tagsview-ul-li-iconfont font14 is-tagsview-icon"-->
-<!--						:class="v.meta.icon"-->
-<!--						v-if="v.path !== tagsRoutePath && getThemeConfig.isTagsviewIcon"-->
-<!--					></i>-->
+					<i class="iconfont icon-webicon318 layout-navbars-tagsview-ul-li-iconfont font14" v-if="v.path === tagsRoutePath"></i>
+<!--					<i class="iconfont icon-webicon318 layout-navbars-tagsview-ul-li-iconfont font14" v-if="v.path === activeTagsViewPath"/>-->
 					<i
-							class="layout-navbars-tagsview-ul-li-iconfont font14 is-tagsview-icon"
-							:class="v.meta.icon"
-							v-if="v.path !== activeTagsViewPath && getThemeConfig.isTagsviewIcon"
+						class="layout-navbars-tagsview-ul-li-iconfont font14 is-tagsview-icon"
+						:class="v.meta.icon"
+						v-if="v.path !== tagsRoutePath && getThemeConfig.isTagsviewIcon"
 					></i>
+<!--					<i-->
+<!--							class="layout-navbars-tagsview-ul-li-iconfont font14 is-tagsview-icon"-->
+<!--							:class="v.meta.icon"-->
+<!--							v-if="v.path !== activeTagsViewPath && getThemeConfig.isTagsviewIcon"-->
+<!--					></i>-->
 					<span>{{ $t(v.meta.title) }}</span>
-<!--					<i-->
-<!--						class="el-icon-refresh-right layout-navbars-tagsview-ul-li-icon ml5"-->
-<!--						v-if="v.path === tagsRoutePath"-->
-<!--						@click.stop="refreshCurrentTagsView(v.path)"-->
-<!--					></i>-->
 					<i
-							class="el-icon-refresh-right layout-navbars-tagsview-ul-li-icon ml5"
-							v-if="v.path === activeTagsViewPath"
-							@click.stop="refreshCurrentTagsView(v.path)"
+						class="el-icon-refresh-right layout-navbars-tagsview-ul-li-icon ml5"
+						v-if="v.path === tagsRoutePath"
+						@click.stop="refreshCurrentTagsView(v.path)"
 					></i>
+<!--					<i-->
+<!--							class="el-icon-refresh-right layout-navbars-tagsview-ul-li-icon ml5"-->
+<!--							v-if="v.path === activeTagsViewPath"-->
+<!--							@click.stop="refreshCurrentTagsView(v.path)"-->
+<!--					></i>-->
 					<i class="el-icon-close layout-navbars-tagsview-ul-li-icon ml5" v-if="!v.meta.isAffix" @click.stop="closeCurrentTagsView(v.path)"></i>
 				</li>
 			</ul>
@@ -59,21 +60,21 @@ export default {
 				y: '',
 			},
 			tagsRefsIndex: 0,
-			// tagsRoutePath: this.$route.path,
+			tagsRoutePath: this.$route.path,
 			tagsViewRoutesList: [],
 		};
 	},
 	computed: {
-		// 新增：智能计算当前高亮的 tagsView 路径
-		activeTagsViewPath() {
-			const { meta, path } = this.$route;
-			// 如果路由元信息中配置了 activeMenu，则使用它作为高亮路径
-			if (meta.activeMenu) {
-				return meta.activeMenu;
-			}
-			// 否则，直接使用当前路由路径
-			return path;
-		},
+		// // 新增：智能计算当前高亮的 tagsView 路径
+		// activeTagsViewPath() {
+		// 	const { meta, path } = this.$route;
+		// 	// 如果路由元信息中配置了 activeMenu，则使用它作为高亮路径
+		// 	if (meta.activeMenu) {
+		// 		return meta.activeMenu;
+		// 	}
+		// 	// 否则，直接使用当前路由路径
+		// 	return path;
+		// },
 		// 获取布局配置信息
 		getThemeConfig() {
 			return this.$store.state.themeConfig.themeConfig;
@@ -210,19 +211,19 @@ export default {
 			if (Session.get('tagsViewList') && this.$store.state.themeConfig.themeConfig.isCacheTagsView) {
 				this.tagsViewList = Session.get('tagsViewList');
 			} else {
-				this.tagsViewList = []
+				// this.tagsViewList = []
 				this.tagsViewRoutesList.map((v) => {
 					if (v.meta.isAffix && !v.meta.isHide) this.tagsViewList.push({ ...v });
 				});
-				// this.addTagsView(this.$route.path);
-				const route = this.$route;
-				// 如果当前路由有 activeMenu，说明它本身是隐藏的，我们应该添加它指向的那个菜单项
-				if (route.meta.activeMenu) {
-					this.addTagsView(route.meta.activeMenu, route);
-				} else {
-					// 否则，直接添加当前路由
-					this.addTagsView(route.path, route);
-				}
+				this.addTagsView(this.$route.path);
+				// const route = this.$route;
+				// // 如果当前路由有 activeMenu，说明它本身是隐藏的，我们应该添加它指向的那个菜单项
+				// if (route.meta.activeMenu) {
+				// 	this.addTagsView(route.meta.activeMenu, route);
+				// } else {
+				// 	// 否则，直接添加当前路由
+				// 	this.addTagsView(route.path, route);
+				// }
 			}
 			// 初始化当前元素(li)的下标
 			this.getTagsRefsIndex(this.$route.path);
@@ -316,17 +317,17 @@ export default {
 	watch: {
 		// 监听路由变化
 		$route: {
-			// handler(to) {
-			// 	this.tagsRoutePath = to.path;
-			// 	this.addTagsView(to.path, to);
-			// 	this.getTagsRefsIndex(to.path);
-			// 	this.tagsViewmoveToCurrentTag();
-			// },
 			handler(to) {
+				this.tagsRoutePath = to.path;
 				this.addTagsView(to.path, to);
-				this.getTagsRefsIndex(this.activeTagsViewPath);
+				this.getTagsRefsIndex(to.path);
 				this.tagsViewmoveToCurrentTag();
 			},
+			// handler(to) {
+			// 	this.addTagsView(to.path, to);
+				// this.getTagsRefsIndex(this.activeTagsViewPath);
+				// this.tagsViewmoveToCurrentTag();
+			// },
 			deep: true,
 		},
 	},
