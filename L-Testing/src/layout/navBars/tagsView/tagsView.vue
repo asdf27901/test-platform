@@ -86,9 +86,12 @@ export default {
 	},
 	created() {
 		// 监听非本页面调用 0 刷新当前，1 关闭当前，2 关闭其它，3 关闭全部
-		this.bus.$on('onCurrentContextmenuClick', (data) => {
-			this.onCurrentContextmenuClick(data);
-		});
+		// this.bus.$on('onCurrentContextmenuClick', (data) => {
+		// 	this.onCurrentContextmenuClick(data);
+		// });
+		this.bus.$on('closeTagsView', ({path, redirect}) => {
+			this.closeCurrentTagsView(path, redirect)
+		})
 	},
 	mounted() {
 		this.getTagsViewRoutes();
@@ -333,7 +336,8 @@ export default {
 	},
 	destroyed() {
 		// 取消非本页面调用监听（fun/tagsView）
-		this.bus.$off('onCurrentContextmenuClick');
+		// this.bus.$off('onCurrentContextmenuClick');
+		this.bus.$off('closeTagsView');
 	},
 };
 </script>
