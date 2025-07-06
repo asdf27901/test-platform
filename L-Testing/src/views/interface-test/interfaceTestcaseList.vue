@@ -302,7 +302,10 @@ export default {
         },
         handleEdit(row) {
             // 注意：这里跳转的是用例编辑页
-            this.$router.push({ name: 'EditInterfaceTestCase', query: { testcaseId: row.id } });
+            this.$router.push({
+                path: '/interfaces-test/testcaseList/editTestcase',
+                query: { testcaseId: row.id }
+            });
         },
         handleDelete(id) {
             this.$confirm('此操作将永久删除该测试用例, 是否继续?', '提示', {
@@ -371,7 +374,7 @@ export default {
         },
         handleSelectInterfaceSuccess(interfaceId) {
             this.$router.push({
-                name: 'AddInterfaceTestCase',
+                path: '/interfaces-test/testcaseList/addTestcase',
                 query: { interfaceId: interfaceId } // 通过 query 参数传递ID
             });
         },
