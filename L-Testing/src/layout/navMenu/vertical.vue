@@ -45,7 +45,7 @@ export default {
 	},
 	data() {
 		return {
-			defaultActive: this.$route.path,
+			// defaultActive: this.$route.path,
 		};
 	},
 	computed: {
@@ -58,15 +58,15 @@ export default {
 			return document.body.clientWidth < 1000 ? false : this.$store.state.themeConfig.themeConfig.isCollapse;
 		},
 		// 新增：智能计算当前激活的菜单
-		// defaultActive() {
-		// 	const { meta, path } = this.$route;
-		// 	// 如果路由元信息中配置了 activeMenu，则使用它作为高亮路径
-		// 	if (meta.activeMenu) {
-		// 		return meta.activeMenu;
-		// 	}
-		// 	// 否则，直接使用当前路由路径
-		// 	return path;
-		// },
+		defaultActive() {
+			const { meta, path } = this.$route;
+			// 如果路由元信息中配置了 activeMenu，则使用它作为高亮路径
+			if (meta.activeMenu) {
+				return meta.activeMenu;
+			}
+			// 否则，直接使用当前路由路径
+			return path;
+		},
 	},
 	watch: {
 		// 监听路由的变化
