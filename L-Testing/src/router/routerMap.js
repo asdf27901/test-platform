@@ -115,6 +115,36 @@ export const routerMap = [
                         }
                     }
                 ]
+            },
+            {
+                path: "/config",
+                name: "config",
+                component: () => import('@/layout/routerView/parent.vue'),
+                meta: {
+                    title: "message.router.config",
+                    isLink: "",
+                    isHide: false,
+                    isKeepAlive: false,
+                    isAffix: false,
+                    isIframe: false,
+                    icon: "fa fa-gear"
+                },
+                children: [
+                    {
+                        path: "/environmentVariable",
+                        name: "EnvironmentVariable",
+                        component: () => import('@/views/config/environmentVariable.vue'),
+                        meta: {
+                            title: "message.router.environmentVariable",
+                            isLink: "",
+                            isHide: false,
+                            isKeepAlive: false,
+                            isAffix: false,
+                            isIframe: false,
+                            icon: "fa fa-vimeo"
+                        },
+                    }
+                ]
             }
         ]
     },
