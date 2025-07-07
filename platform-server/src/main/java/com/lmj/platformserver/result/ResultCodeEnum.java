@@ -18,6 +18,7 @@ public enum ResultCodeEnum {
     DUPLICATE_INTERFACE_NAME(508, "接口名重复"),
     INTERFACE_ID_NOT_FOUND(510, "接口id不存在"),
     INTERFACE_TESTCASE_ID_NOT_FOUND(511, "接口用例id不存在"),
+    ENVIRONMENT_VARIABLE_ID_NOT_FOUND(512, "环境变量ID不存在"),
 
     TOKEN_EXPIRED(601, "token已过期"),
     TOKEN_INVALID(602, "无效token"),
