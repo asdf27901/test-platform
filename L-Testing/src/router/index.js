@@ -46,13 +46,13 @@ export function formatTwoStageRoutes(arr) {
 	const newArr = [];
 	const cacheList = [];
 	arr.forEach((v) => {
-		// if (!v.meta || !v.meta.isHideInTagsView) {
-		// 	newArr.push({ ...v });
-		// }
+		if (!v.meta || !v.meta.isHideInTagsView) {
+			newArr.push({ ...v });
+		}
 		if (v.meta && v.meta.isKeepAlive) {
 			cacheList.push(v.name);
 		}
-		newArr.push({ ...v });
+		// newArr.push({ ...v });
 		// cacheList.push(v.name);
 		store.dispatch('keepAliveNames/setCacheKeepAlive', cacheList);
 	});
