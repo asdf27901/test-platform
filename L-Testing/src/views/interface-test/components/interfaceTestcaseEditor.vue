@@ -133,9 +133,9 @@
                             >
                                 <el-option
                                     v-for="item in environments"
-                                    :key="item.value"
-                                    :label="item.label"
-                                    :value="item.value"
+                                    :key="item.id"
+                                    :label="item.name"
+                                    :value="item.id"
                                 ></el-option>
                             </el-select>
                         </div>
@@ -595,6 +595,7 @@ import Vue from "vue";
 import {interfaceTestcaseApis} from "@/api/interface/interfaceTestcase";
 import {fileApis} from "@/api/file";
 import ScriptEditor from "@/views/interface-test/components/scriptEditor.vue";
+import {environmentVariableApis} from "@/api/config/environmentVariable";
 
 export default {
     name: "InterfaceTestcaseEditor",
@@ -627,11 +628,7 @@ export default {
             editingTestCaseNameValue: '', // 编辑输入框的临时值
             // 环境选择
             currentEnvironment: '',
-            environments: [
-                {label: '开发环境 (Dev)', value: 'dev'},
-                {label: '测试环境 (Test)', value: 'test'},
-                {label: '生产环境 (Prod)', value: 'prod'},
-            ],
+            environments: [],
         };
     },
     computed: {
@@ -759,8 +756,19 @@ export default {
                         return;
                     }
 
-                    const {data} = await interfaceApis.getInterfaceDetail(interfaceId)
-                    this.interfacePath = data.path
+                    const [res1, res2] = await Promise.all([
+                        interfaceApis.getInterfaceDetail(interfaceId),
+                        environmentVariableApis.getUserEnvironmentVariable()
+                    ])
+
+                    this.interfacePath = res1.data.path
+                    this.environments = res2.data.map(v => {
+                        return {
+                            id: v.id,
+                            name: v.name,
+                            variables: v.variables
+                        }
+                    })
 
                     // 判断加载后的逻辑
                     if (this.testCases.length > 0) {
@@ -792,8 +800,12 @@ export default {
                 try {
                     const {data} = await interfaceTestcaseApis.getInterfaceTestcaseDetail(testcaseId)
                     this.interfaceId = data.interfaceId
-                    const res =  await interfaceApis.getInterfaceDetail(this.interfaceId)
-                    this.interfacePath = res.data.path
+                    const [res1, res2] = await Promise.all([
+                        interfaceApis.getInterfaceDetail(this.interfaceId),
+                        environmentVariableApis.getUserEnvironmentVariable()
+                    ])
+
+                    this.interfacePath = res1.data.path
                     const response = {
                         body: null,
                         cookies: [],
@@ -816,6 +828,14 @@ export default {
 
                     this.testCases.push(this.currentTestCase)
                     this.selectTestCase(this.currentTestCase)
+
+                    this.environments = res2.data.map(v => {
+                        return {
+                            id: v.id,
+                            name: v.name,
+                            variables: v.variables
+                        }
+                    })
                     this.pageLoading = false
                 } catch (e) {
                     if (e.code) {
