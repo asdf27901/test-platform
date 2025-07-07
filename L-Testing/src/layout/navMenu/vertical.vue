@@ -71,15 +71,15 @@ export default {
 	watch: {
 		// 监听路由的变化
 		$route: {
-			handler(to) {
-				this.defaultActive = to.path;
-				const clientWidth = document.body.clientWidth;
-				if (clientWidth < 1000) this.$store.state.themeConfig.themeConfig.isCollapse = false;
-			},
-			// handler() {
+			// handler(to) {
+			// 	this.defaultActive = to.path;
 			// 	const clientWidth = document.body.clientWidth;
 			// 	if (clientWidth < 1000) this.$store.state.themeConfig.themeConfig.isCollapse = false;
 			// },
+			handler() {
+				const clientWidth = document.body.clientWidth;
+				if (clientWidth < 1000) this.$store.state.themeConfig.themeConfig.isCollapse = false;
+			},
 			deep: true,
 		},
 	},
