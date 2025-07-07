@@ -9,7 +9,9 @@ export default {
 		interfaces: '接口管理',
 		interfaceTestcaseList: '测试用例',
 		addInterfaceTestcase: '添加用例',
-		editInterfaceTestcase: '编辑用例'
+		editInterfaceTestcase: '编辑用例',
+		config: '配置',
+		environmentVariable: '环境变量'
 	},
 	user: {
 		title0: '组件大小',
