@@ -10,8 +10,11 @@ import com.lmj.platformserver.service.EnvironmentVariableService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -22,6 +25,7 @@ public class EnvironmentVariableServiceImpl implements EnvironmentVariableServic
 
     @Override
     public Long addEnvironmentVariable(EnvironmentVariable environmentVariable) {
+        existDuplicateVariable(environmentVariable.getVariables());
         environmentVariableMapper.insert(environmentVariable);
         return environmentVariable.getId();
     }
@@ -56,6 +60,25 @@ public class EnvironmentVariableServiceImpl implements EnvironmentVariableServic
         if (variable == null) {
             throw new EnvironmentVariableErrorException(ResultCodeEnum.ENVIRONMENT_VARIABLE_ID_NOT_FOUND);
         }
+        existDuplicateVariable(environmentVariable.getVariables());
         environmentVariableMapper.updateById(environmentVariable);
+    }
+
+    private void existDuplicateVariable(List<Map<String, Object>> variables) {
+
+        if (!CollectionUtils.isEmpty(variables)) {
+            Map<String, Integer> keyCounter = new HashMap<>();
+            variables.forEach(v -> {
+                String key = (String) v.get("key");
+                Integer count = keyCounter.getOrDefault(key, 0) + 1;
+                keyCounter.put(key, count);
+            });
+
+            for (Map.Entry<String, Integer> entry : keyCounter.entrySet()) {
+                if (entry.getValue() > 1) {
+                    throw new EnvironmentVariableErrorException(ResultCodeEnum.ENVIRONMENT_VARIABLE_DUPLICATE);
+                }
+            }
+        }
     }
 }
