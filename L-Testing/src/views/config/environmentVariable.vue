@@ -197,6 +197,21 @@ export default {
                 return;
             }
 
+            const keyCounts = this.activeEnvironment.variables.reduce((pre, cur) => {
+                pre[cur.key] = (pre[cur.key] || 0) + 1;
+                return pre
+            }, {})
+
+            if (keyCounts) {
+                const keys = Object.keys(keyCounts)
+                for (let key of keys) {
+                    if (keyCounts[key] > 1) {
+                        Message.error(key + "重复，请修改")
+                        return
+                    }
+                }
+            }
+
             this.pageLoading = true
             try {
                 if (this.activeEnvironment.id) {
