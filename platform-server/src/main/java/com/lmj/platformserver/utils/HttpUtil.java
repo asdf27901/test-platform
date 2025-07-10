@@ -6,7 +6,9 @@ import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.Method;
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONException;
 import com.lmj.platformserver.exception.BaseException;
+import com.lmj.platformserver.exception.JsonParseException;
 import com.lmj.platformserver.result.ResultCodeEnum;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,10 +66,15 @@ public class HttpUtil {
                     // 它可能是一个Map，也可能是序列化后的String，取决于前端
                     Object jsonBody = requestBodyMap.get("jsonBody");
                     if (jsonBody instanceof String) {
-                        processedData.put("body", jsonBody);
+                        try {
+                            processedData.put("body", JSON.to(Map.class, jsonBody));
+                        } catch (JSONException e) {
+                            throw new JsonParseException(ResultCodeEnum.JSON_PARSE_ERROR);
+                        }
+
                     } else {
                         // 尝试将其转换为标准的JSON字符串
-                        processedData.put("body", JSON.toJSONString(jsonBody));
+                        processedData.put("body", jsonBody);
                     }
                 }
                 case "form-data", "x-www-form-urlencoded" -> {
