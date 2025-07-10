@@ -207,7 +207,7 @@ public class HttpUtil {
 
         Map<String, Object> res = new HashMap<>();
         res.put("statusCode", httpResponse.getStatus());
-        res.put("body", httpResponse.body());
+        res.put("body", JSON.parse(httpResponse.body()));
         res.put("headers", sanitizedHeaders);
         res.put("cookies", httpResponse.getCookies());
         res.put("responseTime", responseTime);
