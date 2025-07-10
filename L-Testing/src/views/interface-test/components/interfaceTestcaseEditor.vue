@@ -936,6 +936,15 @@ export default {
                     if (e.code) {
                         Message.error(e.message)
                     }
+                    this.currentTestCase.response =  {
+                        body: null,
+                        cookies: [],
+                        headers: {},
+                        statusCode: null,
+                        responseTime: null,
+                        preExecutionResult: null,
+                        postExecutionResult: null
+                    }
                 } finally {
                     this.isSendingRequest = false
                     this.syncTableSelection()
