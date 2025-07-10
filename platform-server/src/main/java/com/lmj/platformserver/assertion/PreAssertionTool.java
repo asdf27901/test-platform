@@ -183,11 +183,13 @@ public class PreAssertionTool extends AbstractAssertionTool {
 
         @HostAccess.Export
         @SneakyThrows
+        @SuppressWarnings("unchecked")
         public void setJson(Map<String, Object> newJson) {
             if (!"json".equals(getType())) {
                 throw new IllegalStateException("Cannot set JSON body when request body type is not 'json'");
             }
-            requestContext.put("body", JSON.toJSONString(newJson));
+            Map<String, Object> body = JSON.to(Map.class, JSON.toJSONString(newJson));
+            requestContext.put("body", body);
         }
 
         @HostAccess.Export
