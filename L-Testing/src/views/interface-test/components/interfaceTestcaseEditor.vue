@@ -927,7 +927,6 @@ export default {
                         ...requestData,
                         interfaceId: this.interfaceId
                     })
-                    data.response.body = JSON.parse(data.response.body)
                     this.currentTestCase.response = {
                         ...data.response,
                         postExecutionResult: data.postExecutionResult,
