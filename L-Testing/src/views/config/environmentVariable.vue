@@ -192,7 +192,19 @@ export default {
                 this.showForm = false;
                 return;
             }
-            this.activeEnvironment = this.environments.find(v => v.id === id)
+            const originalEnv = this.environments.find(v => v.id === id)
+            if (!originalEnv) return
+
+            // 深拷贝一份数据用于编辑，避免直接修改原始列表
+            this.activeEnvironment = JSON.parse(JSON.stringify(originalEnv));
+
+            this.activeEnvironment.variables.forEach(variable => {
+                // 检查 variable.value 是否是一个对象 (且不是 null)
+                if (typeof variable.value === 'object') {
+                    variable.value = JSON.stringify(variable.value)
+                }
+            });
+
             this.showForm = true;
         },
 
@@ -204,7 +216,7 @@ export default {
             this.activeEnvironment = {
                 id: null,
                 name: '',
-                variables: [{ key: '', value: '', remark: '' }], // 默认给一行
+                variables: [{ key: '', value: '', type: 'string', remark: '' }], // 默认给一行
             };
             this.showForm = true;
         },
@@ -213,7 +225,7 @@ export default {
          * @description 添加一个新的变量行
          */
         addVariableRow() {
-            this.activeEnvironment.variables.push({ key: '', value: '', remark: '' });
+            this.activeEnvironment.variables.push({ key: '', value: '', type: 'string', remark: '' });
         },
 
         /**
@@ -248,15 +260,29 @@ export default {
                 }
             }
 
+            // 克隆并处理数据，避免修改原始响应式数据
+            const payload = JSON.parse(JSON.stringify(this.activeEnvironment));
+            for (const variable of payload.variables) {
+                if (variable.type === 'object') {
+                    try {
+                        // 尝试将JSON字符串解析为真正的JS对象/数组
+                        variable.value = JSON.parse(variable.value);
+                    } catch (e) {
+                        this.$message.error(`变量 "${variable.key}" 的值不是一个有效的JSON格式！`);
+                        return; // 中断保存
+                    }
+                }
+            }
+
             this.pageLoading = true
             try {
-                if (this.activeEnvironment.id) {
+                if (payload.id) {
                     // 更新操作
-                    await environmentVariableApis.updateEnvironmentVariable(this.activeEnvironment)
+                    await environmentVariableApis.updateEnvironmentVariable(payload)
                     this.$message.success('环境更新成功！');
                 } else {
                     // 新建操作
-                    const {data} = await environmentVariableApis.saveEnvironmentVariable(this.activeEnvironment)
+                    const {data} = await environmentVariableApis.saveEnvironmentVariable(payload)
                     this.$message.success('环境新建成功！')
                     this.currentEnvironmentId = data
                     // 刷新列表以同步名称变化
@@ -298,6 +324,23 @@ export default {
                 }
             }).catch(() => {})
         },
+        handleTypeChange(row) {
+            switch (row.type) {
+                case 'boolean':
+                    row.value = true;
+                    break;
+                case 'number':
+                    row.value = 0;
+                    break;
+                case 'object':
+                    row.value = '{}';
+                    break;
+                case 'string':
+                default:
+                    row.value = '';
+                    break;
+            }
+        }
     },
 };
 </script>
