@@ -181,8 +181,8 @@ public class HttpUtil {
                 }
             }
             case "json" -> {
-                String jsonBodyObject = (String) requestData.get("body");
-                httpRequest.body(jsonBodyObject);
+                Object jsonBodyObject = requestData.get("body");
+                httpRequest.body(JSON.toJSONString(jsonBodyObject));
             }
             default -> {}
         }
