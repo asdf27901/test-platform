@@ -54,7 +54,43 @@
 
                         <el-table-column label="变量值">
                             <template slot-scope="scope">
-                                <el-input v-model="scope.row.value" placeholder="例如：http://api.dev.com"></el-input>
+                                <!-- 根据 scope.row.type 显示不同输入框 -->
+                                <el-input
+                                    v-if="scope.row.type === 'string'"
+                                    v-model="scope.row.value"
+                                    placeholder="字符串类型"
+                                ></el-input>
+
+                                <el-input-number
+                                    v-if="scope.row.type === 'number'"
+                                    v-model="scope.row.value"
+                                    controls-position="right"
+                                    style="width: 100%"
+                                ></el-input-number>
+
+                                <el-switch
+                                    v-if="scope.row.type === 'boolean'"
+                                    v-model="scope.row.value"
+                                ></el-switch>
+
+                                <!-- 对于JSON（数组或对象），可以使用文本域，并提示用户输入合法的JSON -->
+                                <el-input
+                                    v-if="scope.row.type === 'object'"
+                                    type="textarea"
+                                    v-model="scope.row.value"
+                                    placeholder='请输入合法的JSON，例如 [1, 2] 或 {"a": 1}'
+                                ></el-input>
+                            </template>
+                        </el-table-column>
+
+                        <el-table-column label="类型" width="120">
+                            <template slot-scope="scope">
+                                <el-select v-model="scope.row.type" @change="handleTypeChange(scope.row)">
+                                    <el-option label="String" value="string"></el-option>
+                                    <el-option label="Number" value="number"></el-option>
+                                    <el-option label="Boolean" value="boolean"></el-option>
+                                    <el-option label="Object" value="object"></el-option>
+                                </el-select>
                             </template>
                         </el-table-column>
 
