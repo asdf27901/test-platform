@@ -56,10 +56,13 @@ public class InterfaceTestcaseController {
     }
 
     @PostMapping("/sendRequest")
-    public Response<RequestResultVo> sendTestcaseRequest(@RequestBody @Validated InterfaceTestcase interfaceTestcase) {
+    public Response<RequestResultVo> sendTestcaseRequest(
+            @RequestBody @Validated InterfaceTestcase interfaceTestcase,
+            @RequestParam(value = "envId", required = false) Long envId
+    ) {
         log.info("发送测试用例请求");
         Map<String, Object> requestData = BeanUtil.beanToMap(interfaceTestcase);
-        RequestResultVo resultVo = interfaceTestcaseService.sendInterfaceTestcaseRequest(requestData);
+        RequestResultVo resultVo = interfaceTestcaseService.sendInterfaceTestcaseRequest(requestData, envId);
         return Response.success(resultVo);
     }
  }

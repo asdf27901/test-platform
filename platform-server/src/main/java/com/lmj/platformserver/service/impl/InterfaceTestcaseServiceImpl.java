@@ -2,21 +2,26 @@ package com.lmj.platformserver.service.impl;
 
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lmj.platformserver.assertion.PostAssertionTool;
 import com.lmj.platformserver.assertion.PreAssertionTool;
+import com.lmj.platformserver.context.UserContextHolder;
 import com.lmj.platformserver.dto.InterfaceTestcaseListQueryDTO;
+import com.lmj.platformserver.entity.EnvironmentVariable;
 import com.lmj.platformserver.entity.Interface;
 import com.lmj.platformserver.entity.InterfaceTestcase;
 import com.lmj.platformserver.exception.InterfaceErrorException;
 import com.lmj.platformserver.exception.InterfaceTestcaseErrorException;
+import com.lmj.platformserver.mapper.EnvironmentVariableMapper;
 import com.lmj.platformserver.mapper.InterfaceMapper;
 import com.lmj.platformserver.mapper.InterfaceTestcaseMapper;
 import com.lmj.platformserver.result.ResultCodeEnum;
 import com.lmj.platformserver.service.InterfaceTestcaseService;
 import com.lmj.platformserver.service.JsScriptExecutionService;
 import com.lmj.platformserver.utils.HttpUtil;
+import com.lmj.platformserver.utils.VariableResolver;
 import com.lmj.platformserver.vo.InterfaceTestcaseVo;
 import com.lmj.platformserver.vo.RequestResultVo;
 import com.lmj.platformserver.vo.ScriptExecutionResultVo;
@@ -41,6 +46,9 @@ public class InterfaceTestcaseServiceImpl implements InterfaceTestcaseService {
 
     @Autowired
     private JsScriptExecutionService jsScriptExecutionService;
+
+    @Autowired
+    private EnvironmentVariableMapper environmentVariableMapper;
 
     @Override
     public void save(List<InterfaceTestcase> interfaceTestcases, Long interfaceId) {
@@ -74,11 +82,22 @@ public class InterfaceTestcaseServiceImpl implements InterfaceTestcaseService {
     }
 
     @Override
-    public RequestResultVo sendInterfaceTestcaseRequest(Map<String, Object> requestData) {
+    @SuppressWarnings("unchecked")
+    public RequestResultVo sendInterfaceTestcaseRequest(Map<String, Object> requestData, Long envId) {
         Long interfaceId = (Long) requestData.get("interfaceId");
         Interface i = interfaceMapper.selectById(interfaceId);
         if (i == null) {
             throw new InterfaceErrorException(ResultCodeEnum.INTERFACE_ID_NOT_FOUND);
+        }
+
+        // 获取环境变量
+        EnvironmentVariable environmentVariable = null;
+        if (envId != null) {
+            environmentVariable = environmentVariableMapper.selectOne(
+                    new LambdaQueryWrapper<EnvironmentVariable>()
+                            .eq(EnvironmentVariable::getCreateUser, UserContextHolder.getUserId())
+                            .eq(EnvironmentVariable::getId, envId)
+            );
         }
 
         String path = i.getPath();
@@ -89,10 +108,15 @@ public class InterfaceTestcaseServiceImpl implements InterfaceTestcaseService {
         if (preRequestScript != null && !preRequestScript.equals("")) {
             ScriptExecutionResultVo executionResultVo = jsScriptExecutionService.executeJsScript(
                     preRequestScript,
-                    new PreAssertionTool(map)
+                    new PreAssertionTool(map, environmentVariable == null ? null : environmentVariable.getVariables())
             );
             requestResultVo.setPreExecutionResult(executionResultVo);
         }
+
+        if (environmentVariable != null) {
+            map = (Map<String, Object>) VariableResolver.resolve(environmentVariable.getVariables(), map);
+        }
+
         HttpRequest httpRequest = httpUtil.createHttpRequest(map, path);
 
         long start = System.currentTimeMillis();
@@ -107,10 +131,13 @@ public class InterfaceTestcaseServiceImpl implements InterfaceTestcaseService {
         if (postRequestScript != null && !postRequestScript.equals("")) {
             ScriptExecutionResultVo executionResultVo = jsScriptExecutionService.executeJsScript(
                     postRequestScript,
-                    new PostAssertionTool(response)
+                    new PostAssertionTool(response, environmentVariable == null ? null : environmentVariable.getVariables())
             );
             requestResultVo.setPostExecutionResult(executionResultVo);
         }
+
+        // 更新环境变量
+        environmentVariableMapper.updateById(environmentVariable);
 
         return requestResultVo;
     }
