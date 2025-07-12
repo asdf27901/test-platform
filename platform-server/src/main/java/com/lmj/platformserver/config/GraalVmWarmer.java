@@ -15,6 +15,6 @@ public class GraalVmWarmer implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
-        scriptService.executeJsScript("console.log('Engine warmed up!')", new PostAssertionTool());
+        scriptService.executeJsScript("console.log('Engine warmed up!')", new PostAssertionTool(null, null));
     }
 }
