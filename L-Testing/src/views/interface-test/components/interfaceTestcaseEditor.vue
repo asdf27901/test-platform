@@ -126,7 +126,7 @@
 
                             <span style="margin-right: 10px">测试环境: </span>
                             <el-select
-                                v-model="currentEnvironment"
+                                v-model="currentTestCase.currentEnvironment"
                                 placeholder="请选择环境"
                                 class="custom-env-select"
                                 clearable
@@ -626,8 +626,6 @@ export default {
             currentTestCase: {},
             editingTestCaseName: false, // 是否处于编辑状态
             editingTestCaseNameValue: '', // 编辑输入框的临时值
-            // 环境选择
-            currentEnvironment: '',
             environments: [],
         };
     },
@@ -852,6 +850,8 @@ export default {
                 id: Date.now(), // 使用时间戳作为临时ID
                 name: "未命名用例",
                 priority: 0,
+                // 环境选择
+                currentEnvironment: '',
                 method: 'GET',
                 host: '',
                 path: this.interfacePath || '无法获取接口路径，请稍后重试',
@@ -926,7 +926,7 @@ export default {
                     const {data} = await interfaceTestcaseApis.sendInterfaceTestcaseRequest({
                         ...requestData,
                         interfaceId: this.interfaceId
-                    })
+                    }, this.currentTestCase.currentEnvironment)
                     this.currentTestCase.response = {
                         ...data.response,
                         postExecutionResult: data.postExecutionResult,
