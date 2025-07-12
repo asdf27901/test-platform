@@ -17,8 +17,20 @@ public class VariableResolver {
         return ReUtil.contains(REPLACE_REGEX, template);
     }
 
-    private static String getVariableName(String template) {
-        return ReUtil.getGroup1(REPLACE_REGEX, template);
+    private static List<String> getVariableNameList(String template) {
+        return ReUtil.findAllGroup1(REPLACE_REGEX, template);
+    }
+
+    private static String replaceString(String template, String regex, Object target) {
+        if (target instanceof Map<?, ?> m) {
+            return ReUtil.replaceAll(template, regex, JSON.toJSONString(m));
+        } else if (target instanceof List<?> l) {
+            StringJoiner sj = new StringJoiner(",");
+            l.forEach(v -> sj.add(v.toString()));
+            return ReUtil.replaceAll(template, regex, sj.toString());
+        } else {
+            return ReUtil.replaceAll(template, regex, String.valueOf(target));
+        }
     }
 
     public static Object resolve(List<Map<String, Object>> v, Map<String, Object> data) {
@@ -56,17 +68,32 @@ public class VariableResolver {
                 newList.add(resolve(lo, variables, deep + 1));
             }
             return newList;
-        } else {
+        } else if (o instanceof String s) {
+            if (!neededReplace(s)) {
+                return s.trim();
+            }
             // 不是List和Map，那就去variables集合中找是否存在同名的变量
-            if (neededReplace(o.toString())) {
-                String variableName = getVariableName(o.toString());
-                Object ov = variables.get(variableName);
+            s = s.trim();
+
+            List<String> variableNameList = getVariableNameList(s);
+            boolean flag = s.equals("{{" + variableNameList.get(0) + "}}");
+            // 需要判断是不是只有{{name}}的情况，如果是，就按取出来的变量类型直接返回即可
+            if (flag) {
+                Object ov = variables.get(variableNameList.get(0));
                 if (ov != null) {
                     return ov;
                 }
+            } else {
+                for (String name : variableNameList) {
+                    Object ov = variables.get(name);
+                    if (ov != null) {
+                        s = replaceString(s, "\\{\\{" + name + "\\}\\}", ov);
+                    }
+                }
+                return s;
             }
-            return o;
         }
+        return o;
     }
 
     public static void main(String[] args) {
