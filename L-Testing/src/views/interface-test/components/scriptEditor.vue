@@ -198,6 +198,26 @@ export default {
                         test: {
                             _type: "method",
                             _doc: "测试函数"
+                        },
+                        environment: {
+                            _type: "object",
+                            _doc: "当前所选环境对象",
+                            set: {
+                                _type: "method",
+                                _doc: "设置环境变量"
+                            },
+                            get: {
+                                _type: "method",
+                                _doc: "获取环境变量"
+                            },
+                            clear: {
+                                _type: "method",
+                                _doc: "清空环境变量"
+                            },
+                            del: {
+                                _type: "method",
+                                _doc: "删除环境变量"
+                            }
                         }
                     }
                 }
@@ -265,6 +285,26 @@ export default {
                         test: {
                             _type: "method",
                             _doc: "测试函数"
+                        },
+                        environment: {
+                            _type: "object",
+                            _doc: "当前所选环境对象",
+                            set: {
+                                _type: "method",
+                                _doc: "设置环境变量"
+                            },
+                            get: {
+                                _type: "method",
+                                _doc: "获取环境变量"
+                            },
+                            clear: {
+                                _type: "method",
+                                _doc: "清空环境变量"
+                            },
+                            del: {
+                                _type: "method",
+                                _doc: "删除环境变量"
+                            }
                         }
                     }
                 }
