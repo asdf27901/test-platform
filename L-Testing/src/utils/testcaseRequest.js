@@ -72,9 +72,10 @@ export function prepareDataForSave(testCase) {
         id: testCase.id,
         name: testCase.name.trim(),
         priority: testCase.priority, // 如果未选择，给个默认值，例如 '1' 代表中
-        host: testCase.host.trim().startsWith('http://') ?
-            testCase.host.trim() : testCase.host.trim().startsWith('https://') ?
-                testCase.host.trim() : 'https://' + testCase.host.trim(),
+        // host: testCase.host.trim().startsWith('http://') ?
+        //     testCase.host.trim() : testCase.host.trim().startsWith('https://') ?
+        //         testCase.host.trim() : 'https://' + testCase.host.trim(),
+        host: testCase.host.trim(),
 
         // 请求相关
         method: testCase.method,
