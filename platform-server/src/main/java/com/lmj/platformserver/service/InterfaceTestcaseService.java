@@ -18,5 +18,5 @@ public interface InterfaceTestcaseService {
 
     InterfaceTestcase getInterfaceTestcaseDetail(Long id);
 
-    RequestResultVo sendInterfaceTestcaseRequest(Map<String, Object> requestData);
+    RequestResultVo sendInterfaceTestcaseRequest(Map<String, Object> requestData, Long envId);
 }
