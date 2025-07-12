@@ -1,21 +1,20 @@
 package com.lmj.platformserver.assertion;
 
 import com.alibaba.fastjson2.JSON;
-import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 import org.graalvm.polyglot.HostAccess;
 
 import java.util.*;
 
-@NoArgsConstructor
 public class PreAssertionTool extends AbstractAssertionTool {
 
-    private Map<String, Object> requestContext;
+    private final Map<String, Object> requestContext;
 
     @HostAccess.Export
     public RequestProxy request;
 
-    public PreAssertionTool(Map<String, Object> processedRequestContext) {
+    public PreAssertionTool(Map<String, Object> processedRequestContext, List<Map<String, Object>> variables) {
+        super(variables);
         this.requestContext = processedRequestContext;
         // 在构造时，创建代理对象
         this.request = new RequestProxy();
