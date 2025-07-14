@@ -127,7 +127,7 @@
 
                             <span style="margin-right: 10px">测试环境: </span>
                             <el-select
-                                v-model="currentTestCase.currentEnvironment"
+                                v-model="currentEnvironment"
                                 placeholder="请选择环境"
                                 class="custom-env-select"
                                 clearable
@@ -151,7 +151,7 @@
                                 <el-option label="PUT" value="PUT"/>
                                 <el-option label="DELETE" value="DELETE"/>
                             </el-select>
-                            <el-input v-model="currentTestCase.host" placeholder="请输入Host，没有填写protocol，默认使用https" class="host-input"/>
+                            <el-input v-model="host" placeholder="请输入Host" class="host-input"/>
                             <el-input v-model="currentTestCase.path" class="path-input" disabled/>
                         </div>
 
@@ -581,6 +581,13 @@
                  :element-loading-text="mainCardLoadingText"
                  element-loading-spinner="el-icon-loading">
         </el-card>
+
+        <auto-generate-cases-dialog
+            v-if="generateDialogVisible"
+            :visible.sync="generateDialogVisible"
+            :case-tpl-creator="createNewTestCaseData"
+            @generate="handleGeneratedCases"
+        />
     </div>
 </template>
 
@@ -624,8 +631,11 @@ export default {
             isUploading: false,
             isSendingRequest: false,
             interfaceId: this.$route.query.interfaceId,
+            host: '',
             testCases: [],
             interfacePath: '',
+            // 环境选择
+            currentEnvironment: null,
             currentTestCase: {},
             editingTestCaseName: false, // 是否处于编辑状态
             editingTestCaseNameValue: '', // 编辑输入框的临时值
@@ -802,6 +812,7 @@ export default {
                 try {
                     const {data} = await interfaceTestcaseApis.getInterfaceTestcaseDetail(testcaseId)
                     this.interfaceId = data.interfaceId
+                    this.host = data.host
                     const [res1, res2] = await Promise.all([
                         interfaceApis.getInterfaceDetail(this.interfaceId),
                         environmentVariableApis.getUserEnvironmentVariable()
@@ -818,7 +829,16 @@ export default {
                         postExecutionResult: null
                     }
                     this.currentTestCase = {
-                        ...data,
+                        id: data.id,
+                        headers: data.headers,
+                        method: data.method,
+                        name: data.name,
+                        priority: data.priority,
+                        requestBodyType: data.requestBodyType,
+                        preRequestScript: data.preRequestScript,
+                        postRequestScript: data.postRequestScript,
+                        pathParam: data.pathParam,
+                        queryParams: data.queryParams,
                         ...data.requestBody,
                         response,
                         hasJsonFlag: true,
@@ -854,10 +874,7 @@ export default {
                 id: Date.now(), // 使用时间戳作为临时ID
                 name: "未命名用例",
                 priority: 0,
-                // 环境选择
-                currentEnvironment: '',
                 method: 'GET',
-                host: '',
                 path: this.interfacePath || '无法获取接口路径，请稍后重试',
                 pathParam: '',
                 queryParams: [],
@@ -875,7 +892,7 @@ export default {
                 urlEncodedParams: [],      // x-www-form-urlencoded 类型的参数列表
                 jsonBody: null,              // json 类型的文本内容
                 preRequestScript: '',              // 前置脚本
-                postRequestScript: '',        // 断言脚本
+                postRequestScript: 'lt.test("test statusCode and response.body.code is 200", () => {\n  lt.expect(lt.response.statusCode).to.be.equal(200)\n  lt.expect(lt.response.body.code).to.be.equal(200)\n})\n',        // 断言脚本
                 // 响应数据
                 response: {
                     body: null,
@@ -914,7 +931,7 @@ export default {
         },
         // 模拟发送请求
         async sendRequest() {
-            if (!this.currentTestCase.host) {
+            if (!this.host) {
                 Message.error('请填写Host')
                 return
             }
@@ -923,14 +940,18 @@ export default {
                 this.goBack()
                 return
             }
-            const requestData = prepareDataForSave(this.currentTestCase)
+            // const requestData = prepareDataForSave(this.currentTestCase)
+            const requestData = prepareDataForSave({
+                ...this.currentTestCase,
+                host: this.host
+            })
             if (requestData) {
                 this.isSendingRequest = true
                 try {
                     const {data} = await interfaceTestcaseApis.sendInterfaceTestcaseRequest({
                         ...requestData,
                         interfaceId: this.interfaceId
-                    }, this.currentTestCase.currentEnvironment)
+                    }, this.currentEnvironment)
                     this.currentTestCase.response = {
                         ...data.response,
                         postExecutionResult: data.postExecutionResult,
@@ -1211,6 +1232,8 @@ export default {
 
             // 1. 遍历所有用例，进行校验并更新错误状态
             this.testCases.forEach(testCase => {
+                testCase.host = this.host
+                testCase.envId = this.currentEnvironment
                 // 校验时传入 interfaceId
                 const errors = validateTestCase(this.mode, testCase, this.interfaceId);
                 Vue.set(testCase, 'errors', errors);
@@ -1228,6 +1251,7 @@ export default {
                     }
                     return requestData
                 });
+                this.isSendingRequest = true
                 try {
                     await interfaceTestcaseApis.saveInterfaceTestcases({
                         interfaceId: this.interfaceId,
@@ -1239,11 +1263,31 @@ export default {
                     if (e.code) {
                         Message.error(e.message)
                     }
+                } finally {
+                    this.isSendingRequest = false
                 }
             } else {
                 Message.error("部分用例存在问题，请检查带有红色感叹号的用例。");
             }
         },
+        handleGeneratedCases(newCases) {
+            if (!newCases || newCases.length === 0) {
+                this.$message.info("没有生成任何用例。");
+                return;
+            }
+
+            this.$confirm(`即将为您生成 ${newCases.length} 个新的测试用例，是否继续？`, '确认', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'info'
+            }).then(() => {
+                this.testCases.push(...newCases);
+
+                // 自动选中第一个新生成的用例
+                this.selectTestCase(this.testCases[this.testCases.length - newCases.length]);
+                this.$message.success(`成功生成 ${newCases.length} 个测试用例！`);
+            }).catch(() => {});
+        }
     },
     watch: {
         'currentTestCase.requestBodyType'(newVal) {
