@@ -152,7 +152,7 @@ public class HttpUtil {
                     formDataParams.forEach(formDataParam -> {
                         if ((Boolean) formDataParam.get("enabled")) {
                             // 文本类型
-                            if (formDataParam.get("type") == "text") {
+                            if ("text".equals(formDataParam.get("type"))) {
                                 httpRequest.form((String) formDataParam.get("key"), formDataParam.get("value"));
                             }
                             else {
