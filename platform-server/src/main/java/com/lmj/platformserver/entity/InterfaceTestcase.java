@@ -54,11 +54,14 @@ public class InterfaceTestcase extends BaseEntity{
     private Byte priority;
 
     @NotBlank(message = "域名不能为空")
-    @Pattern(
-            regexp = "^https?://.*$",
-            message = "域名必须以 http:// 或 https:// 开头"
-    )
+//    @Pattern(
+//            regexp = "^https?://.*$",
+//            message = "域名必须以 http:// 或 https:// 开头"
+//    )
     private String host;
+
+    @TableField("env_id")
+    private Long envId;
 
     @NotBlank(message = "请求方法不能为空")
     @Pattern(regexp = "(?i)GET|POST|PUT|DELETE|PATCH", message = "请求方法错误")
