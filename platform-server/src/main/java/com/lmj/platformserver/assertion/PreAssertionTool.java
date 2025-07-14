@@ -54,7 +54,7 @@ public class PreAssertionTool extends AbstractAssertionTool {
             List<Map<String, Object>> headersList = getHeadersList();
             Map<String, Object> newHeader = new HashMap<>();
             newHeader.put("key", key);
-            newHeader.put("value", value == null ? "" : value);
+            newHeader.put("value", objectValue2String(value));
             newHeader.put("enabled", true);
             if (headersList == null) {
                 headersList = new ArrayList<>();
@@ -86,7 +86,7 @@ public class PreAssertionTool extends AbstractAssertionTool {
                     .findFirst();
 
             if (existingHeader.isPresent()) {
-                existingHeader.get().put("value", value);
+                existingHeader.get().put("value", objectValue2String(value));
             } else {
                 add(key, value);
             }
@@ -118,7 +118,7 @@ public class PreAssertionTool extends AbstractAssertionTool {
             List<Map<String, Object>> queryParamsList = getQueryParamsList();
             Map<String, Object> newQueryParam = new HashMap<>();
             newQueryParam.put("key", key);
-            newQueryParam.put("value", value == null ? "" : value);
+            newQueryParam.put("value", objectValue2String(value));
             newQueryParam.put("enabled", true);
             if (queryParamsList == null) {
                 queryParamsList = new ArrayList<>();
@@ -150,7 +150,7 @@ public class PreAssertionTool extends AbstractAssertionTool {
                     .findFirst();
 
             if (existingParam.isPresent()) {
-                existingParam.get().put("value", value);
+                existingParam.get().put("value", objectValue2String(value));
             } else {
                 add(key, value);
             }
@@ -175,9 +175,9 @@ public class PreAssertionTool extends AbstractAssertionTool {
         }
 
         @HostAccess.Export
-        public String getJson() {
+        public String getJsonStr() {
             if (!"json".equals(getType())) return null;
-            return (String) requestContext.get("body");
+            return JSON.toJSONString(requestContext.get("body"));
         }
 
         @HostAccess.Export
@@ -212,7 +212,7 @@ public class PreAssertionTool extends AbstractAssertionTool {
             List<Map<String, Object>> form = getForm();
             Map<String, Object> newParam = new HashMap<>();
             newParam.put("key", key);
-            newParam.put("value", value);
+            newParam.put("value", objectValue2String(value));
             newParam.put("enabled", true);
             if ("form-data".equals(type)) {
                 newParam.put("type", "text");
@@ -261,7 +261,7 @@ public class PreAssertionTool extends AbstractAssertionTool {
 
             List<Map<String, Object>> form = getForm();
             if (form == null) {
-                addForm(key, value);
+                addForm(key, objectValue2String(value));
                 return;
             }
 
@@ -271,7 +271,7 @@ public class PreAssertionTool extends AbstractAssertionTool {
 
             if (existingParam.isPresent()) {
                 Map<String, Object> param = existingParam.get();
-                param.put("value", value);
+                param.put("value", objectValue2String(value));
                 param.remove("fileUrl");
                 if ("form-data".equals(type)) {
                     param.put("type", "text");
@@ -323,6 +323,20 @@ public class PreAssertionTool extends AbstractAssertionTool {
             if (form != null) {
                 form.clear();
             }
+        }
+    }
+
+    private static String objectValue2String(Object value) {
+        if (value == null) {
+            return null;
+        } else if (value instanceof List<?> l) {
+            StringJoiner sj = new StringJoiner(",");
+            l.forEach(v -> sj.add(v.toString()));
+            return sj.toString();
+        } else if (value instanceof Map<?,?>){
+            return JSON.toJSONString(value);
+        } else {
+            return String.valueOf(value);
         }
     }
 }
