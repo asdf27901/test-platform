@@ -399,7 +399,7 @@
                                 </el-button>
                             </div>
 
-                            <div v-if="currentTestCase.requestBodyType === 'json'" class="code-json-editor">
+                            <div v-if="currentTestCase.requestBodyType === 'json'" class="code-json-editor" :key="currentTestCase.id">
                                 <json-editor
                                     v-model="currentTestCase.jsonBody"
                                     :show-btns="false"
@@ -1228,6 +1228,10 @@ export default {
             this.bus.$emit('reFreshTestcaseList')
         },
         async saveOrUpdateTestcases() {
+            if (!this.testCases) {
+                Message.error('当前用例为空')
+                return
+            }
             let allValid = true;
 
             // 1. 遍历所有用例，进行校验并更新错误状态
