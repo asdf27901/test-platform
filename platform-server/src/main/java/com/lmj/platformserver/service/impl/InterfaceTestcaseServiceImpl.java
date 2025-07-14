@@ -12,6 +12,7 @@ import com.lmj.platformserver.dto.InterfaceTestcaseListQueryDTO;
 import com.lmj.platformserver.entity.EnvironmentVariable;
 import com.lmj.platformserver.entity.Interface;
 import com.lmj.platformserver.entity.InterfaceTestcase;
+import com.lmj.platformserver.exception.EnvironmentVariableErrorException;
 import com.lmj.platformserver.exception.InterfaceErrorException;
 import com.lmj.platformserver.exception.InterfaceTestcaseErrorException;
 import com.lmj.platformserver.mapper.EnvironmentVariableMapper;
@@ -56,6 +57,19 @@ public class InterfaceTestcaseServiceImpl implements InterfaceTestcaseService {
         if (i == null) {
             throw new InterfaceErrorException(ResultCodeEnum.INTERFACE_ID_NOT_FOUND);
         }
+        Long envId = interfaceTestcases.get(0).getEnvId();
+        if (envId != null) {
+            Long userId = UserContextHolder.getUserId();
+            EnvironmentVariable variable = environmentVariableMapper.selectOne(
+                    new LambdaQueryWrapper<EnvironmentVariable>()
+                            .eq(EnvironmentVariable::getId, envId)
+                            .eq(EnvironmentVariable::getCreateUser, userId)
+            );
+            if (variable == null) {
+                throw new EnvironmentVariableErrorException(ResultCodeEnum.ENVIRONMENT_VARIABLE_ID_NOT_FOUND);
+            }
+        }
+
         interfaceTestcases.forEach(ii -> ii.setInterfaceId(interfaceId));
 
         interfaceTestcaseMapper.insertOrUpdate(interfaceTestcases);
