@@ -15,6 +15,7 @@
                         <div style="display: flex; flex-direction: column; justify-content: center;">
                             <el-button
                                     size="mini"
+                                    @click="generateDialogVisible = true"
                                     style="
                                         width: 70px;
                                         height: 26px;
@@ -596,13 +597,15 @@ import {interfaceTestcaseApis} from "@/api/interface/interfaceTestcase";
 import {fileApis} from "@/api/file";
 import ScriptEditor from "@/views/interface-test/components/scriptEditor.vue";
 import {environmentVariableApis} from "@/api/config/environmentVariable";
+import AutoGenerateCasesDialog from "@/views/interface-test/components/autoGenerateCasesDialog.vue";
 
 export default {
     name: "InterfaceTestcaseEditor",
     components: {
         VueJsonPretty,
         JsonEditor,
-        ScriptEditor
+        ScriptEditor,
+        AutoGenerateCasesDialog
     },
     props: {
         mode: {
@@ -627,6 +630,7 @@ export default {
             editingTestCaseName: false, // 是否处于编辑状态
             editingTestCaseNameValue: '', // 编辑输入框的临时值
             environments: [],
+            generateDialogVisible: false,
         };
     },
     computed: {
