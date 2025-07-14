@@ -71,12 +71,12 @@ export function prepareDataForSave(testCase) {
     return {
         id: testCase.id,
         name: testCase.name.trim(),
-        priority: testCase.priority, // 如果未选择，给个默认值，例如 '1' 代表中
+        priority: testCase.priority,
         // host: testCase.host.trim().startsWith('http://') ?
         //     testCase.host.trim() : testCase.host.trim().startsWith('https://') ?
         //         testCase.host.trim() : 'https://' + testCase.host.trim(),
         host: testCase.host.trim(),
-
+        envId: testCase.envId,
         // 请求相关
         method: testCase.method,
         // 注意：这里的 pathParam 是为了适配数据库的 request_path_params 字段
