@@ -397,10 +397,12 @@ export default {
                     this.setParameter(nullParamCase, variable.location, variable.key, null, variable.type);
                     generatedCases.push(nullParamCase);
                 }
-                // 错误类型
-                const errorTypeCase = this.createCaseFromBase(baseCase, `【自动生成】参数{${variable.key}}为错误类型`)
-                this.setParameter(errorTypeCase, variable.location, variable.key, this.getWrongTypeValue(variable.type), variable.type, true)
-                generatedCases.push(errorTypeCase)
+                // 错误类型, 如果不是body的话不用考虑错误类型
+                if (variable.location === 'body') {
+                    const errorTypeCase = this.createCaseFromBase(baseCase, `【自动生成】参数{${variable.key}}为错误类型`)
+                    this.setParameter(errorTypeCase, variable.location, variable.key, this.getWrongTypeValue(variable.type), variable.type, true)
+                    generatedCases.push(errorTypeCase)
+                }
                 // 数值大小边界情况
                 if (variable.type === 'number') {
                     const { min, max } = variable;
@@ -450,30 +452,6 @@ export default {
             });
             this.$emit('generate', generatedCases);
             this.dialogVisible = false;
-        },
-        getSampleValue(variable) {
-            if (variable.defaultValue) {
-                if (variable.type === 'object') {
-                    try {
-                        return JSON.parse(variable.defaultValue);
-                    }
-                    catch (e) {
-                        this.$message.warning(`变量 "${variable.key}" 的默认值不是一个有效的JSON，已使用备用值。`);
-                        return { error: "invalid default value" };
-                    }
-                }
-                if (variable.type === 'boolean') {
-                    return String(variable.defaultValue).toLowerCase() === 'true';
-                }
-                return variable.defaultValue;
-            }
-            switch (variable.type) {
-                case 'string': return 'test_string';
-                case 'number': return typeof variable.min === 'number' ? variable.min : 100;
-                case 'boolean': return true;
-                case 'object': return { sample: "object" };
-                default: return '';
-            }
         },
         getWrongTypeValue(type) {
             switch (type) {
