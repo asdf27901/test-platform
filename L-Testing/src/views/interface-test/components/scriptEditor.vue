@@ -122,7 +122,7 @@ export default {
                             body: {
                                 _type: "object",
                                 _doc: "请求体对象",
-                                getJson: {
+                                getJsonStr: {
                                     _type: "method",
                                     _doc: "获取请求体json(字符串)"
                                 },
