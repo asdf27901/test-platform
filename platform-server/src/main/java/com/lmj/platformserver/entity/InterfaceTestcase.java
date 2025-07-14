@@ -1,6 +1,7 @@
 package com.lmj.platformserver.entity;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
@@ -60,7 +61,7 @@ public class InterfaceTestcase extends BaseEntity{
 //    )
     private String host;
 
-    @TableField("env_id")
+    @TableField(value = "env_id", updateStrategy = FieldStrategy.ALWAYS)
     private Long envId;
 
     @NotBlank(message = "请求方法不能为空")
