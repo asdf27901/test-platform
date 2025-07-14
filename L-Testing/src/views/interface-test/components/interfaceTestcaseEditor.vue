@@ -813,6 +813,7 @@ export default {
                     const {data} = await interfaceTestcaseApis.getInterfaceTestcaseDetail(testcaseId)
                     this.interfaceId = data.interfaceId
                     this.host = data.host
+                    this.currentEnvironment = data.envId
                     const [res1, res2] = await Promise.all([
                         interfaceApis.getInterfaceDetail(this.interfaceId),
                         environmentVariableApis.getUserEnvironmentVariable()
