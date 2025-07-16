@@ -2,7 +2,7 @@
 	<div class="h100">
 		<transition :name="setTransitionName" mode="out-in">
 			<keep-alive :include="keepAliveNameList">
-				<router-view :key="refreshRouterViewKey || $route.fullPath" />
+				<router-view :key="refreshRouterViewKey || $route.path" />
 			</keep-alive>
 		</transition>
 	</div>
