@@ -1244,6 +1244,7 @@ export default {
                     }
                 } finally {
                     this.isSendingRequest = false
+                    this.syncTableSelection()
                 }
             } else {
                 Message.error("部分用例存在问题，请检查带有红色感叹号的用例。");
