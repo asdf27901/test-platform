@@ -1,8 +1,8 @@
 
-export function validateTestCase(mode, testCase, interfaceId) {
+export function validateTestCase(testCase, interfaceId) {
     const errors = [];
 
-    if (!interfaceId && mode === 'add') {
+    if (!interfaceId) {
         errors.push("用例未关联到任何接口。");
     }
 
