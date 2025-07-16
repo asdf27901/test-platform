@@ -630,7 +630,7 @@ export default {
             pageLoading: true,
             isUploading: false,
             isSendingRequest: false,
-            interfaceId: this.$route.query.interfaceId,
+            interfaceId: '',
             host: '',
             testCases: [],
             interfacePath: '',
@@ -1214,7 +1214,7 @@ export default {
                 testCase.host = this.host
                 testCase.envId = this.currentEnvironment
                 // 校验时传入 interfaceId
-                const errors = validateTestCase(this.mode, testCase, this.interfaceId);
+                const errors = validateTestCase(testCase, this.interfaceId);
                 Vue.set(testCase, 'errors', errors);
                 if (errors.length > 0) {
                     allValid = false;
