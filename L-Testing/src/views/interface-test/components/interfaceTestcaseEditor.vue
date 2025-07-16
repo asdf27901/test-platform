@@ -641,6 +641,7 @@ export default {
             editingTestCaseNameValue: '', // 编辑输入框的临时值
             environments: [],
             generateDialogVisible: false,
+            cachePath: null
         };
     },
     computed: {
@@ -756,8 +757,14 @@ export default {
     created() {
         this.initializePage();
     },
+    activated() {
+        if (this.cachePath !== null && this.cachePath !== this.$route.fullPath) {
+            this.initializePage()
+        }
+    },
     methods: {
         async initializePage() {
+            this.cachePath = this.$route.fullPath
             this.pageLoading = true;
             if (this.mode === 'add') {
                 try {
@@ -806,6 +813,7 @@ export default {
                 const testcaseId = this.$route.query.testcaseId;
                 if (!testcaseId) {
                     this.$message.error("缺少用例ID，无法加载页面！");
+                    this.cachePath = ''
                     this.goBack()
                     return;
                 }
