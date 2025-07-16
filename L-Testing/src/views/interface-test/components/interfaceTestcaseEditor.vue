@@ -766,115 +766,81 @@ export default {
         async initializePage() {
             this.cachePath = this.$route.fullPath
             this.pageLoading = true;
-            if (this.mode === 'add') {
-                try {
-                    const interfaceId = this.$route.query.interfaceId;
-                    if (!interfaceId) {
-                        this.$message.error("缺少接口ID，无法加载页面！");
-                        this.goBack()
-                        return;
-                    }
+            this.testCases = []
 
-                    const [res1, res2] = await Promise.all([
-                        interfaceApis.getInterfaceDetail(interfaceId),
-                        environmentVariableApis.getUserEnvironmentVariable()
-                    ])
-
-                    this.interfacePath = res1.data.path
-                    this.environments = res2.data.map(v => {
-                        return {
-                            id: v.id,
-                            name: v.name,
-                            variables: v.variables
-                        }
-                    })
-
-                    // 判断加载后的逻辑
-                    if (this.testCases.length > 0) {
-                        // 如果有已有用例，默认选中第一个
-                        this.selectTestCase(this.testCases[0]);
-                    } else {
-                        // 如果没有已有用例，创建一个新的默认用例
-                        const newCase = this.createNewTestCaseData();
-                        newCase.path = this.interfacePath || '无法获取接口路径，请稍后重试'
-                        this.testCases.push(newCase);
-                        this.selectTestCase(newCase);
-                    }
-
-                    this.pageLoading = false;
-
-                } catch (error) {
-                    if (error.code) {
-                        Message.error(error.message)
-                        this.goBack()
-                    }
+            try {
+                const { mode } = this
+                const { interfaceId, testcaseId } = this.$route.query
+                if (mode === 'add' && !interfaceId) {
+                    this.$message.error("缺少接口ID，无法加载页面！");
+                    this.cachePath = ''
+                    this.goBack()
+                    return;
                 }
-            } else if (this.mode === 'edit') {
-                const testcaseId = this.$route.query.testcaseId;
-                if (!testcaseId) {
+                if (mode === 'edit' && !testcaseId) {
                     this.$message.error("缺少用例ID，无法加载页面！");
                     this.cachePath = ''
                     this.goBack()
                     return;
                 }
-                try {
-                    const {data} = await interfaceTestcaseApis.getInterfaceTestcaseDetail(testcaseId)
-                    this.interfaceId = data.interfaceId
-                    this.host = data.host
-                    this.currentEnvironment = data.envId
-                    const [res1, res2] = await Promise.all([
-                        interfaceApis.getInterfaceDetail(this.interfaceId),
-                        environmentVariableApis.getUserEnvironmentVariable()
-                    ])
 
-                    this.interfacePath = res1.data.path
-                    const response = {
-                        body: null,
-                        cookies: [],
-                        headers: {},
-                        statusCode: null,
-                        responseTime: null,
-                        preExecutionResult: null,
-                        postExecutionResult: null
-                    }
-                    this.currentTestCase = {
-                        id: data.id,
-                        headers: data.headers,
-                        method: data.method,
-                        name: data.name,
-                        priority: data.priority,
-                        requestBodyType: data.requestBodyType,
-                        preRequestScript: data.preRequestScript,
-                        postRequestScript: data.postRequestScript,
-                        pathParam: data.pathParam,
-                        queryParams: data.queryParams,
-                        ...data.requestBody,
-                        response,
-                        hasJsonFlag: true,
-                        requestTabsActive: 'params',
-                        responseTabsActive: 'body',
-                        path: this.interfacePath
-                    }
-                    delete this.currentTestCase.requestBody
+                const promises = [
+                    environmentVariableApis.getUserEnvironmentVariable(),
+                    mode === 'edit' ? interfaceTestcaseApis.getInterfaceTestcaseDetail(testcaseId) : Promise.resolve(null),
+                ]
 
-                    this.testCases.push(this.currentTestCase)
-                    this.selectTestCase(this.currentTestCase)
+                const [envRes, testcaseRes] = await Promise.all(promises);
+                this.environments = envRes.data.map(v => ({
+                    id: v.id,
+                    name: v.name,
+                    variables: v.variables
+                }));
 
-                    this.environments = res2.data.map(v => {
-                        return {
-                            id: v.id,
-                            name: v.name,
-                            variables: v.variables
-                        }
-                    })
-                    this.pageLoading = false
-                } catch (e) {
-                    if (e.code) {
-                        Message.error(e.message)
-                        this.goBack()
-                    }
+                const finalInterfaceId = mode === 'add' ? interfaceId : testcaseRes.data.interfaceId;
+                const interfaceRes = await interfaceApis.getInterfaceDetail(finalInterfaceId);
+                this.interfacePath = interfaceRes.data.path;
+
+                const caseData = mode === 'edit' ? testcaseRes.data : {}; // 新增模式用空对象作为基础
+                const formattedCase = this._formatTestCaseData(caseData);
+
+                if (mode === 'edit') {
+                    this.host = testcaseRes.data.host;
+                    this.currentEnvironment = testcaseRes.data.envId;
+                    this.interfaceId = testcaseRes.data.interfaceId; // 顺便更新一下 interfaceId
                 }
+                this.testCases.push(formattedCase);
+                this.selectTestCase(formattedCase);
+            } catch (e) {
+                if (e.code) {
+                    Message.error(e.message);
+                }
+                this.cachePath = ''
+                this.goBack()
+            } finally {
+                this.pageLoading = false
             }
+        },
+
+        _formatTestCaseData(apiData={}) {
+            const newCase = this.createNewTestCaseData()
+
+            Object.assign(newCase, {
+                id: apiData.id || newCase.id,
+                name: apiData.name || newCase.name,
+                path: apiData.path || newCase.path,
+                method: apiData.method || newCase.method,
+                priority: apiData.priority || newCase.priority,
+                pathParam: apiData.pathParam || newCase.pathParam,
+                queryParams: apiData.queryParams || newCase.queryParams,
+                headers: apiData.headers || newCase.headers,
+                requestBodyType: apiData.requestBodyType || newCase.requestBodyType,
+                preRequestScript: apiData.preRequestScript || newCase.preRequestScript,
+                postRequestScript: apiData.postRequestScript || newCase.postRequestScript,
+                formDataParams: (apiData.requestBody && apiData.requestBody.formDataParams) || newCase.formDataParams,
+                urlEncodedParams: (apiData.requestBody && apiData.requestBody.urlEncodedParams) || newCase.urlEncodedParams,
+                jsonBody: (apiData.requestBody && apiData.requestBody.jsonBody) || newCase.jsonBody,
+            })
+            return newCase
         },
 
         // 新增一个空的用例数据
