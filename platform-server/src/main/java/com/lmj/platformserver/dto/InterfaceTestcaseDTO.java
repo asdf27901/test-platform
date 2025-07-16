@@ -2,7 +2,6 @@ package com.lmj.platformserver.dto;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.lmj.platformserver.entity.InterfaceTestcase;
-import com.lmj.platformserver.groups.Add;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -18,7 +17,7 @@ public class InterfaceTestcaseDTO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @NotNull(message = "关联的接口ID不能为空", groups = Add.class)
+    @NotNull(message = "关联的接口ID不能为空")
     @TableField("interface_id")
     private Long interfaceId;
 
