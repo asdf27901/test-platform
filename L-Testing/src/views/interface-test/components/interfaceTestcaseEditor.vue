@@ -125,7 +125,7 @@
                                 <el-option label="低" :value=2></el-option>
                             </el-select>
 
-                            <span style="margin-right: 10px">测试环境: </span>
+                            <span style="margin-right: 10px">环境: </span>
                             <el-select
                                 v-model="currentEnvironment"
                                 placeholder="请选择环境"
@@ -799,6 +799,7 @@ export default {
                 const finalInterfaceId = mode === 'add' ? interfaceId : testcaseRes.data.interfaceId;
                 const interfaceRes = await interfaceApis.getInterfaceDetail(finalInterfaceId);
                 this.interfacePath = interfaceRes.data.path;
+                this.interfaceId = finalInterfaceId
 
                 const caseData = mode === 'edit' ? testcaseRes.data : {}; // 新增模式用空对象作为基础
                 const formattedCase = this._formatTestCaseData(caseData);
@@ -806,7 +807,6 @@ export default {
                 if (mode === 'edit') {
                     this.host = testcaseRes.data.host;
                     this.currentEnvironment = testcaseRes.data.envId;
-                    this.interfaceId = testcaseRes.data.interfaceId; // 顺便更新一下 interfaceId
                 }
                 this.testCases.push(formattedCase);
                 this.selectTestCase(formattedCase);
@@ -850,6 +850,7 @@ export default {
                 name: "未命名用例",
                 priority: 0,
                 method: 'GET',
+                interfaceId: this.interfaceId,
                 path: this.interfacePath || '无法获取接口路径，请稍后重试',
                 pathParam: '',
                 queryParams: [],
@@ -923,10 +924,7 @@ export default {
             if (requestData) {
                 this.isSendingRequest = true
                 try {
-                    const {data} = await interfaceTestcaseApis.sendInterfaceTestcaseRequest({
-                        ...requestData,
-                        interfaceId: this.interfaceId
-                    }, this.currentEnvironment)
+                    const {data} = await interfaceTestcaseApis.sendInterfaceTestcaseRequest(requestData, this.currentEnvironment)
                     this.currentTestCase.response = {
                         ...data.response,
                         postExecutionResult: data.postExecutionResult,
@@ -1214,7 +1212,7 @@ export default {
                 testCase.host = this.host
                 testCase.envId = this.currentEnvironment
                 // 校验时传入 interfaceId
-                const errors = validateTestCase(testCase, this.interfaceId);
+                const errors = validateTestCase(testCase);
                 Vue.set(testCase, 'errors', errors);
                 if (errors.length > 0) {
                     allValid = false;
@@ -1233,7 +1231,6 @@ export default {
                 this.isSendingRequest = true
                 try {
                     await interfaceTestcaseApis.saveInterfaceTestcases({
-                        interfaceId: this.interfaceId,
                         interfaceTestcases: saveData
                     })
                     Message.success("保存成功")
