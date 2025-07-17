@@ -1,10 +1,7 @@
 package com.lmj.platformserver.utils;
 
 import cn.hutool.core.net.url.UrlBuilder;
-import cn.hutool.http.Header;
-import cn.hutool.http.HttpRequest;
-import cn.hutool.http.HttpResponse;
-import cn.hutool.http.Method;
+import cn.hutool.http.*;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONException;
 import com.lmj.platformserver.exception.BaseException;
@@ -196,6 +193,8 @@ public class HttpUtil {
             return httpRequest.execute();
         } catch (InaccessibleObjectException e) {
             throw new BaseException(ResultCodeEnum.REQUEST_INVALID);
+        } catch (HttpException e) {
+            throw new BaseException(ResultCodeEnum.HTTP_REQUEST_ERROR);
         }
     }
 
