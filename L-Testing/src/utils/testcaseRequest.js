@@ -22,6 +22,11 @@ export function prepareDataForSave(testCase) {
         return null;
     }
 
+    if (!testCase.interfaceId) {
+        Message.error('没有获取到接口id，请重新获取！')
+        return null
+    }
+
     // --- 2. 数据清洗与格式化 ---
 
     // 清洗和过滤 Query Params
@@ -76,6 +81,7 @@ export function prepareDataForSave(testCase) {
         //     testCase.host.trim() : testCase.host.trim().startsWith('https://') ?
         //         testCase.host.trim() : 'https://' + testCase.host.trim(),
         host: testCase.host.trim(),
+        interfaceId: testCase.interfaceId,
         envId: testCase.envId,
         // 请求相关
         method: testCase.method,
