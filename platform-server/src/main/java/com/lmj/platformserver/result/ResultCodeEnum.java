@@ -21,6 +21,7 @@ public enum ResultCodeEnum {
     ENVIRONMENT_VARIABLE_ID_NOT_FOUND(512, "环境变量ID不存在"),
     ENVIRONMENT_VARIABLE_DUPLICATE(513, "存在重复的环境变量名"),
     JSON_PARSE_ERROR(514, "Json解析出错，请检查Json格式"),
+    HTTP_REQUEST_ERROR(515, "请检查配置是否正确，变量引用是否正确"),
 
     TOKEN_EXPIRED(601, "token已过期"),
     TOKEN_INVALID(602, "无效token"),

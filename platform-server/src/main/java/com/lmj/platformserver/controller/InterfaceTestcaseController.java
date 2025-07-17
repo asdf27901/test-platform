@@ -6,7 +6,6 @@ import com.lmj.platformserver.dto.DeleteInterfaceTestcaseDTO;
 import com.lmj.platformserver.dto.InterfaceTestcaseDTO;
 import com.lmj.platformserver.dto.InterfaceTestcaseListQueryDTO;
 import com.lmj.platformserver.entity.InterfaceTestcase;
-import com.lmj.platformserver.groups.Add;
 import com.lmj.platformserver.result.Response;
 import com.lmj.platformserver.service.InterfaceTestcaseService;
 import com.lmj.platformserver.vo.InterfaceTestcaseVo;
@@ -28,9 +27,9 @@ public class InterfaceTestcaseController {
     private InterfaceTestcaseService interfaceTestcaseService;
 
     @PostMapping("/save")
-    public Response<?> saveInterfaceTestcase(@RequestBody @Validated(Add.class) InterfaceTestcaseDTO interfaceTestcaseDTO) {
+    public Response<?> saveInterfaceTestcase(@RequestBody @Validated InterfaceTestcaseDTO interfaceTestcaseDTO) {
         log.info("添加接口测试用例：{}", interfaceTestcaseDTO);
-        interfaceTestcaseService.save(interfaceTestcaseDTO.getInterfaceTestcases(), interfaceTestcaseDTO.getInterfaceId());
+        interfaceTestcaseService.save(interfaceTestcaseDTO.getInterfaceTestcases());
         return Response.success();
     }
 
