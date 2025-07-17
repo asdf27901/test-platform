@@ -208,7 +208,7 @@ public class HttpUtil {
         res.put("statusCode", httpResponse.getStatus());
         res.put("body", JSON.parse(httpResponse.body()));
         res.put("headers", sanitizedHeaders);
-        res.put("cookies", httpResponse.getCookies());
+        res.put("cookies", JSON.parse(JSON.toJSONString(httpResponse.getCookies())));
         res.put("responseTime", responseTime);
 
         return res;
