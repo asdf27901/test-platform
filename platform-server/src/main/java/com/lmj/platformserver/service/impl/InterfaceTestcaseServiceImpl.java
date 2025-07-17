@@ -29,9 +29,12 @@ import com.lmj.platformserver.vo.ScriptExecutionResultVo;
 import lombok.Cleanup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class InterfaceTestcaseServiceImpl implements InterfaceTestcaseService {
@@ -52,9 +55,14 @@ public class InterfaceTestcaseServiceImpl implements InterfaceTestcaseService {
     private EnvironmentVariableMapper environmentVariableMapper;
 
     @Override
-    public void save(List<InterfaceTestcase> interfaceTestcases, Long interfaceId) {
-        Interface i = interfaceMapper.selectById(interfaceId);
-        if (i == null) {
+    @Transactional
+    public void save(List<InterfaceTestcase> interfaceTestcases) {
+        Set<Long> interfaceIds = interfaceTestcases.stream().map(InterfaceTestcase::getInterfaceId).collect(Collectors.toSet());
+        Long count = interfaceMapper.selectCount(
+                new LambdaQueryWrapper<Interface>()
+                        .in(Interface::getId, interfaceIds)
+        );
+        if (count != interfaceIds.size()) {
             throw new InterfaceErrorException(ResultCodeEnum.INTERFACE_ID_NOT_FOUND);
         }
         Long envId = interfaceTestcases.get(0).getEnvId();
@@ -69,8 +77,6 @@ public class InterfaceTestcaseServiceImpl implements InterfaceTestcaseService {
                 throw new EnvironmentVariableErrorException(ResultCodeEnum.ENVIRONMENT_VARIABLE_ID_NOT_FOUND);
             }
         }
-
-        interfaceTestcases.forEach(ii -> ii.setInterfaceId(interfaceId));
 
         interfaceTestcaseMapper.insertOrUpdate(interfaceTestcases);
     }

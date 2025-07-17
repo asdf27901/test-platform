@@ -39,6 +39,7 @@ public class InterfaceTestcase extends BaseEntity{
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @NotNull(message = "关联的接口ID不能为空")
     @TableField("interface_id")
     private Long interfaceId;
 

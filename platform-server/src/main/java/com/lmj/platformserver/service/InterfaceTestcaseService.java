@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface InterfaceTestcaseService {
-    void save(List<InterfaceTestcase> interfaceTestcases, Long interfaceId);
+    void save(List<InterfaceTestcase> interfaceTestcases);
 
     IPage<InterfaceTestcaseVo> getInterfaceTestcaseList(InterfaceTestcaseListQueryDTO interfaceTestcaseListQueryDTO);
 
