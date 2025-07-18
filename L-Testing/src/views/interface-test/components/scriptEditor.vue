@@ -233,7 +233,8 @@ export default {
                             _doc: "当前请求响应对象",
                             statusCode: { _type: "number", _doc: "响应状态码" },
                             body: { _type: "string", _doc: "响应体" },
-                            headers: { _type: "object", _doc: "响应头" }
+                            headers: { _type: "object", _doc: "响应头" },
+                            cookies: { _type: "object", _doc: "cookies"}
                         },
                         expect: {
                             _type: "method",
