@@ -217,14 +217,15 @@ export default {
 									// 清除缓存/token等
 									Local.clear();
 									// 使用 reload 时，不需要调用 resetRoute() 重置路由
-									window.location.reload();
+									// window.location.reload();
+									this.$router.push({ path: '/login', query: { redirect: this.$route.fullPath } });
 								})
 								.catch(() => {});
 					}, 150);
 					break
 				case 'edit':
 					this.drawerVisible = true
-						this.currentUser = this.$store.state.userInfos.userInfos
+					this.currentUser = this.$store.state.userInfos.userInfos
 					break
 				default:
 					this.$router.push(path);
