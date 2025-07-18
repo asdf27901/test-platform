@@ -106,13 +106,13 @@
                 <el-table-column type="selection" width="55" align="center" reserve-selection></el-table-column>
                 <el-table-column prop="id" label="用例ID" width="80" align="center"></el-table-column>
                 <el-table-column prop="interfaceId" label="接口ID" width="80" align="center"></el-table-column>
-                <el-table-column prop="name" label="用例名称" min-width="180" show-overflow-tooltip align="center"></el-table-column>
+                <el-table-column prop="name" label="用例名称" min-width="450" show-overflow-tooltip align="center"></el-table-column>
                 <el-table-column prop="method" label="请求方法" width="100" align="center">
                     <template slot-scope="scope">
                         <el-tag :type="getMethodTagType(scope.row.method)">{{ scope.row.method }}</el-tag>
                     </template>
                 </el-table-column>
-                <el-table-column prop="path" label="请求路径" min-width="200" show-overflow-tooltip align="center"></el-table-column>
+                <el-table-column prop="path" label="请求路径" min-width="300" show-overflow-tooltip align="center"></el-table-column>
                 <el-table-column prop="priority" label="优先级" width="100" align="center">
                     <template slot-scope="scope">
                         <el-tag :type="getPriorityTagType(scope.row.priority)" size="medium">
@@ -390,6 +390,9 @@ export default {
             }
         }
     },
+    destroyed() {
+        this.bus.$off('reFreshTestcaseList')
+    }
 };
 </script>
 
