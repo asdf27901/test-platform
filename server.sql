@@ -15,7 +15,7 @@ CREATE TABLE Users
     updated_time TIMESTAMP            NOT NULL COMMENT '更新时间',
 
     UNIQUE (username, is_deleted) COMMENT '唯一约束'
-);
+) comment '用户表';
 
 CREATE INDEX idx_users_is_deleted_is_active ON Users (is_deleted, is_active); -- 组合索引，方便查询有效且未删除用户
 
@@ -33,7 +33,7 @@ CREATE TABLE environment_variables
     created_time TIMESTAMP            NOT NULL COMMENT '创建时间',
     update_user  int                  not null comment '更新用户ID',
     updated_time TIMESTAMP            NOT NULL COMMENT '更新时间'
-);
+) comment '环境变量表';
 
 CREATE INDEX idx_environment_variables_create_user_is_deleted ON environment_variables (create_user, is_deleted); -- 方便查询某个用户创建的未删除环境
 
@@ -50,7 +50,7 @@ CREATE TABLE Interfaces
     create_user  int                  not null comment '创建用户ID',
     update_user  int                  not null comment '更新用户ID',
     updated_time TIMESTAMP            NOT NULL COMMENT '更新时间'
-);
+) comment '接口表';
 
 CREATE INDEX idx_interfaces_create_user_is_deleted ON Interfaces (create_user, is_deleted); -- 方便查询某个用户创建的未删除接口
 
@@ -76,7 +76,15 @@ CREATE TABLE Interface_testcases
     created_time                      TIMESTAMP            NOT NULL COMMENT '创建时间',
     update_user                       int                  not null comment '更新用户ID',
     updated_time                      TIMESTAMP            NOT NULL COMMENT '更新时间'
-);
+) comment '接口用例表';
 
 CREATE INDEX idx_testcases_interface_id_is_deleted ON Interface_testcases (interface_id, is_deleted); -- 方便查询某个接口下未删除的用例
 CREATE INDEX idx_testcases_create_user_is_deleted ON Interface_testcases (create_user, is_deleted); -- 方便查询某个用户创建的未删除用例
+
+CREATE TABLE testcase_environments
+(
+    id                  INT AUTO_INCREMENT PRIMARY KEY COMMENT 'ID',
+    testcase_id         INT              NOT NULL COMMENT '关联的接口测试用例ID',
+    environment_id      INT              NOT NULL COMMENT '关联的环境ID',
+    user_id             INT              NOT NULL COMMENT '创建关联的用户ID'
+) COMMENT '测试用例与环境的关联表';
