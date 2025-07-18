@@ -1,7 +1,6 @@
 package com.lmj.platformserver.entity;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
@@ -61,9 +60,6 @@ public class InterfaceTestcase extends BaseEntity{
 //            message = "域名必须以 http:// 或 https:// 开头"
 //    )
     private String host;
-
-    @TableField(value = "env_id", updateStrategy = FieldStrategy.ALWAYS)
-    private Long envId;
 
     @NotBlank(message = "请求方法不能为空")
     @Pattern(regexp = "(?i)GET|POST|PUT|DELETE|PATCH", message = "请求方法错误")

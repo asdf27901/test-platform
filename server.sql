@@ -61,7 +61,6 @@ CREATE TABLE Interface_testcases
     name                              VARCHAR(100)         NOT NULL COMMENT '接口测试用例名称',
     priority                          INT        DEFAULT 0 COMMENT '用例优先级，0-高, 1-中, 2-低',
     host                              varchar(100)         not null comment '域名地址',
-    env_id                            INT                  NULL COMMENT '环境id',
     request_method                    VARCHAR(10)          NOT NULL COMMENT '请求方法',
     request_body_type                 VARCHAR(30) COMMENT '请求体类型',
     request_path_variables            JSON COMMENT '请求路径参数',
