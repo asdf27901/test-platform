@@ -790,23 +790,30 @@ export default {
                 ]
 
                 const [envRes, testcaseRes] = await Promise.all(promises);
+                let envId, path, interfaceTestcase;
+                if (mode === 'edit' && testcaseRes) {
+                    // 只有在 edit 模式且 detailRes 有值时，才解构
+                    ({ envId, path, interfaceTestcase } = testcaseRes.data);
+                    this.host = interfaceTestcase.host;
+                    this.currentEnvironment = envId;
+                }
                 this.environments = envRes.data.map(v => ({
                     id: v.id,
                     name: v.name,
                     variables: v.variables
                 }));
 
-                const finalInterfaceId = mode === 'add' ? interfaceId : testcaseRes.data.interfaceId;
-                const interfaceRes = await interfaceApis.getInterfaceDetail(finalInterfaceId);
-                this.interfacePath = interfaceRes.data.path;
+                const finalInterfaceId = mode === 'add' ? interfaceId : interfaceTestcase.interfaceId;
+                const interfaceRes = await interfaceApis.getInterfaceDetail(finalInterfaceId)
+                this.interfacePath = mode === 'add' ? interfaceRes.data.path : path
                 this.interfaceId = finalInterfaceId
 
-                const caseData = mode === 'edit' ? testcaseRes.data : {}; // 新增模式用空对象作为基础
+                const caseData = mode === 'edit' ? interfaceTestcase : {}; // 新增模式用空对象作为基础
                 const formattedCase = this._formatTestCaseData(caseData);
 
                 if (mode === 'edit') {
-                    this.host = testcaseRes.data.host;
-                    this.currentEnvironment = testcaseRes.data.envId;
+                    this.host = interfaceTestcase.host;
+                    this.currentEnvironment = envId;
                 }
                 this.testCases.push(formattedCase);
                 this.selectTestCase(formattedCase);
@@ -924,7 +931,7 @@ export default {
             if (requestData) {
                 this.isSendingRequest = true
                 try {
-                    const {data} = await interfaceTestcaseApis.sendInterfaceTestcaseRequest(requestData, this.currentEnvironment)
+                    const {data} = await interfaceTestcaseApis.sendInterfaceTestcaseRequest(requestData, this.currentEnvironment ? this.currentEnvironment : null)
                     this.currentTestCase.response = {
                         ...data.response,
                         postExecutionResult: data.postExecutionResult,
@@ -1210,7 +1217,7 @@ export default {
             // 1. 遍历所有用例，进行校验并更新错误状态
             this.testCases.forEach(testCase => {
                 testCase.host = this.host
-                testCase.envId = this.currentEnvironment
+                // testCase.envId = this.currentEnvironment
                 // 校验时传入 interfaceId
                 const errors = validateTestCase(testCase);
                 Vue.set(testCase, 'errors', errors);
@@ -1232,7 +1239,7 @@ export default {
                 try {
                     await interfaceTestcaseApis.saveInterfaceTestcases({
                         interfaceTestcases: saveData
-                    })
+                    }, this.currentEnvironment ? this.currentEnvironment : null)
                     Message.success("保存成功")
                     this.goBack()
                 }catch (e) {

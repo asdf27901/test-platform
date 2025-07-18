@@ -1,11 +1,14 @@
 import request from "@/utils/request";
 
 export const interfaceTestcaseApis = {
-    saveInterfaceTestcases: (data) => {
+    saveInterfaceTestcases: (data, envId) => {
         return request({
             url: '/interface/testcase/save',
             method: 'post',
-            data
+            data,
+            params: {
+                envId
+            }
         })
     },
     getInterfaceTestcaseList: (params) => {
