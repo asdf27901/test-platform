@@ -131,7 +131,7 @@ export const routerMap = [
                 },
                 children: [
                     {
-                        path: "/environmentVariable",
+                        path: "/config/environmentVariable",
                         name: "EnvironmentVariable",
                         component: () => import('@/views/config/environmentVariable.vue'),
                         meta: {

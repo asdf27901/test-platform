@@ -161,7 +161,9 @@ export default {
 							Message.success('登录成功')
 							PrevLoading.start()
 							setTimeout(() => {
-								this.$router.push('/')
+								this.$router.push({
+									path: this.$route.query.redirect ? this.$route.query.redirect : '/'
+								})
 							}, 300)
 						}catch (error) {
 							this.submit.loading = false
