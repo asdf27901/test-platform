@@ -8,6 +8,7 @@ import com.lmj.platformserver.dto.InterfaceTestcaseListQueryDTO;
 import com.lmj.platformserver.entity.InterfaceTestcase;
 import com.lmj.platformserver.result.Response;
 import com.lmj.platformserver.service.InterfaceTestcaseService;
+import com.lmj.platformserver.vo.InterfaceTestcasePageVo;
 import com.lmj.platformserver.vo.InterfaceTestcaseVo;
 import com.lmj.platformserver.vo.RequestResultVo;
 import lombok.extern.slf4j.Slf4j;
@@ -27,16 +28,19 @@ public class InterfaceTestcaseController {
     private InterfaceTestcaseService interfaceTestcaseService;
 
     @PostMapping("/save")
-    public Response<?> saveInterfaceTestcase(@RequestBody @Validated InterfaceTestcaseDTO interfaceTestcaseDTO) {
+    public Response<?> saveInterfaceTestcase(
+            @RequestBody @Validated InterfaceTestcaseDTO interfaceTestcaseDTO,
+            @RequestParam(required = false) Long envId
+    ) {
         log.info("添加接口测试用例：{}", interfaceTestcaseDTO);
-        interfaceTestcaseService.save(interfaceTestcaseDTO.getInterfaceTestcases());
+        interfaceTestcaseService.save(interfaceTestcaseDTO.getInterfaceTestcases(), envId);
         return Response.success();
     }
 
     @GetMapping("/list")
-    public Response<IPage<InterfaceTestcaseVo>> getInterfaceTestcaseList(InterfaceTestcaseListQueryDTO interfaceTestcaseListQueryDTO) {
+    public Response<IPage<InterfaceTestcasePageVo>> getInterfaceTestcaseList(InterfaceTestcaseListQueryDTO interfaceTestcaseListQueryDTO) {
         log.info("获取接口用例列表");
-        IPage<InterfaceTestcaseVo> voIPage = interfaceTestcaseService.getInterfaceTestcaseList(interfaceTestcaseListQueryDTO);
+        IPage<InterfaceTestcasePageVo> voIPage = interfaceTestcaseService.getInterfaceTestcaseList(interfaceTestcaseListQueryDTO);
         return Response.success(voIPage);
     }
 
@@ -48,10 +52,10 @@ public class InterfaceTestcaseController {
     }
 
     @GetMapping("/detail")
-    public Response<InterfaceTestcase> getInterfaceTestcaseDetail(Long id) {
+    public Response<InterfaceTestcaseVo> getInterfaceTestcaseDetail(Long id) {
         log.info("获取接口测试用例详情: {}", id);
-        InterfaceTestcase interfaceTestcase = interfaceTestcaseService.getInterfaceTestcaseDetail(id);
-        return Response.success(interfaceTestcase);
+        InterfaceTestcaseVo interfaceTestcaseVo = interfaceTestcaseService.getInterfaceTestcaseDetail(id);
+        return Response.success(interfaceTestcaseVo);
     }
 
     @PostMapping("/sendRequest")

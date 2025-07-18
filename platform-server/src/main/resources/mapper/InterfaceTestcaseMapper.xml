@@ -3,7 +3,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.lmj.platformserver.mapper.InterfaceTestcaseMapper">
 
-    <select id="getInterfaceTestcaseList" resultType="com.lmj.platformserver.vo.InterfaceTestcaseVo">
+    <select id="getInterfaceTestcaseList" resultType="com.lmj.platformserver.vo.InterfaceTestcasePageVo">
         select its.id,
                its.interface_id,
                its.name,

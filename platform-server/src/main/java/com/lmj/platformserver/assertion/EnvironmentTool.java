@@ -57,7 +57,6 @@ public class EnvironmentTool {
     @HostAccess.Export
     public void clear() {
         if (!CollectionUtils.isEmpty(variables)) {
-            System.out.println("执行了");
             variables.clear();
         }
     }

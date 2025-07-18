@@ -12,17 +12,21 @@ import com.lmj.platformserver.dto.InterfaceTestcaseListQueryDTO;
 import com.lmj.platformserver.entity.EnvironmentVariable;
 import com.lmj.platformserver.entity.Interface;
 import com.lmj.platformserver.entity.InterfaceTestcase;
+import com.lmj.platformserver.entity.TestcaseEnvironment;
 import com.lmj.platformserver.exception.EnvironmentVariableErrorException;
 import com.lmj.platformserver.exception.InterfaceErrorException;
 import com.lmj.platformserver.exception.InterfaceTestcaseErrorException;
 import com.lmj.platformserver.mapper.EnvironmentVariableMapper;
 import com.lmj.platformserver.mapper.InterfaceMapper;
 import com.lmj.platformserver.mapper.InterfaceTestcaseMapper;
+import com.lmj.platformserver.mapper.TestcaseEnvironmentMapper;
 import com.lmj.platformserver.result.ResultCodeEnum;
 import com.lmj.platformserver.service.InterfaceTestcaseService;
 import com.lmj.platformserver.service.JsScriptExecutionService;
+import com.lmj.platformserver.service.TestcaseEnvironmentService;
 import com.lmj.platformserver.utils.HttpUtil;
 import com.lmj.platformserver.utils.VariableResolver;
+import com.lmj.platformserver.vo.InterfaceTestcasePageVo;
 import com.lmj.platformserver.vo.InterfaceTestcaseVo;
 import com.lmj.platformserver.vo.RequestResultVo;
 import com.lmj.platformserver.vo.ScriptExecutionResultVo;
@@ -54,9 +58,15 @@ public class InterfaceTestcaseServiceImpl implements InterfaceTestcaseService {
     @Autowired
     private EnvironmentVariableMapper environmentVariableMapper;
 
+    @Autowired
+    private TestcaseEnvironmentMapper testcaseEnvironmentMapper;
+
+    @Autowired
+    private TestcaseEnvironmentService testcaseEnvironmentService;
+
     @Override
     @Transactional
-    public void save(List<InterfaceTestcase> interfaceTestcases) {
+    public void save(List<InterfaceTestcase> interfaceTestcases, Long envId) {
         Set<Long> interfaceIds = interfaceTestcases.stream().map(InterfaceTestcase::getInterfaceId).collect(Collectors.toSet());
         Long count = interfaceMapper.selectCount(
                 new LambdaQueryWrapper<Interface>()
@@ -65,7 +75,9 @@ public class InterfaceTestcaseServiceImpl implements InterfaceTestcaseService {
         if (count != interfaceIds.size()) {
             throw new InterfaceErrorException(ResultCodeEnum.INTERFACE_ID_NOT_FOUND);
         }
-        Long envId = interfaceTestcases.get(0).getEnvId();
+
+        interfaceTestcaseMapper.insertOrUpdate(interfaceTestcases);
+
         if (envId != null) {
             Long userId = UserContextHolder.getUserId();
             EnvironmentVariable variable = environmentVariableMapper.selectOne(
@@ -76,14 +88,22 @@ public class InterfaceTestcaseServiceImpl implements InterfaceTestcaseService {
             if (variable == null) {
                 throw new EnvironmentVariableErrorException(ResultCodeEnum.ENVIRONMENT_VARIABLE_ID_NOT_FOUND);
             }
-        }
 
-        interfaceTestcaseMapper.insertOrUpdate(interfaceTestcases);
+            List<TestcaseEnvironment> testcaseEnvironmentList = interfaceTestcases.stream().map(i -> {
+                TestcaseEnvironment testcaseEnvironment = new TestcaseEnvironment();
+                testcaseEnvironment.setTestcaseId(i.getId());
+                testcaseEnvironment.setUserId(userId);
+                testcaseEnvironment.setEnvironmentId(envId);
+                return testcaseEnvironment;
+            }).toList();
+
+            testcaseEnvironmentService.saveOrUpdateTestcaseEnvironment(testcaseEnvironmentList);
+        }
     }
 
     @Override
-    public IPage<InterfaceTestcaseVo> getInterfaceTestcaseList(InterfaceTestcaseListQueryDTO interfaceTestcaseListQueryDTO) {
-        Page<InterfaceTestcaseVo> page = new Page<>(interfaceTestcaseListQueryDTO.getCurrent(), interfaceTestcaseListQueryDTO.getSize());
+    public IPage<InterfaceTestcasePageVo> getInterfaceTestcaseList(InterfaceTestcaseListQueryDTO interfaceTestcaseListQueryDTO) {
+        Page<InterfaceTestcasePageVo> page = new Page<>(interfaceTestcaseListQueryDTO.getCurrent(), interfaceTestcaseListQueryDTO.getSize());
         return interfaceTestcaseMapper.getInterfaceTestcaseList(page, interfaceTestcaseListQueryDTO);
     }
 
@@ -93,12 +113,27 @@ public class InterfaceTestcaseServiceImpl implements InterfaceTestcaseService {
     }
 
     @Override
-    public InterfaceTestcase getInterfaceTestcaseDetail(Long id) {
+    public InterfaceTestcaseVo getInterfaceTestcaseDetail(Long id) {
         InterfaceTestcase interfaceTestcase = interfaceTestcaseMapper.selectById(id);
         if (interfaceTestcase == null) {
             throw new InterfaceTestcaseErrorException(ResultCodeEnum.INTERFACE_TESTCASE_ID_NOT_FOUND);
         }
-        return interfaceTestcase;
+        // 获取当前用户，当前用例下绑定的环境变量
+        Long userId = UserContextHolder.getUserId();
+        TestcaseEnvironment testcaseEnvironment = testcaseEnvironmentMapper.selectOne(
+                new LambdaQueryWrapper<TestcaseEnvironment>()
+                        .eq(TestcaseEnvironment::getTestcaseId, id)
+                        .eq(TestcaseEnvironment::getUserId, userId)
+        );
+        // 获取当前用例的请求路径
+        Interface i = interfaceMapper.selectById(interfaceTestcase.getInterfaceId());
+
+        InterfaceTestcaseVo interfaceTestcaseVo = new InterfaceTestcaseVo();
+        interfaceTestcaseVo.setInterfaceTestcase(interfaceTestcase);
+        interfaceTestcaseVo.setPath(i.getPath());
+        interfaceTestcaseVo.setEnvId(testcaseEnvironment == null ? null : testcaseEnvironment.getEnvironmentId());
+
+        return interfaceTestcaseVo;
     }
 
     @Override
