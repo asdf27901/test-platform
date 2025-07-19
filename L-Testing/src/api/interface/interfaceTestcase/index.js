@@ -36,13 +36,14 @@ export const interfaceTestcaseApis = {
             }
         })
     },
-    sendInterfaceTestcaseRequest: (requestData, envId) => {
+    sendInterfaceTestcaseRequest: (requestData, envId, testcaseId) => {
         return request({
             url: `/interface/testcase/sendRequest`,
             method: 'post',
             data: requestData,
             params: {
-                envId
+                envId,
+                testcaseId
             }
         })
     }

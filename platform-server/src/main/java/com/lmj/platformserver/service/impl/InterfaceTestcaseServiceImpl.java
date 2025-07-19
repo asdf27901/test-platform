@@ -138,7 +138,7 @@ public class InterfaceTestcaseServiceImpl implements InterfaceTestcaseService {
 
     @Override
     @SuppressWarnings("unchecked")
-    public RequestResultVo sendInterfaceTestcaseRequest(Map<String, Object> requestData, Long envId) {
+    public RequestResultVo sendInterfaceTestcaseRequest(Map<String, Object> requestData, Long envId, Long testcaseId) {
         Long interfaceId = (Long) requestData.get("interfaceId");
         Interface i = interfaceMapper.selectById(interfaceId);
         if (i == null) {
@@ -174,6 +174,8 @@ public class InterfaceTestcaseServiceImpl implements InterfaceTestcaseService {
 
         HttpRequest httpRequest = httpUtil.createHttpRequest(map, path);
 
+        Map<String, Object> httpRequestDataMap = httpUtil.getHttpRequestDataMap(httpRequest);
+
         long start = System.currentTimeMillis();
         @Cleanup HttpResponse httpResponse = httpUtil.sendCustomizeHttpRequest(httpRequest);
         long end = System.currentTimeMillis();
@@ -194,6 +196,9 @@ public class InterfaceTestcaseServiceImpl implements InterfaceTestcaseService {
         // 更新环境变量
         environmentVariableMapper.updateById(environmentVariable);
 
+        requestResultVo.setRequest(httpRequestDataMap);
+        requestResultVo.setInterfaceId(interfaceId);
+        requestResultVo.setTestcaseId(testcaseId);
         return requestResultVo;
     }
 }
