@@ -1,5 +1,6 @@
 package com.lmj.platformserver.utils;
 
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.net.url.UrlBuilder;
 import cn.hutool.http.*;
 import com.alibaba.fastjson2.JSON;
@@ -13,6 +14,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.lang.reflect.InaccessibleObjectException;
+import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -196,6 +199,30 @@ public class HttpUtil {
         } catch (HttpException e) {
             throw new BaseException(ResultCodeEnum.HTTP_REQUEST_ERROR);
         }
+    }
+
+    @SneakyThrows
+    public Map<String, Object> getHttpRequestDataMap(HttpRequest httpRequest) {
+        HashMap<String, Object> rawRequest = new HashMap<>();
+        Map<String, List<String>> mutableHeaders = new HashMap<>(httpRequest.headers());
+        String path = httpRequest.getUrl();
+        URI uri = new URI(path);
+        rawRequest.put("host", uri.getAuthority());
+        rawRequest.put("path", path);
+        rawRequest.put("method", httpRequest.getMethod().toString());
+        rawRequest.put("body", httpRequest.bodyBytes() == null ? null : new String(httpRequest.bodyBytes()));
+
+        Map<String, Object> form = httpRequest.form();
+        if (mutableHeaders.containsKey(Header.CONTENT_TYPE.getValue())) {
+            rawRequest.put("form", form);
+        } else {
+            if (MapUtil.isNotEmpty(form)) {
+                mutableHeaders.put(Header.CONTENT_TYPE.getValue(), new ArrayList<>(List.of("multipart/form-data")));
+                rawRequest.put("form", form);
+            }
+        }
+        rawRequest.put("headers", mutableHeaders);
+        return rawRequest;
     }
 
     public Map<String, Object> getHttpResponseDataMap(HttpResponse httpResponse, long responseTime) {
