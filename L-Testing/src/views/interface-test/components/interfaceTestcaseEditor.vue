@@ -931,7 +931,11 @@ export default {
             if (requestData) {
                 this.isSendingRequest = true
                 try {
-                    const {data} = await interfaceTestcaseApis.sendInterfaceTestcaseRequest(requestData, this.currentEnvironment ? this.currentEnvironment : null)
+                    const {data} = await interfaceTestcaseApis.sendInterfaceTestcaseRequest(
+                        requestData,
+                        this.currentEnvironment ? this.currentEnvironment : null,
+                        this.$route.query.testcaseId ? this.$route.query.testcaseId : null
+                    )
                     this.currentTestCase.response = {
                         ...data.response,
                         postExecutionResult: data.postExecutionResult,
