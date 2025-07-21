@@ -65,8 +65,8 @@ public class RunInterfaceTestcaseService {
         if (environmentVariable != null) {
             requestDataMapper = (Map<String, Object>) VariableResolver.resolve(environmentVariable.getVariables(), requestDataMapper);
         }
-        apiRequestLogs.setRequestData(new ArrayList<>(List.of(requestDataMapper)));
         HttpRequest httpRequest = httpUtil.createHttpRequest(requestDataMapper, api.getPath());
+        apiRequestLogs.setRequestData(new ArrayList<>(List.of(httpUtil.getHttpRequestDataMap(httpRequest))));
 
         long start = System.currentTimeMillis();
         @Cleanup HttpResponse httpResponse = sendRequest(httpRequest);
