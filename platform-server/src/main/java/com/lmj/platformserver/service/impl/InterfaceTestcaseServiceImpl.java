@@ -3,6 +3,7 @@ package com.lmj.platformserver.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.lmj.platformserver.annotation.RequestCatchLog;
 import com.lmj.platformserver.constant.ApiTestcaseRequestType;
 import com.lmj.platformserver.context.UserContextHolder;
 import com.lmj.platformserver.dto.InterfaceTestcaseListQueryDTO;
@@ -126,7 +127,7 @@ public class InterfaceTestcaseServiceImpl implements InterfaceTestcaseService {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
+    @RequestCatchLog(ApiTestcaseRequestType.SINGLE)
     public RequestResultVo sendInterfaceTestcaseRequest(Map<String, Object> requestData, Long envId, Long testcaseId) {
 
         Long interfaceId = (Long) requestData.get("interfaceId");
