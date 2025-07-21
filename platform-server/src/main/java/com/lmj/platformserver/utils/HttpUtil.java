@@ -12,6 +12,7 @@ import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.lang.reflect.InaccessibleObjectException;
 import java.net.URI;
@@ -134,7 +135,9 @@ public class HttpUtil {
         if (!CollectionUtils.isEmpty(headers)) {
             headers.forEach(h -> {
                 if ((Boolean) h.get("enabled")) {
-                    httpRequest.header((String) h.get("key"), (String) h.get("value"), true);
+                    if (StringUtils.hasText((String) h.get("key")) && StringUtils.hasText((String) h.get("value"))) {
+                        httpRequest.header((String) h.get("key"), (String) h.get("value"), true);
+                    }
                 }
             });
         }
