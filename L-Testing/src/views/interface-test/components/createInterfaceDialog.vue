@@ -31,7 +31,7 @@
                             :rules="createFormRules.name"
                             label-width="80px"
                         >
-                            <el-input v-model="item.name" placeholder="请输入接口名称" maxlength="20" show-word-limit clearable></el-input>
+                            <el-input v-model.trim="item.name" placeholder="请输入接口名称" maxlength="20" show-word-limit clearable></el-input>
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -64,7 +64,7 @@
                             :rules="createFormRules.path"
                             label-width="80px"
                         >
-                            <el-input v-model="item.path" placeholder="请输入接口路径, 如: /api/user/list" clearable></el-input>
+                            <el-input v-model.trim="item.path" placeholder="请输入接口路径, 如: /api/user/list" clearable></el-input>
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -127,7 +127,8 @@ export default {
                 ],
                 path: [
                     { required: true, message: '请输入接口路径', trigger: 'blur' },
-                    { pattern: /^\/[a-zA-Z0-9/\-_:]+$/, message: '请输入合法的路径, 以 / 开头', trigger: 'blur' }
+                    { pattern: /^\/[a-zA-Z0-9/\-_:]+$/, message: '请输入合法的路径, 以 / 开头', trigger: 'blur' },
+                    { validator: this.validateUniqueCombination, trigger: 'blur' }
                 ]
             },
             // 请求方法选项
@@ -222,6 +223,43 @@ export default {
                 callback();
             }
         },
+        validateUniqueCombination(rule, value, callback) {
+            // value 在这里是正在被校验的字段值（比如路径）
+            // rule.prop 是该字段的路径，比如 'interfaces.0.path'
+
+            // 从 rule.prop 中获取当前校验项的索引
+            const prop = rule.field || rule.prop;
+            // 使用更通用的正则，无论是 name, path 还是 method 触发都能获取到索引
+            const match = prop.match(/interfaces\.(\d+)\./);
+            if (!match) {
+                return callback(); // 未匹配到索引，无法比较，直接通过
+            }
+            const currentIndex = Number(match[1]);
+
+            // 获取当前行的完整数据
+            const currentItem = this.createForm.interfaces[currentIndex];
+            const currentMethod = currentItem.method;
+            const currentPath = currentItem.path;
+
+            // 如果方法或路径为空，则不进行唯一性校验，交由 required 规则处理
+            if (!currentMethod || !currentPath) {
+                return callback();
+            }
+
+            // 遍历所有接口，检查是否存在重复的【方法+路径】组合（并排除当前项自身）
+            const interfaces = this.createForm.interfaces;
+            const duplicate = interfaces.some((item, idx) => {
+                // 核心比较逻辑
+                return idx !== currentIndex && item.method === currentMethod && item.path === currentPath;
+            });
+
+            if (duplicate) {
+                // 提供更精确的错误提示
+                callback(new Error('请求方法与路径的组合已存在'));
+            } else {
+                callback(); // 校验通过
+            }
+        }
     }
 };
 </script>

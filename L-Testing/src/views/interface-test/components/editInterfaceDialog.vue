@@ -10,7 +10,7 @@
             <el-row :gutter="20" style="margin-bottom: 20px;">
                 <el-col :span="18">
                     <el-form-item label="接口名称" prop="name">
-                        <el-input v-model="form.name" placeholder="请输入接口名称" maxlength="20" show-word-limit clearable></el-input>
+                        <el-input v-model.trim="form.name" placeholder="请输入接口名称" maxlength="20" show-word-limit clearable></el-input>
                     </el-form-item>
                 </el-col>
             </el-row>
@@ -35,7 +35,7 @@
             <el-row style="margin-bottom: 20px;">
                 <el-col :span="17">
                     <el-form-item label="接口路径" prop="path">
-                        <el-input v-model="form.path" placeholder="请输入接口路径, 如: /api/user/list" clearable></el-input>
+                        <el-input v-model.trim="form.path" placeholder="请输入接口路径, 如: /api/user/list" clearable></el-input>
                     </el-form-item>
                 </el-col>
             </el-row>
