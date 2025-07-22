@@ -73,8 +73,13 @@ public class InterfaceServiceImpl implements InterfaceService {
     }
 
     @Override
+    @Transactional
     public void deleteBatch(List<Long> ids) {
         interfaceMapper.deleteByIds(ids);
+        interfaceTestcaseMapper.delete(
+                new LambdaQueryWrapper<InterfaceTestcase>()
+                        .in(InterfaceTestcase::getInterfaceId, ids)
+        );
     }
 
     @Override
