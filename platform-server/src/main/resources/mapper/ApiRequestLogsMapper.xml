@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lmj.platformserver.mapper.ApiRequestLogsMapper">
+
+    <select id="getApiRequestLogsList" resultType="com.lmj.platformserver.vo.ApiRequestLogsPageQueryVo">
+        select arl.id,
+               arl.interface_id,
+               arl.testcase_id,
+               arl.chain_id,
+               arl.request_type,
+               arl.execute_result,
+               arl.executor_name,
+               arl.execution_time,
+               it.name as testcase_name
+        from api_request_logs arl
+        left join interface_testcases it on arl.testcase_id = it.id
+        <where>
+            <if test="dto.id != null">
+                and arl.id = #{dto.id}
+            </if>
+            <if test="dto.interfaceId != null">
+                and arl.interface_id = #{dto.interfaceId}
+            </if>
+            <if test="dto.testcaseId != null">
+                and arl.testcase_id = #{dto.testcaseId}
+            </if>
+            <if test="dto.requestType != null">
+                and arl.request_type = #{dto.requestType}
+            </if>
+            <if test="dto.chainId != null">
+                and arl.chain_id = #{dto.chainId}
+            </if>
+            <if test="dto.executorId != null">
+                and arl.executor_id = #{dto.executorId}
+            </if>
+            <if test="dto.executeResult != null">
+                and arl.execute_result = #{dto.executeResult}
+            </if>
+            <if test="dto.begin != null">
+                and arl.execution_time &gt;= #{dto.begin}
+            </if>
+            <if test="dto.end != null">
+                and arl.execution_time &lt;= #{dto.end}
+            </if>
+            <if test="dto.testcaseName != null and dto.testcaseName != ''">
+                and it.name like concat('%', #{dto.testcaseName}, '%')
+            </if>
+        </where>
+    </select>
+
+</mapper>
