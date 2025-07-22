@@ -132,11 +132,20 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InterfaceErrorException.class)
     public Response<?> exceptionHandler(InterfaceErrorException e) {
         log.error("请求异常:", e);
-        List<Interface> duplicateInterfaces = e.getDuplicateInterfaces();
-        if (duplicateInterfaces != null && !duplicateInterfaces.isEmpty()) {
-            StringJoiner sj = new StringJoiner(", ", "接口名存在重复：", "");
-            duplicateInterfaces.forEach(i -> sj.add(i.getName()));
-            return Response.fail(e.getResultCodeEnum(), sj.toString());
+        if (e.getResultCodeEnum() == ResultCodeEnum.DUPLICATE_INTERFACE_NAME) {
+            List<Interface> duplicateInterfaces = e.getDuplicateInterfaces();
+            if (duplicateInterfaces != null && !duplicateInterfaces.isEmpty()) {
+                StringJoiner sj = new StringJoiner(", ", "接口名存在重复：", "");
+                duplicateInterfaces.forEach(i -> sj.add(i.getName()));
+                return Response.fail(e.getResultCodeEnum(), sj.toString());
+            }
+        } else if (e.getResultCodeEnum() == ResultCodeEnum.DUPLICATE_INTERFACE_PATH) {
+            List<Interface> duplicateInterfaces = e.getDuplicateInterfaces();
+            if (duplicateInterfaces != null && !duplicateInterfaces.isEmpty()) {
+                StringJoiner sj = new StringJoiner(", ", "接口：", " 已存在");
+                duplicateInterfaces.forEach(i -> sj.add(i.getMethod() + ": " + i.getPath()));
+                return Response.fail(e.getResultCodeEnum(), sj.toString());
+            }
         }
         return Response.fail(e.getResultCodeEnum());
     }
