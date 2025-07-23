@@ -47,6 +47,7 @@
                 and it.name like concat('%', #{dto.testcaseName}, '%')
             </if>
         </where>
+        order by arl.execution_time desc
     </select>
 
 </mapper>
