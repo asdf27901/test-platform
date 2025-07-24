@@ -2,7 +2,7 @@
 	<div class="h100">
 		<transition :name="setTransitionName" mode="out-in">
 			<keep-alive :include="keepAliveNameList">
-				<router-view :key="refreshRouterViewKey || $route.path" />
+				<router-view :key="refreshRouterViewKey || $route.path" ref="keepAlive"/>
 			</keep-alive>
 		</transition>
 	</div>
@@ -34,6 +34,27 @@ export default {
 			});
 		});
 	},
+	mounted() {
+		this.bus.$on('removeCachePage', ({name, prop, k}) => {
+			const {cache} = this.$refs.keepAlive.$vnode.parent.componentInstance
+			if (!cache || (!name && !prop && !k) || (prop && Object.keys(prop).length === 0)) {
+				return
+			}
+			for (const key in cache) {
+				if (cache[key]?.name === name || key.includes(k)) {
+					delete cache[key]
+					return
+				}
+				if (prop) {
+					const flag = Object.keys(prop).every(f => cache[key].componentInstance[f] === prop[f])
+					if (flag) {
+						delete cache[key]
+						return
+					}
+				}
+			}
+		})
+	},
 	computed: {
 		// 设置主界面切换动画
 		setTransitionName() {
@@ -46,5 +67,9 @@ export default {
 			return this.$store.state.keepAliveNames.keepAliveNames;
 		},
 	},
+	beforeDestroy() {
+		this.bus.$off('onTagsViewRefreshRouterView')
+		this.bus.$off('removeCachePage')
+	}
 };
 </script>
