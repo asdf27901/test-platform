@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 public class InterfacePageQueryDTO {
     private Integer current = 1;
     private Integer size = 10;
+    private Long interfaceId;
     private Long userId;
     private String name;
     private String method;
