@@ -5,7 +5,12 @@
         <div class="filter-container">
             <el-form :model="searchForm" ref="searchForm" label-width="100px" class="search-form">
                 <el-row :gutter="24">
-                    <el-col :span="8">
+                    <el-col :span="6">
+                        <el-form-item label="接口ID" prop="interfaceId">
+                            <el-input v-model="searchForm.interfaceId" placeholder="请输入接口ID" clearable></el-input>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="6">
                         <el-form-item label="创建用户" prop="userId">
                             <el-select v-model="searchForm.userId" placeholder="请选择创建用户" clearable style="width: 100%;" filterable>
                                 <el-option
@@ -17,12 +22,12 @@
                             </el-select>
                         </el-form-item>
                     </el-col>
-                    <el-col :span="8">
+                    <el-col :span="6">
                         <el-form-item label="接口名称" prop="name">
                             <el-input v-model="searchForm.name" placeholder="请输入接口名称" clearable></el-input>
                         </el-form-item>
                     </el-col>
-                    <el-col :span="8">
+                    <el-col :span="6">
                         <el-form-item label="请求方法" prop="method">
                             <el-select v-model="searchForm.method" placeholder="请选择方法" clearable style="width: 100%;">
                                 <el-option
@@ -36,12 +41,12 @@
                             </el-select>
                         </el-form-item>
                     </el-col>
-                    <el-col :span="8">
+                    <el-col :span="6">
                         <el-form-item label="接口路径" prop="path">
                             <el-input v-model="searchForm.path" placeholder="请输入接口路径" clearable @keyup.enter.native="handleSearch"></el-input>
                         </el-form-item>
                     </el-col>
-                    <el-col :span="8">
+                    <el-col :span="6">
                         <el-form-item label="接口描述" prop="description">
                             <el-input v-model="searchForm.description" placeholder="请输入接口描述" clearable @keyup.enter.native="handleSearch"></el-input>
                         </el-form-item>
@@ -179,6 +184,7 @@ export default {
 
             // 搜索表单数据
             searchForm: {
+                interfaceId: '',
                 userId: '',
                 name: '',
                 method: '',
