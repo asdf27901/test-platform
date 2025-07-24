@@ -145,7 +145,7 @@
                     <!-- 请求构建区 -->
                     <div class="url-bar">
                         <div class="url-input-group">
-                            <el-select v-model="currentTestCase.method" class="method-select">
+                            <el-select v-model="method" class="method-select" :disabled="mode !== 'add'">
                                 <el-option label="POST" value="POST"/>
                                 <el-option label="GET" value="GET"/>
                                 <el-option label="PUT" value="PUT"/>
@@ -631,6 +631,7 @@ export default {
             isUploading: false,
             isSendingRequest: false,
             interfaceId: '',
+            method: 'GET',
             host: '',
             testCases: [],
             interfacePath: '',
@@ -767,6 +768,9 @@ export default {
             this.cachePath = this.$route.fullPath
             this.pageLoading = true;
             this.testCases = []
+            this.host = ''
+            this.method = 'GET'
+            this.currentEnvironment = null
 
             try {
                 const { mode } = this
@@ -813,6 +817,7 @@ export default {
 
                 if (mode === 'edit') {
                     this.host = interfaceTestcase.host;
+                    this.method = interfaceTestcase.method
                     this.currentEnvironment = envId;
                 }
                 this.testCases.push(formattedCase);
@@ -835,7 +840,6 @@ export default {
                 id: apiData.id || newCase.id,
                 name: apiData.name || newCase.name,
                 path: apiData.path || newCase.path,
-                method: apiData.method || newCase.method,
                 priority: apiData.priority || newCase.priority,
                 pathParam: apiData.pathParam || newCase.pathParam,
                 queryParams: apiData.queryParams || newCase.queryParams,
@@ -856,7 +860,6 @@ export default {
                 id: Date.now(), // 使用时间戳作为临时ID
                 name: "未命名用例",
                 priority: 0,
-                method: 'GET',
                 interfaceId: this.interfaceId,
                 path: this.interfacePath || '无法获取接口路径，请稍后重试',
                 pathParam: '',
@@ -920,13 +923,15 @@ export default {
             }
             if (!this.currentTestCase.path || this.currentTestCase.path.includes('无法获取')) {
                 Message.error('请重新获取接口请求地址')
+                this.cachePath = ''
                 this.goBack()
                 return
             }
             // const requestData = prepareDataForSave(this.currentTestCase)
             const requestData = prepareDataForSave({
                 ...this.currentTestCase,
-                host: this.host
+                host: this.host,
+                method: this.method
             })
             if (requestData) {
                 this.isSendingRequest = true
@@ -1221,6 +1226,7 @@ export default {
             // 1. 遍历所有用例，进行校验并更新错误状态
             this.testCases.forEach(testCase => {
                 testCase.host = this.host
+                testCase.method = this.method
                 // testCase.envId = this.currentEnvironment
                 // 校验时传入 interfaceId
                 const errors = validateTestCase(testCase);
@@ -1245,6 +1251,7 @@ export default {
                         interfaceTestcases: saveData
                     }, this.currentEnvironment ? this.currentEnvironment : null)
                     Message.success("保存成功")
+                    this.cachePath = ''
                     this.goBack()
                 }catch (e) {
                     if (e.code) {
