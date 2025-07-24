@@ -316,6 +316,7 @@ export default {
                 try {
                     await interfaceTestcaseApis.deleteInterfaceTestcaseBatch([id])
                     this.$message.success('删除成功!')
+                    this.bus.$emit('removeCachePage', {prop: {cachePath: `/interfaces-test/testcaseList/editTestcase?testcaseId=${id}`}})
                     await this.afterDeleteRefresh()
                 } catch (e) {
                     if (e.code) {
@@ -337,7 +338,8 @@ export default {
                 try {
                     const ids = this.selectedRows.map(item => item.id)
                     await interfaceTestcaseApis.deleteInterfaceTestcaseBatch(ids)
-                    this.$message.success('批量删除成功!');
+                    this.$message.success('批量删除成功!')
+                    ids.forEach(id => this.bus.$emit('removeCachePage', {prop: {cachePath: `/interfaces-test/testcaseList/editTestcase?testcaseId=${id}`}}))
                     await this.afterDeleteRefresh()
                 } catch (e) {
                     if (e.code) {
