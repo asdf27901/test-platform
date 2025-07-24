@@ -277,24 +277,49 @@ export default {
 		},
 		// 2、关闭当前 tagsView：当前项 `tags-view` icon 关闭时点击，如果是设置了固定的（isAffix），不可以关闭
 		closeCurrentTagsView(path, redirect) {
-			this.tagsViewList.map((v, k, arr) => {
-				if (!v.meta.isAffix) {
-					if (v.path === path) {
-						this.tagsViewList.splice(k, 1);
+			try {
+				const index = this.tagsViewList.findIndex(tag => tag.path === path)
+				if (index > -1) {
+					const tagView = this.tagsViewList[index]
+					if (!tagView.meta.isAffix) {
+						this.tagsViewList.splice(index, 1)
+						setTimeout(() => {
+							this.bus.$emit('removeCachePage', {k: tagView.path})
+						})
 						if (redirect) {
 							this.$router.push(redirect)
 							return
 						}
 						setTimeout(() => {
-							// 最后一个
-							if (this.tagsViewList.length === k) this.$router.push({ path: arr[arr.length - 1].path, query: arr[arr.length - 1].query });
-							// 否则，跳转到下一个
-							else this.$router.push({ path: arr[k].path, query: arr[k].query });
-						}, 0);
+							// 判断当前tagViews的长度是不是只有1个
+							if (this.tagsViewList.length > 0) {
+								if (this.tagsViewList.length === index) this.$router.push({path: this.tagsViewList[index - 1].path, query: this.tagsViewList[index -1].query})
+								else this.$router.push({ path: this.tagsViewList[index].path, query: this.tagsViewList[index].query })
+							}
+						})
 					}
 				}
-			});
-			this.addBrowserSetSession(this.tagsViewList);
+			} finally {
+				this.addBrowserSetSession(this.tagsViewList)
+			}
+
+			// this.tagsViewList.map((v, k, arr) => {
+			// 	if (!v.meta.isAffix) {
+			// 		if (v.path === path) {
+			// 			this.tagsViewList.splice(k, 1);
+			// 			if (redirect) {
+			// 				this.$router.push(redirect)
+			// 				return
+			// 			}
+			// 			setTimeout(() => {
+			// 				// 最后一个
+			// 				if (this.tagsViewList.length === k) this.$router.push({ path: arr[arr.length - 1].path, query: arr[arr.length - 1].query });
+			// 				// 否则，跳转到下一个
+			// 				else this.$router.push({ path: arr[k].path, query: arr[k].query });
+			// 			}, 0);
+			// 		}
+			// 	}
+			// });
 		},
 		// 3、关闭其它 tagsView：如果是设置了固定的（isAffix），不进行关闭
 		closeOtherTagsView(path) {
