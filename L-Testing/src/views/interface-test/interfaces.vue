@@ -357,6 +357,7 @@ export default {
                 try {
                     await interfaceApis.deleteInterfacesBatch([row.id])
                     this.$message.success('删除成功!');
+                    this.bus.$emit('removeCachePage', {prop: {cachePath: `/interfaces-test/testcaseList/addTestcase?interfaceId=${row.id}`}})
                     await this.afterDeleteRefresh()
                 } catch (error) {
                     if (error.code) {
@@ -381,6 +382,7 @@ export default {
                     const ids = this.multipleSelection.map(item => item.id);
                     await interfaceApis.deleteInterfacesBatch(ids)
                     this.$message.success('批量删除成功!');
+                    ids.forEach(id => this.bus.$emit('removeCachePage', {prop: {cachePath: `/interfaces-test/testcaseList/addTestcase?interfaceId=${id}`}}))
                     await this.afterDeleteRefresh()
                 }catch (error) {
                     if (error.code) {
