@@ -16,6 +16,9 @@
         from interfaces i
         <where>
             i.is_deleted = 0
+            <if test="interfacePageQueryDTO.interfaceId != null">
+                and id = #{interfacePageQueryDTO.interfaceId}
+            </if>
             <if test="interfacePageQueryDTO.userId != null">
                 and create_user = #{interfacePageQueryDTO.userId}
             </if>
