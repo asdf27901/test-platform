@@ -1,5 +1,6 @@
 package com.lmj.platformserver.utils;
 
+import cn.hutool.core.io.resource.BytesResource;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.net.url.UrlBuilder;
 import cn.hutool.http.*;
@@ -21,10 +22,7 @@ import java.io.IOException;
 import java.lang.reflect.InaccessibleObjectException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
@@ -219,17 +217,28 @@ public class HttpUtil {
         URI uri = new URI(path);
         rawRequest.put("host", uri.getAuthority());
         rawRequest.put("path", path);
+        rawRequest.put("queryParam", uri.getRawQuery());
         rawRequest.put("method", httpRequest.getMethod().toString());
         rawRequest.put("body", httpRequest.bodyBytes() == null ? null : new String(httpRequest.bodyBytes()));
 
         Map<String, Object> form = httpRequest.form();
-        if (mutableHeaders.containsKey(Header.CONTENT_TYPE.getValue())) {
-            rawRequest.put("form", form);
-        } else {
-            if (MapUtil.isNotEmpty(form)) {
+        if (MapUtil.isNotEmpty(form)) {
+            List<Map<String, String>> l = new ArrayList<>();
+            if (httpRequest.header(Header.CONTENT_TYPE) != null) {
+                for (Map.Entry<String, Object> entry : form.entrySet()) {
+                    l.add(new HashMap<>(Map.of("key", entry.getKey(), "value", String.valueOf(entry.getValue()))));
+                }
+            } else {
                 mutableHeaders.put(Header.CONTENT_TYPE.getValue(), new ArrayList<>(List.of("multipart/form-data")));
-                rawRequest.put("form", form);
+                for (Map.Entry<String, Object> entry : form.entrySet()) {
+                    if (entry.getValue() instanceof BytesResource b) {
+                        l.add(new HashMap<>(Map.of("key", entry.getKey(), "value", b.getName(), "type", "file")));
+                    } else {
+                        l.add(new HashMap<>(Map.of("key", entry.getKey(), "value", entry.getKey(), "type", "text")));
+                    }
+                }
             }
+            rawRequest.put("form", l);
         }
         rawRequest.put("headers", mutableHeaders);
         return rawRequest;
@@ -268,9 +277,9 @@ public class HttpUtil {
 
         } catch (IOException e) {
             // 如果解压或转换失败，记录错误并存储原始的（可能是乱码的）字符串
-            res.put("body", "Error processing response body: " + e.getMessage());
+//            res.put("body", "Error processing response body: " + e.getMessage());
             // 或者存储原始字节的Base64编码，避免乱码
-            // res.put("body_base64", Base64.getEncoder().encodeToString(responseBodyBytes));
+             res.put("body_base64", Base64.getEncoder().encodeToString(responseBodyBytes));
         }
 
         return res;
