@@ -9,6 +9,7 @@ import com.lmj.platformserver.entity.ApiRequestLogs;
 import com.lmj.platformserver.entity.EnvironmentVariable;
 import com.lmj.platformserver.entity.Interface;
 import com.lmj.platformserver.mapper.EnvironmentVariableMapper;
+import com.lmj.platformserver.pojo.RequestSteps;
 import com.lmj.platformserver.utils.HttpUtil;
 import com.lmj.platformserver.utils.VariableResolver;
 import com.lmj.platformserver.vo.RequestResultVo;
@@ -16,9 +17,8 @@ import com.lmj.platformserver.vo.ScriptExecutionResultVo;
 import lombok.Cleanup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 @Service
@@ -51,39 +51,40 @@ public class RunInterfaceTestcaseService {
             ApiRequestLogs apiRequestLogs
     ) {
         RequestResultVo resultVo = new RequestResultVo();
+        RequestSteps steps = new RequestSteps();
+        apiRequestLogs.getSteps().add(steps);
         apiRequestLogs.setInterfaceId(api.getId());
+        steps.setInterfaceId(api.getId());
 
         Map<String, Object> requestDataMapper = httpUtil.processRequestDataForHttp(requestData);
         String preRequestScript = (String) requestData.get("preRequestScript");
+        String postRequestScript = (String) requestData.get("postRequestScript");
         ScriptExecutionResultVo preScriptResult = executeScript(requestDataMapper, null, environmentVariable, preRequestScript, true);
         resultVo.setPreExecutionResult(preScriptResult);
-        if (preScriptResult != null) {
-            apiRequestLogs.setPreScriptData(new ArrayList<>(List.of(preScriptResult)));
-        } else {
-            apiRequestLogs.setPreScriptData(new ArrayList<>());
-        }
+        steps.setPreScriptData(preScriptResult);
         if (environmentVariable != null) {
             requestDataMapper = (Map<String, Object>) VariableResolver.resolve(environmentVariable.getVariables(), requestDataMapper);
         }
         HttpRequest httpRequest = httpUtil.createHttpRequest(requestDataMapper, api.getPath());
-        apiRequestLogs.setRequestData(new ArrayList<>(List.of(httpUtil.getHttpRequestDataMap(httpRequest))));
+        Map<String, Object> requestDataMap = httpUtil.getHttpRequestDataMap(httpRequest);
+        if (requestDataMap.get("host") == null) {
+            requestDataMap.put("host", requestDataMapper.get("host"));
+            requestDataMap.put("path", StringUtils.hasText((String) requestDataMap.get("queryParam")) ? requestDataMapper.get("host") +  api.getPath() + requestDataMap.get("queryParam") : requestDataMapper.get("host") + api.getPath());
+        }
+        requestDataMap.put("preScript", preRequestScript);
+        requestDataMap.put("postScript", postRequestScript);
+        steps.setRequestData(requestDataMap);
 
         long start = System.currentTimeMillis();
         @Cleanup HttpResponse httpResponse = sendRequest(httpRequest);
         long end = System.currentTimeMillis();
         Map<String, Object> responseDataMap = httpUtil.getHttpResponseDataMap(httpResponse, end - start);
-        apiRequestLogs.setResponseData(new ArrayList<>(List.of(responseDataMap)));
+        steps.setResponseData(responseDataMap);
         resultVo.setResponse(responseDataMap);
 
-        String postRequestScript = (String) requestData.get("postRequestScript");
         ScriptExecutionResultVo postScriptResult = executeScript(null, responseDataMap, environmentVariable, postRequestScript, false);
         resultVo.setPostExecutionResult(postScriptResult);
-        if (postScriptResult != null) {
-            apiRequestLogs.setPostScriptData(new ArrayList<>(List.of(postScriptResult)));
-        } else {
-            apiRequestLogs.setPostScriptData(new ArrayList<>());
-        }
-
+        steps.setPostScriptData(postScriptResult);
 
         updateEnvironment(environmentVariable);
         return resultVo;

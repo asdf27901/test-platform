@@ -3,8 +3,7 @@ package com.lmj.platformserver.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.lmj.platformserver.annotation.RequestCatchLog;
-import com.lmj.platformserver.constant.ApiTestcaseRequestType;
+import com.lmj.platformserver.annotation.SingleRequestCatchLog;
 import com.lmj.platformserver.context.UserContextHolder;
 import com.lmj.platformserver.dto.InterfaceTestcaseListQueryDTO;
 import com.lmj.platformserver.entity.*;
@@ -127,7 +126,7 @@ public class InterfaceTestcaseServiceImpl implements InterfaceTestcaseService {
     }
 
     @Override
-    @RequestCatchLog(ApiTestcaseRequestType.SINGLE)
+    @SingleRequestCatchLog
     public RequestResultVo sendInterfaceTestcaseRequest(Map<String, Object> requestData, Long envId, Long testcaseId) {
 
         Long interfaceId = (Long) requestData.get("interfaceId");

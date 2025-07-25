@@ -1,15 +1,11 @@
 package com.lmj.platformserver.annotation;
 
-import com.lmj.platformserver.constant.ApiTestcaseRequestType;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target(ElementType.METHOD)
+@Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface RequestCatchLog {
-
-    ApiTestcaseRequestType value();
+public @interface SingleRequestCatchLog {
 }
