@@ -167,13 +167,14 @@ public class HttpUtil {
                             else {
                                 // 需要从阿里云上拉取文件下来
                                 String fileUrl = (String) formDataParam.get("fileUrl");
-                                byte[] fileBytes = null;
+                                byte[] fileBytes;
                                 if (fileUrl != null && !fileUrl.equals("")) {
                                     fileBytes = aliOssUtil.getFileBytes(fileUrl);
+                                    if (fileBytes != null) {
+                                        String fileName = (String) formDataParam.get("value");
+                                        httpRequest.form((String) formDataParam.get("key"), fileBytes, fileName);
+                                    }
                                 }
-                                String fileName = (String) formDataParam.get("value");
-
-                                httpRequest.form((String) formDataParam.get("key"), fileBytes, fileName);
                             }
                         }
                     });
