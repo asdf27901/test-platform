@@ -190,7 +190,7 @@ public class HttpUtil {
             }
             case "json" -> {
                 Object jsonBodyObject = requestData.get("body");
-                httpRequest.body(JSON.toJSONString(jsonBodyObject));
+                httpRequest.body(jsonBodyObject == null ? null : JSON.toJSONString(jsonBodyObject));
             }
             default -> {}
         }
@@ -219,7 +219,8 @@ public class HttpUtil {
         rawRequest.put("path", path);
         rawRequest.put("queryParam", uri.getRawQuery());
         rawRequest.put("method", httpRequest.getMethod().toString());
-        rawRequest.put("body", httpRequest.bodyBytes() == null ? null : new String(httpRequest.bodyBytes()));
+        byte[] bodyBytes = httpRequest.bodyBytes();
+        rawRequest.put("body", bodyBytes == null ? null : new String(bodyBytes));
 
         Map<String, Object> form = httpRequest.form();
         if (MapUtil.isNotEmpty(form)) {
