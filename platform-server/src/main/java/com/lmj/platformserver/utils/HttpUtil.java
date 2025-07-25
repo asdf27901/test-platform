@@ -9,18 +9,24 @@ import com.lmj.platformserver.exception.BaseException;
 import com.lmj.platformserver.exception.JsonParseException;
 import com.lmj.platformserver.result.ResultCodeEnum;
 import lombok.SneakyThrows;
+import org.brotli.dec.BrotliInputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.lang.reflect.InaccessibleObjectException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.zip.GZIPInputStream;
 
 @Component
 public class HttpUtil {
@@ -236,12 +242,69 @@ public class HttpUtil {
 
         Map<String, Object> res = new HashMap<>();
         res.put("statusCode", httpResponse.getStatus());
-        res.put("body", JSON.parse(httpResponse.body()));
         res.put("headers", sanitizedHeaders);
         res.put("cookies", JSON.parse(JSON.toJSONString(httpResponse.getCookies())));
         res.put("responseTime", responseTime);
 
+        byte[] responseBodyBytes = httpResponse.bodyBytes();
+        String contentEncoding = httpResponse.header(Header.CONTENT_ENCODING);
+        String bodyAsString;
+
+        try {
+            // 解压响应体
+            byte[] decompressedBytes = decompressBody(responseBodyBytes, contentEncoding);
+
+            // 将解压后的字节转换为字符串
+            bodyAsString = new String(decompressedBytes, StandardCharsets.UTF_8);
+
+            // 如果内容是JSON，尝试解析成JSON对象，否则直接使用字符串
+            String contentType = httpResponse.header(Header.CONTENT_TYPE);
+            if (contentType != null && contentType.toLowerCase().contains("application/json")) {
+                res.put("body", JSON.parse(bodyAsString));
+            } else {
+                res.put("body", bodyAsString);
+            }
+
+        } catch (IOException e) {
+            // 如果解压或转换失败，记录错误并存储原始的（可能是乱码的）字符串
+            res.put("body", "Error processing response body: " + e.getMessage());
+            // 或者存储原始字节的Base64编码，避免乱码
+            // res.put("body_base64", Base64.getEncoder().encodeToString(responseBodyBytes));
+        }
+
         return res;
+    }
+
+    private byte[] decompressBody(byte[] compressedBody, String contentEncoding) throws IOException {
+        if (compressedBody == null || compressedBody.length == 0) {
+            return new byte[0];
+        }
+
+        if (contentEncoding == null) {
+            return compressedBody; // 没有压缩，直接返回
+        }
+
+        ByteArrayInputStream bis = new ByteArrayInputStream(compressedBody);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+        switch (contentEncoding.toLowerCase()) {
+            case "br" -> {
+                try (BrotliInputStream brotliInputStream = new BrotliInputStream(bis)) {
+                    brotliInputStream.transferTo(bos);
+                }
+            }
+            case "gzip" -> {
+                try (GZIPInputStream gzipInputStream = new GZIPInputStream(bis)) {
+                    gzipInputStream.transferTo(bos);
+                }
+            }
+            // 可以添加对 "deflate" 的支持
+            default -> {
+                return compressedBody; // 不支持的压缩类型，直接返回
+            }
+        }
+
+        return bos.toByteArray();
     }
 }
 
