@@ -1,6 +1,7 @@
 package com.lmj.platformserver.utils;
 
 import com.aliyun.oss.OSS;
+import com.aliyun.oss.OSSException;
 import com.aliyun.oss.model.*;
 import com.lmj.platformserver.exception.FileUploadException;
 import com.lmj.platformserver.properties.AliOssProperties;
@@ -106,9 +107,13 @@ public class AliOssUtil {
     @SneakyThrows
     public byte[] getFileBytes(String url) {
         String objectName = parseObjectNameFromUrl(url);
-        @Cleanup OSSObject ossObject = ossClient.getObject(aliOssProperties.getBucketName(), objectName);
-        @Cleanup InputStream inputStream = ossObject.getObjectContent();
-        return inputStream.readAllBytes();
+        try {
+            @Cleanup OSSObject ossObject = ossClient.getObject(aliOssProperties.getBucketName(), objectName);
+            @Cleanup InputStream inputStream = ossObject.getObjectContent();
+            return inputStream.readAllBytes();
+        } catch (OSSException e) {
+            return null;
+        }
     }
 
     private String parseObjectNameFromUrl(String url) {
