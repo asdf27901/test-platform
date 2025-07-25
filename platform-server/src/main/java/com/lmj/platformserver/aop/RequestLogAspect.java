@@ -1,7 +1,6 @@
 package com.lmj.platformserver.aop;
 
 import cn.hutool.core.util.ArrayUtil;
-import com.lmj.platformserver.annotation.RequestCatchLog;
 import com.lmj.platformserver.assertion.AssertionResult;
 import com.lmj.platformserver.constant.ApiTestcaseRequestType;
 import com.lmj.platformserver.constant.RequestResultConstant;
@@ -13,6 +12,7 @@ import com.lmj.platformserver.exception.InterfaceErrorException;
 import com.lmj.platformserver.exception.InterfaceTestcaseErrorException;
 import com.lmj.platformserver.mapper.ApiRequestLogsMapper;
 import com.lmj.platformserver.mapper.UserMapper;
+import com.lmj.platformserver.pojo.RequestSteps;
 import com.lmj.platformserver.vo.ScriptExecutionResultVo;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
@@ -22,7 +22,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Aspect
 @Component
@@ -34,39 +33,45 @@ public class RequestLogAspect {
     @Autowired
     private UserMapper userMapper;
 
-    @Pointcut("@annotation(com.lmj.platformserver.annotation.RequestCatchLog)")
+    @Pointcut("@annotation(com.lmj.platformserver.annotation.SingleRequestCatchLog)")
     public void requestLogPointCut() {
         // 切入点
     }
 
-    @Around("requestLogPointCut() && @annotation(anno)")
-    public Object doAround(ProceedingJoinPoint joinPoint, RequestCatchLog anno) throws Throwable {
+    @Around("requestLogPointCut()")
+    public Object doSingleRequestAround(ProceedingJoinPoint joinPoint) throws Throwable {
         ApiRequestLogs apiRequestLogs = new ApiRequestLogs();
         apiRequestLogs.setExecutionTime(LocalDateTime.now());
         ApiRequestLogsContextHolder.set(apiRequestLogs);
 
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
-        ApiTestcaseRequestType requestType = anno.value();
 
-        if (requestType == ApiTestcaseRequestType.SINGLE) {
-            String[] parameterNames = signature.getParameterNames();
-            Object[] args = joinPoint.getArgs();
-            Long testcaseId = findParamValue("testcaseId", args, parameterNames, Long.class);
-            apiRequestLogs.setTestcaseId(testcaseId);
-        }
+        String[] parameterNames = signature.getParameterNames();
+        Object[] args = joinPoint.getArgs();
+        Long testcaseId = findParamValue("testcaseId", args, parameterNames, Long.class);
+        apiRequestLogs.setTestcaseId(testcaseId);
         try {
             return joinPoint.proceed();
         } catch (Throwable e) {
-            apiRequestLogs.setErrorMsg(e.getMessage());
             if (e instanceof InterfaceErrorException || e instanceof InterfaceTestcaseErrorException) {
                 apiRequestLogs.setInterfaceId(null);
                 apiRequestLogs.setTestcaseId(null);
             }
+            apiRequestLogs.setErrorMsg(e.getMessage());
+            apiRequestLogs.setExecuteResult(RequestResultConstant.ERROR);
             throw e;
         } finally {
-            apiRequestLogs.setRequestType(requestType.getValue());
-            apiRequestLogs.setExecuteResult(dealWithSingleRequestLogResult(apiRequestLogs));
+            int stepSize = apiRequestLogs.getSteps().size();
 
+            if (stepSize > 0) {
+                RequestSteps step = apiRequestLogs.getSteps().get(0);
+                step.setTestcaseId(testcaseId);
+                Byte dealt = dealWithStep(step);
+                apiRequestLogs.setExecuteResult(dealt);
+                step.setErrorMsg(apiRequestLogs.getErrorMsg());
+            }
+
+            apiRequestLogs.setRequestType(ApiTestcaseRequestType.SINGLE.getValue());
             Long userId = UserContextHolder.getUserId();
             User user = userMapper.selectById(userId);
             apiRequestLogs.setExecutorId(userId);
@@ -91,41 +96,45 @@ public class RequestLogAspect {
         return null;
     }
 
-    private Byte dealWithSingleRequestLogResult(ApiRequestLogs logs) {
-        if (logs.getRequestData() == null || logs.getResponseData() == null) {
+    private Byte dealWithStep(RequestSteps step) {
+        if (step.getRequestData() == null || step.getResponseData() == null) {
+            step.setExecuteResult(RequestResultConstant.ERROR);
             return RequestResultConstant.ERROR;
         }
-        List<ScriptExecutionResultVo> preScriptData = logs.getPreScriptData();
-        if (preScriptData.size() != 0) {
-            ScriptExecutionResultVo preExecutionResult = preScriptData.get(0);
-            if (preExecutionResult.getError() != null) {
-                return RequestResultConstant.FAIL;
-            }
-            if (preExecutionResult.getResults() != null) {
-                for (AssertionResult result : preExecutionResult.getResults()) {
-                    if (!result.getResult()) {
-                        return RequestResultConstant.FAIL;
-                    }
-                }
-            }
-        }
-        List<ScriptExecutionResultVo> postScriptData = logs.getPostScriptData();
-        if (postScriptData.size() != 0) {
-            ScriptExecutionResultVo postExecutionResult = postScriptData.get(0);
-            if (postExecutionResult.getError() != null) {
-                return RequestResultConstant.FAIL;
-            }
-            if (postExecutionResult.getResults() != null) {
-                for (AssertionResult result : postExecutionResult.getResults()) {
-                    if (!result.getResult()) {
-                        return RequestResultConstant.FAIL;
-                    }
-                }
-            }
-        }
-        if (!logs.getResponseData().get(0).get("statusCode").equals(200)) {
+
+        ScriptExecutionResultVo preScriptData = step.getPreScriptData();
+        if (preScriptData != null && preScriptData.getError() != null) {
+            step.setExecuteResult(RequestResultConstant.FAIL);
             return RequestResultConstant.FAIL;
         }
+        if (preScriptData != null && preScriptData.getResults() != null) {
+            for (AssertionResult result : preScriptData.getResults()) {
+                if (!result.getResult()) {
+                    step.setExecuteResult(RequestResultConstant.FAIL);
+                    return RequestResultConstant.FAIL;
+                }
+            }
+        }
+
+        ScriptExecutionResultVo postScriptData = step.getPostScriptData();
+        if (postScriptData != null && postScriptData.getError() != null) {
+            step.setExecuteResult(RequestResultConstant.FAIL);
+            return RequestResultConstant.FAIL;
+        }
+        if (postScriptData != null && postScriptData.getResults() != null) {
+            for (AssertionResult result : postScriptData.getResults()) {
+                if (!result.getResult()) {
+                    step.setExecuteResult(RequestResultConstant.FAIL);
+                    return RequestResultConstant.FAIL;
+                }
+            }
+        }
+        Integer statusCode = (Integer) step.getResponseData().get("statusCode");
+        if (statusCode >= 400) {
+            step.setExecuteResult(RequestResultConstant.FAIL);
+            return RequestResultConstant.FAIL;
+        }
+        step.setExecuteResult(RequestResultConstant.SUCCESS);
         return RequestResultConstant.SUCCESS;
     }
 }
