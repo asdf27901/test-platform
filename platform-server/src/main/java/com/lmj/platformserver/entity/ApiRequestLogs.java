@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.lmj.platformserver.pojo.RequestSteps;
 import lombok.Data;
 
@@ -52,5 +53,6 @@ public class ApiRequestLogs implements Serializable {
     private String executorName;
 
     @TableField("execution_time")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime executionTime;
 }
