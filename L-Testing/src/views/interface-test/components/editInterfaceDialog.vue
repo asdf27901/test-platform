@@ -94,7 +94,10 @@ export default {
             rules: {
                 name: [{ required: true, message: '请输入接口名称', trigger: 'blur' }],
                 method: [{ required: true, message: '请选择请求方法', trigger: 'change' }],
-                path: [{ required: true, message: '请输入接口路径', trigger: 'blur' }],
+                path: [
+                    { required: true, message: '请输入接口路径', trigger: 'blur' },
+                    { pattern: /^\/[a-zA-Z0-9/\-_:]*$/, message: '请输入合法的路径, 以 / 开头', trigger: 'blur' },
+                ],
             },
             // 请求方法选项 (与父组件保持一致)
             methodOptions: [

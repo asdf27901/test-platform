@@ -127,7 +127,7 @@ export default {
                 ],
                 path: [
                     { required: true, message: '请输入接口路径', trigger: 'blur' },
-                    { pattern: /^\/[a-zA-Z0-9/\-_:]+$/, message: '请输入合法的路径, 以 / 开头', trigger: 'blur' },
+                    { pattern: /^\/[a-zA-Z0-9/\-_:]*$/, message: '请输入合法的路径, 以 / 开头', trigger: 'blur' },
                     { validator: this.validateUniqueCombination, trigger: 'blur' }
                 ]
             },
