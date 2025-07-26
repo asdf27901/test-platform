@@ -63,18 +63,22 @@ public class ApiRequestLogsServiceImpl implements ApiRequestLogsService {
                     interfaceIdStepsMap.put(interfaceId, step);
                 }
             }
-            List<InterfaceTestcase> interfaceTestcases = interfaceTestcaseMapper.selectByIds(testcaseIds);
-            for (InterfaceTestcase testcase : interfaceTestcases) {
-                RequestSteps step = testcaseIdStepsMap.get(testcase.getId());
-                if (step != null) {
-                    step.setTestcaseName(testcase.getName());
+            if (testcaseIds.size() > 0 ){
+                List<InterfaceTestcase> interfaceTestcases = interfaceTestcaseMapper.selectByIds(testcaseIds);
+                for (InterfaceTestcase testcase : interfaceTestcases) {
+                    RequestSteps step = testcaseIdStepsMap.get(testcase.getId());
+                    if (step != null) {
+                        step.setTestcaseName(testcase.getName());
+                    }
                 }
             }
-            List<Interface> interfaces = interfaceMapper.selectByIds(interfaceIds);
-            for (Interface i : interfaces) {
-                RequestSteps step = interfaceIdStepsMap.get(i.getId());
-                if (step != null) {
-                    step.setInterfaceName(i.getName());
+            if (interfaceIds.size() > 0) {
+                List<Interface> interfaces = interfaceMapper.selectByIds(interfaceIds);
+                for (Interface i : interfaces) {
+                    RequestSteps step = interfaceIdStepsMap.get(i.getId());
+                    if (step != null) {
+                        step.setInterfaceName(i.getName());
+                    }
                 }
             }
         }
