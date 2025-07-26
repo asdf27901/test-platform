@@ -25,6 +25,7 @@ public class Interface extends BaseEntity{
     private String method;
 
     @NotBlank(message = "请求路径不能为空")
+    @Pattern(regexp = "/[a-zA-Z0-9/\\-_:]*", message = "请输入合法的路径, 以 / 开头")
     private String path;
 
     private String description;
