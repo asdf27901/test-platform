@@ -235,7 +235,13 @@ export default {
 		},
 		// 添加 tagsView：未设置隐藏（isHide）也添加到在 tagsView 中
 		addTagsView(path, to) {
-			if (this.tagsViewList.some((v) => v.path === path)) return false;
+			if (this.tagsViewList.some((v) => v.path === path)) {
+				const index = this.tagsViewList.findIndex(v => v.path === path)
+				const item = this.tagsViewRoutesList.find((v) => v.path === path);
+				item.query = to?.query ? to?.query : this.$route.query
+				this.tagsViewList[index] = { ...item }
+				return false;
+			}
 			const item = this.tagsViewRoutesList.find((v) => v.path === path);
 			if (!item) return false
 			if (item.meta.isLink && !item.meta.isIframe) return false;
