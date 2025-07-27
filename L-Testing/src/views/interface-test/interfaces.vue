@@ -176,6 +176,13 @@ export default {
     components: {
         createInterfaceDialog, editInterfaceDialog
     },
+    props: {
+        interfaceId: {
+            type: [String, Number],
+            default: null,
+            required: false
+        }
+    },
     data() {
         return {
             // [修改] 新增 tableHeight 和 debouncedResizeHandler
@@ -224,6 +231,12 @@ export default {
 
         this.fetchActiveUser();
         this.fetchData();
+    },
+    activated() {
+        if (this.interfaceId) {
+            this.searchForm.interfaceId = this.interfaceId
+        }
+        this.fetchData()
     },
     // [修改] 新增 mounted 和 beforeDestroy 生命周期钩子
     mounted() {
