@@ -289,9 +289,7 @@ export default {
 					const tagView = this.tagsViewList[index]
 					if (!tagView.meta.isAffix) {
 						this.tagsViewList.splice(index, 1)
-						setTimeout(() => {
-							this.bus.$emit('removeCachePage', {k: tagView.path})
-						})
+						this.bus.$emit('removeCachePage', {k: tagView.path})
 						if (redirect) {
 							this.$router.push(redirect)
 							return
