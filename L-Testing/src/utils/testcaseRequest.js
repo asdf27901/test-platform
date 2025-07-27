@@ -8,13 +8,13 @@ import {Message} from "element-ui";
 export function prepareDataForSave(testCase) {
     // 验证 Path Param 和 Query Params 的互斥性
     // 这里只筛选出启用的参数进行判断
-    const hasActiveQueryParams = testCase.queryParams.some(p => p.enabled);
-    const hasPathParam = testCase.pathParam && testCase.pathParam.trim() !== '';
+    // const hasActiveQueryParams = testCase.queryParams.some(p => p.enabled);
+    // const hasPathParam = testCase.pathParam && testCase.pathParam.trim() !== '';
 
-    if (hasActiveQueryParams && hasPathParam) {
-        Message.error("路径参数 (Path Param) 和请求参数 (Query Params) 不能同时使用，请只保留其一！");
-        return null;
-    }
+    // if (hasActiveQueryParams && hasPathParam) {
+    //     Message.error("路径参数 (Path Param) 和请求参数 (Query Params) 不能同时使用，请只保留其一！");
+    //     return null;
+    // }
 
     // 如果是JSON请求，验证JSON格式是否正确
     if (testCase.requestBodyType === 'json' && !testCase.hasJsonFlag) {
