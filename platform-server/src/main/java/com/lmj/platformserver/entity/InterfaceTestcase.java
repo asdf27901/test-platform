@@ -21,18 +21,18 @@ import java.util.Map;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "interface_testcases", autoResultMap = true)
-@MultiFieldAssociationCheck(
-        when = "pathParam != null && !pathParam.equals('')",
-        must = "queryParams == null || queryParams.?[#this['enabled'] == true].size() == 0",
-        message = "路径参数和查询参数只能存在其中一个",
-        errorField = "queryParams"
-)
-@MultiFieldAssociationCheck(
-        when = "queryParams == null || queryParams.?[#this['enabled'] == true].size() > 0",
-        must = "pathParam == null || pathParam.equals('')",
-        message = "路径参数和查询参数只能存在其中一个",
-        errorField = "pathParam"
-)
+//@MultiFieldAssociationCheck(
+//        when = "pathParam != null && !pathParam.equals('')",
+//        must = "queryParams == null || queryParams.?[#this['enabled'] == true].size() == 0",
+//        message = "路径参数和查询参数只能存在其中一个",
+//        errorField = "queryParams"
+//)
+//@MultiFieldAssociationCheck(
+//        when = "queryParams == null || queryParams.?[#this['enabled'] == true].size() > 0",
+//        must = "pathParam == null || pathParam.equals('')",
+//        message = "路径参数和查询参数只能存在其中一个",
+//        errorField = "pathParam"
+//)
 public class InterfaceTestcase extends BaseEntity{
 
     @Serial

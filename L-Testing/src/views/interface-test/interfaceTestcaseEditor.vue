@@ -151,17 +151,16 @@
                                 <el-option label="PUT" value="PUT"/>
                                 <el-option label="DELETE" value="DELETE"/>
                             </el-select>
-                            <el-input v-model="host" placeholder="请输入Host" class="host-input"/>
+                            <el-input v-model.trim="host" placeholder="请输入Host" class="host-input"/>
                             <el-input v-model="currentTestCase.path" class="path-input" disabled/>
                         </div>
 
                         <!-- 路径参数输入框 -->
                         <el-input
-                            v-model="currentTestCase.pathParam"
+                            v-model.trim="currentTestCase.pathParam"
                             placeholder="请输入路径参数, 例如: /{1}/{xxxx}"
                             class="path-param-input"
                             clearable
-                            :disabled="queryParamNum > 0"
                         />
 
                         <el-button
@@ -187,17 +186,17 @@
                                 <el-table-column width="55" type="selection" align="center"/>
                                 <el-table-column prop="key" label="Key">
                                     <template slot-scope="scope">
-                                        <el-input v-model="scope.row.key" placeholder="Key"></el-input>
+                                        <el-input v-model.trim="scope.row.key" placeholder="Key"></el-input>
                                     </template>
                                 </el-table-column>
                                 <el-table-column prop="value" label="Value">
                                     <template slot-scope="scope">
-                                        <el-input v-model="scope.row.value" placeholder="Value"></el-input>
+                                        <el-input v-model.trim="scope.row.value" placeholder="Value"></el-input>
                                     </template>
                                 </el-table-column>
                                 <el-table-column prop="description" label="备注">
                                     <template slot-scope="scope">
-                                        <el-input v-model="scope.row.description" placeholder="备注"></el-input>
+                                        <el-input v-model.trim="scope.row.description" placeholder="备注"></el-input>
                                     </template>
                                 </el-table-column>
                                 <el-table-column label="操作" width="80">
@@ -216,7 +215,6 @@
                                     icon="el-icon-plus"
                                     @click="addQueryParam"
                                     style="margin-top: 10px;"
-                                    :disabled="currentTestCase.pathParam.trim().length > 0"
                             >
                                 添加参数
                             </el-button>
@@ -234,17 +232,17 @@
                                 </el-table-column>
                                 <el-table-column prop="key" label="Key">
                                     <template slot-scope="scope">
-                                        <el-input v-model="scope.row.key" placeholder="Key"></el-input>
+                                        <el-input v-model.trim="scope.row.key" placeholder="Key"></el-input>
                                     </template>
                                 </el-table-column>
                                 <el-table-column prop="value" label="Value">
                                     <template slot-scope="scope">
-                                        <el-input v-model="scope.row.value" placeholder="Value"></el-input>
+                                        <el-input v-model.trim="scope.row.value" placeholder="Value"></el-input>
                                     </template>
                                 </el-table-column>
                                 <el-table-column prop="description" label="备注">
                                     <template slot-scope="scope">
-                                        <el-input v-model="scope.row.description" placeholder="备注"></el-input>
+                                        <el-input v-model.trim="scope.row.description" placeholder="备注"></el-input>
                                     </template>
                                 </el-table-column>
                                 <el-table-column label="操作" width="80">
@@ -297,7 +295,7 @@
                                     <el-table-column width="55" type="selection" align="center"></el-table-column>
                                     <el-table-column prop="key" label="Key">
                                         <template slot-scope="scope">
-                                            <el-input v-model="scope.row.key" placeholder="Key"></el-input>
+                                            <el-input v-model.trim="scope.row.key" placeholder="Key"></el-input>
                                         </template>
                                     </el-table-column>
                                     <el-table-column label="类型" prop="type" width="120">
@@ -310,7 +308,7 @@
                                     </el-table-column>
                                     <el-table-column label="Value" prop="value">
                                         <template slot-scope="scope">
-                                            <el-input v-if="scope.row.type === 'text'" v-model="scope.row.value" placeholder="Value"></el-input>
+                                            <el-input v-if="scope.row.type === 'text'" v-model.trim="scope.row.value" placeholder="Value"></el-input>
                                             <el-upload
                                                 v-else
                                                 :show-file-list="false"
@@ -338,7 +336,7 @@
                                     </el-table-column>
                                     <el-table-column prop="description" label="备注">
                                         <template slot-scope="scope">
-                                            <el-input v-model="scope.row.description" placeholder="备注"></el-input>
+                                            <el-input v-model.trim="scope.row.description" placeholder="备注"></el-input>
                                         </template>
                                     </el-table-column>
                                     <el-table-column label="操作" width="80">
@@ -369,17 +367,17 @@
                                     <el-table-column width="55" type="selection" align="center"></el-table-column>
                                     <el-table-column prop="key" label="Key">
                                         <template slot-scope="scope">
-                                            <el-input v-model="scope.row.key" placeholder="Key"></el-input>
+                                            <el-input v-model.trim="scope.row.key" placeholder="Key"></el-input>
                                         </template>
                                     </el-table-column>
                                     <el-table-column prop="value" label="Value">
                                         <template slot-scope="scope">
-                                            <el-input v-model="scope.row.value" placeholder="Value"></el-input>
+                                            <el-input v-model.trim="scope.row.value" placeholder="Value"></el-input>
                                         </template>
                                     </el-table-column>
                                     <el-table-column prop="description" label="备注">
                                         <template slot-scope="scope">
-                                            <el-input v-model="scope.row.description" placeholder="备注"></el-input>
+                                            <el-input v-model.trim="scope.row.description" placeholder="备注"></el-input>
                                         </template>
                                     </el-table-column>
                                     <el-table-column label="操作" width="80">
@@ -649,14 +647,6 @@ export default {
         responseHeadersArray() {
             const headers = this.currentTestCase?.response.headers || {};
             return Object.entries(headers).map(([key, value]) => ({ key, value }));
-        },
-        queryParamNum() {
-            return this.currentTestCase?.queryParams?.reduce((prev, curr) => {
-                if (curr.enabled) {
-                    return prev + 1
-                }
-                return prev
-            }, 0) || 0
         },
         mainCardLoadingText() {
             if (this.pageLoading) {
@@ -1067,18 +1057,12 @@ export default {
         // 处理用户手动勾选数据行Checkbox时触发的事件
         handleParamsSelect(selection, row) {
             row.enabled = !row.enabled
-            if (row.enabled) {
-                this.currentTestCase.pathParam = ''
-            }
         },
         handleParamsSelectAll(selection) {
             const selectionSet = new Set(selection);
             this.currentTestCase.queryParams.forEach(param => {
                 param.enabled = selectionSet.has(param);
             });
-            if (selectionSet) {
-                this.currentTestCase.pathParam = ''
-            }
         },
         handleHeaderSelect(selection, row) {
             row.enabled = !row.enabled
