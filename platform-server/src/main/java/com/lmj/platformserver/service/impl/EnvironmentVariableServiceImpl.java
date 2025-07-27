@@ -36,6 +36,7 @@ public class EnvironmentVariableServiceImpl implements EnvironmentVariableServic
         return environmentVariableMapper.selectList(
                 new LambdaQueryWrapper<EnvironmentVariable>()
                         .eq(EnvironmentVariable::getCreateUser, userId)
+                        .orderByDesc(EnvironmentVariable::getUpdatedTime)
         );
     }
 
