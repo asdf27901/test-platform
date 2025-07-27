@@ -60,7 +60,8 @@ export const routerMap = [
                             isAffix: false,
                             isIframe: false,
                             icon: "fa fa-plug"
-                        }
+                        },
+                        props: true
                     },
                     {
                         path: "/interfaces-test/testcaseList",
