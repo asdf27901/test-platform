@@ -14,7 +14,7 @@ export const routerMap = [
                     icon: 'fa fa-bar-chart-o',
                     isLink: "",
                     isHide: false,
-                    isKeepAlive: true,
+                    isKeepAlive: false,
                     isAffix: true,
                     isIframe: false,
                 }
@@ -79,7 +79,7 @@ export const routerMap = [
                     {
                         path: "/interfaces-test/testcaseList/addTestcase",
                         name: "InterfaceTestcaseEditor",
-                        component: () => import('@/views/interface-test/components/interfaceTestcaseEditor.vue'),
+                        component: () => import('@/views/interface-test/interfaceTestcaseEditor.vue'),
                         props: {
                            mode: 'add'
                         },
@@ -98,7 +98,7 @@ export const routerMap = [
                     {
                         path: "/interfaces-test/testcaseList/editTestcase",
                         name: "InterfaceTestcaseEditor",
-                        component: () => import('@/views/interface-test/components/interfaceTestcaseEditor.vue'),
+                        component: () => import('@/views/interface-test/interfaceTestcaseEditor.vue'),
                         props: {
                             mode: 'edit'
                         },
@@ -112,6 +112,37 @@ export const routerMap = [
                             isHideInTagsView: false,
                             icon: 'fa fa-edit',
                             activeMenu: "/interfaces-test/testcaseList"
+                        }
+                    },
+                    {
+                        path: "/interfaces-test/apiRequestLog",
+                        name: "ApiRequestLogList",
+                        component: () => import('@/views/interface-test/apiRequestLogList.vue'),
+                        meta: {
+                            title: "message.router.apiRequestLog",
+                            isLink: "",
+                            isHide: false,
+                            isKeepAlive: true,
+                            isAffix: false,
+                            isIframe: false,
+                            isHideInTagsView: false,
+                            icon: 'fa fa-edit',
+                        }
+                    },
+                    {
+                        path: "/interfaces-test/apiRequestLog/apiRequestLogDetail",
+                        name: 'ApiRequestLogDetail',
+                        component: () => import('@/views/interface-test/apiRequestLogDetail.vue'),
+                        meta: {
+                            title: "message.router.apiRequestLogDetail",
+                            isLink: "",
+                            isHide: true,
+                            isKeepAlive: true,
+                            isAffix: false,
+                            isIframe: false,
+                            isHideInTagsView: false,
+                            icon: 'fa fa-edit',
+                            activeMenu: "/interfaces-test/apiRequestLog"
                         }
                     }
                 ]
