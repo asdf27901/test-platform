@@ -226,6 +226,9 @@ export default {
         };
     },
     created() {
+        if (this.interfaceId) {
+            this.searchForm.interfaceId = this.interfaceId
+        }
         // [修改] 初始化 debounced handler
         this.debouncedResizeHandler = debounce(this.resizeTableHeight, 100);
 
