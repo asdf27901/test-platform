@@ -392,6 +392,20 @@ export default {
             }
         }
     },
+    watch: {
+        tableData() {
+            // 解决横向滚动时，列没对齐的问题
+            this.$nextTick(() => {
+                setTimeout(() => {
+                    let lastColEl = document.querySelector('.el-table__header colgroup col:last-child')
+                    if (lastColEl) {
+                        // 最后一列的宽度加上滚动条的宽度
+                        lastColEl.width = Number(lastColEl.width) + 20
+                    }
+                }, 1000)
+            })
+        }
+    },
     destroyed() {
         this.bus.$off('reFreshTestcaseList')
     }
@@ -436,5 +450,14 @@ export default {
     padding-top: 20px; /* 改为padding-top以避免影响高度计算 */
     text-align: right;
 }
-
+::v-deep .el-table .el-table__fixed-right .el-table__fixed-body-wrapper .el-table__body {
+    padding-bottom: 610px!important;
+}
+::v-deep .el-table .el-table__fixed-right {
+    height: auto !important;
+    bottom: 16px !important;
+}
+::v-deep .el-table .el-table__fixed::before, .el-table__fixed-right::before {
+    display: none;
+}
 </style>

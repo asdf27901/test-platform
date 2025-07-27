@@ -464,6 +464,20 @@ export default {
             }
         }
     },
+    watch: {
+        tableData() {
+            // 解决横向滚动时，列没对齐的问题
+            this.$nextTick(() => {
+                setTimeout(() => {
+                    let lastColEl = document.querySelector('.el-table__header colgroup col:last-child')
+                    if (lastColEl) {
+                        // 最后一列的宽度加上滚动条的宽度
+                        lastColEl.width = Number(lastColEl.width) + 20
+                    }
+                }, 1000)
+            })
+        }
+    }
 };
 </script>
 
@@ -508,5 +522,15 @@ export default {
 /* 确保表格内的单元格内容居中 */
 ::v-deep .table-cell-center {
     text-align: center;
+}
+::v-deep .el-table .el-table__fixed-right .el-table__fixed-body-wrapper .el-table__body {
+    padding-bottom: 610px!important;
+}
+::v-deep .el-table .el-table__fixed-right {
+    height: auto !important;
+    bottom: 16px !important;
+}
+::v-deep .el-table .el-table__fixed::before, .el-table__fixed-right::before {
+    display: none;
 }
 </style>
