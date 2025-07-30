@@ -113,7 +113,10 @@ public class InterfaceServiceImpl implements InterfaceService {
 
     @Override
     public List<Interface> getActiveInterfaceList() {
-        return interfaceMapper.selectList(null);
+        return interfaceMapper.selectList(
+                new LambdaQueryWrapper<Interface>()
+                        .orderByAsc(Interface::getId)
+        );
     }
 
     @Override
