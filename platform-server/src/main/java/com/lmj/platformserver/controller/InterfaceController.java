@@ -41,7 +41,7 @@ public class InterfaceController {
     }
 
     @PostMapping("/deleteBatch")
-    public Response<?> deleteBatch(@RequestBody DeleteInterfaceDTO dto) {
+    public Response<?> deleteBatch(@RequestBody @Validated DeleteInterfaceDTO dto) {
         log.info("批量删除接口");
         interfaceService.deleteBatch(dto.getIds());
         return Response.success();
