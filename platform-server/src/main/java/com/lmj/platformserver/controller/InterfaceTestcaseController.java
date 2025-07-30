@@ -9,6 +9,7 @@ import com.lmj.platformserver.entity.InterfaceTestcase;
 import com.lmj.platformserver.result.Response;
 import com.lmj.platformserver.service.InterfaceTestcaseService;
 import com.lmj.platformserver.vo.InterfaceTestcasePageVo;
+import com.lmj.platformserver.vo.InterfaceTestcaseUlVo;
 import com.lmj.platformserver.vo.InterfaceTestcaseVo;
 import com.lmj.platformserver.vo.RequestResultVo;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -68,5 +70,12 @@ public class InterfaceTestcaseController {
         Map<String, Object> requestData = BeanUtil.beanToMap(interfaceTestcase);
         RequestResultVo resultVo = interfaceTestcaseService.sendInterfaceTestcaseRequest(requestData, envId, testcaseId);
         return Response.success(resultVo);
+    }
+
+    @GetMapping("/getInterfaceTestcaseById")
+    public Response<List<InterfaceTestcaseUlVo>> getInterfaceTestcaseById(@RequestParam Long interfaceId) {
+        log.info("根据接口ID获取所有测试用例: {}", interfaceId);
+        List<InterfaceTestcaseUlVo> interfaceTestcaseUlVos = interfaceTestcaseService.getInterfaceTestcaseById(interfaceId);
+        return Response.success(interfaceTestcaseUlVos);
     }
  }
