@@ -1,6 +1,7 @@
 package com.lmj.platformserver.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lmj.platformserver.groups.Update;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -25,8 +26,10 @@ public class BaseEntity implements Serializable {
     private LocalDateTime updatedTime;
 
     @TableField(value = "is_deleted")
+    @JsonIgnore
     private Byte deleted;
 
     @Version
+    @JsonIgnore
     private Long version;
 }
