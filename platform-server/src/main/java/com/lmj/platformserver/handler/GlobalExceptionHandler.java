@@ -30,6 +30,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BaseException.class)
     public Response<?> exceptionHandler(BaseException ex) {
         log.error("业务异常: ", ex);
+        if (ex.getResultCodeEnum() == null) {
+            return Response.fail(ex.getMessage());
+        }
         return Response.fail(ex.getResultCodeEnum());
     }
 
@@ -146,6 +149,9 @@ public class GlobalExceptionHandler {
                 duplicateInterfaces.forEach(i -> sj.add(i.getMethod() + ": " + i.getPath()));
                 return Response.fail(e.getResultCodeEnum(), sj.toString());
             }
+        }
+        if (e.getResultCodeEnum() == null) {
+            return Response.fail(e.getMessage());
         }
         return Response.fail(e.getResultCodeEnum());
     }

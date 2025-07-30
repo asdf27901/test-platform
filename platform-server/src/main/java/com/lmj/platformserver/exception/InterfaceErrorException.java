@@ -22,6 +22,10 @@ public class InterfaceErrorException extends BaseException{
         this.duplicateInterfaces = duplicateInterfaces;
     }
 
+    public InterfaceErrorException(String message) {
+        super(message);
+    }
+
     public List<Interface> getDuplicateInterfaces() {
         return duplicateInterfaces;
     }
