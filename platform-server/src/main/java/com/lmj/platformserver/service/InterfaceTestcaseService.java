@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.lmj.platformserver.dto.InterfaceTestcaseListQueryDTO;
 import com.lmj.platformserver.entity.InterfaceTestcase;
 import com.lmj.platformserver.vo.InterfaceTestcasePageVo;
+import com.lmj.platformserver.vo.InterfaceTestcaseUlVo;
 import com.lmj.platformserver.vo.InterfaceTestcaseVo;
 import com.lmj.platformserver.vo.RequestResultVo;
 
@@ -20,4 +21,6 @@ public interface InterfaceTestcaseService {
     InterfaceTestcaseVo getInterfaceTestcaseDetail(Long id);
 
     RequestResultVo sendInterfaceTestcaseRequest(Map<String, Object> requestData, Long envId, Long testcaseId);
+
+    List<InterfaceTestcaseUlVo> getInterfaceTestcaseById(Long interfaceId);
 }

@@ -20,6 +20,7 @@ import com.lmj.platformserver.service.RunInterfaceTestcaseService;
 import com.lmj.platformserver.service.TestcaseEnvironmentService;
 
 import com.lmj.platformserver.vo.InterfaceTestcasePageVo;
+import com.lmj.platformserver.vo.InterfaceTestcaseUlVo;
 import com.lmj.platformserver.vo.InterfaceTestcaseVo;
 import com.lmj.platformserver.vo.RequestResultVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -153,5 +154,19 @@ public class InterfaceTestcaseServiceImpl implements InterfaceTestcaseService {
             );
         }
         return runInterfaceTestcaseService.runSingleRequest(api, environmentVariable, requestData);
+    }
+
+    @Override
+    public List<InterfaceTestcaseUlVo> getInterfaceTestcaseById(Long interfaceId) {
+        List<InterfaceTestcase> interfaceTestcaseList = interfaceTestcaseMapper.selectList(
+                new LambdaQueryWrapper<InterfaceTestcase>()
+                        .eq(InterfaceTestcase::getInterfaceId, interfaceId)
+        );
+        return interfaceTestcaseList.stream().map(i -> {
+            InterfaceTestcaseUlVo interfaceTestcaseUlVo = new InterfaceTestcaseUlVo();
+            interfaceTestcaseUlVo.setId(i.getId());
+            interfaceTestcaseUlVo.setName(i.getName());
+            return interfaceTestcaseUlVo;
+        }).toList();
     }
 }
