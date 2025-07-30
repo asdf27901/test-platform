@@ -53,7 +53,9 @@
         select
             interface_id
         from interface_testcases
-        where interface_id in
+        where
+            is_deleted = 0
+            and interface_id in
         <foreach collection="ids" item="interfaceId" open="(" close=")" separator=",">
             #{interfaceId}
         </foreach>
