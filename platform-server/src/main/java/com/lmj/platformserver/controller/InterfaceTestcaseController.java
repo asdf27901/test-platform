@@ -45,7 +45,7 @@ public class InterfaceTestcaseController {
     }
 
     @PostMapping("/delete")
-    public Response<?> deleteInterfaceTestcase(@RequestBody DeleteInterfaceTestcaseDTO dto) {
+    public Response<?> deleteInterfaceTestcase(@RequestBody @Validated DeleteInterfaceTestcaseDTO dto) {
         log.info("删除接口用例");
         interfaceTestcaseService.deleteInterfaceTestcaseBatch(dto.getIds());
         return Response.success();
