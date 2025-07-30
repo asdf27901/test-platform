@@ -58,4 +58,8 @@ public class Response<T> implements Serializable {
     public static <T> Response<T> fail(ResultCodeEnum resultCodeEnum, String message) {
         return build(null, resultCodeEnum, message);
     }
+
+    public static <T> Response<T> fail(String message) {
+        return build(null, ResultCodeEnum.FAIL, message);
+    }
 }
