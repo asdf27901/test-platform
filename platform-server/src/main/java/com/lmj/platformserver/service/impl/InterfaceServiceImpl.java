@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lmj.platformserver.dto.InterfacePageQueryDTO;
 import com.lmj.platformserver.dto.SaveInterfacesDTO;
 import com.lmj.platformserver.entity.Interface;
-import com.lmj.platformserver.entity.InterfaceTestcase;
 import com.lmj.platformserver.exception.InterfaceErrorException;
 import com.lmj.platformserver.mapper.InterfaceMapper;
 import com.lmj.platformserver.mapper.InterfaceTestcaseMapper;
@@ -15,7 +14,6 @@ import com.lmj.platformserver.service.InterfaceService;
 import com.lmj.platformserver.vo.InterfaceVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
@@ -73,13 +71,13 @@ public class InterfaceServiceImpl implements InterfaceService {
     }
 
     @Override
-    @Transactional
     public void deleteBatch(List<Long> ids) {
+        // 删除前，需要查找接口ID下是否存在测试用例
+        Set<Long> existTestcaseIds = interfaceTestcaseMapper.getInterfaceListByInterfaceIds(ids);
+        if (existTestcaseIds != null && !existTestcaseIds.isEmpty()) {
+            throw new InterfaceErrorException(existTestcaseIds + "存在未删除测试用例，删除接口失败");
+        }
         interfaceMapper.deleteByIds(ids);
-        interfaceTestcaseMapper.delete(
-                new LambdaQueryWrapper<InterfaceTestcase>()
-                        .in(InterfaceTestcase::getInterfaceId, ids)
-        );
     }
 
     @Override

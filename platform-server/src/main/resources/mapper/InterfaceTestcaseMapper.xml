@@ -49,4 +49,14 @@
         order by its.interface_id, its.id
     </select>
 
+    <select id="getInterfaceListByInterfaceIds" resultType="java.lang.Long">
+        select
+            interface_id
+        from interface_testcases
+        where interface_id in
+        <foreach collection="ids" item="interfaceId" open="(" close=")" separator=",">
+            #{interfaceId}
+        </foreach>
+    </select>
+
 </mapper>
