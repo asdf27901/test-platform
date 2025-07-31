@@ -21,6 +21,8 @@ public enum ResultCodeEnum {
     INTERFACE_TESTCASE_ID_NOT_FOUND(511, "接口用例id不存在"),
     ENVIRONMENT_VARIABLE_ID_NOT_FOUND(512, "环境变量ID不存在"),
     ENVIRONMENT_VARIABLE_DUPLICATE(513, "存在重复的环境变量名"),
+    CHAIN_REQUEST_TESTCASE_ID_DUPLICATE(513, "用例ID存在重复"),
+    CHAIN_REQUEST_ID_NOT_FOUND(512, "链路ID不存在"),
     JSON_PARSE_ERROR(514, "Json解析出错，请检查Json格式"),
     HTTP_REQUEST_ERROR(515, "请检查配置是否正确，变量引用是否正确"),
     API_REQUEST_LOGS_ID_NOT_FOUND(516, "接口请求记录id不存在"),
