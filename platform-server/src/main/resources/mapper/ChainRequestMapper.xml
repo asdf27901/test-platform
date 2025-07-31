@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lmj.platformserver.mapper.ChainRequestMapper">
+
+    <resultMap id="ChainRequestPageQueryVoMap" type="com.lmj.platformserver.vo.ChainRequestPageQueryVo" autoMapping="true">
+        <id property="id" column="id"/>
+        <result property="caseIds" column="case_ids" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
+    </resultMap>
+
+    <select id="getChainRequestPageQueryVoList" resultMap="ChainRequestPageQueryVoMap">
+        select id,
+               name,
+               case_ids,
+                (select nickname from users where id = create_user) as create_user_name,
+               created_time,
+                (select nickname from users where id = create_user) as update_user_name,
+               updated_time
+        from chain_requests
+        <where>
+            is_deleted = 0
+            <if test="dto.id != null">
+                and id = #{dto.id}
+            </if>
+            <if test="dto.name != null and dto.name != ''">
+                and name like concat('%', #{dto.name}, '%')
+            </if>
+            <if test="dto.userId != null">
+                and create_user = #{dto.userId}
+            </if>
+            <if test="dto.begin != null">
+                and created_time &gt;= #{dto.begin}
+            </if>
+            <if test="dto.end != null">
+                and created_time &lt;= #{dto.end}
+            </if>
+            <if test="dto.caseIds != null and !dto.caseIds.isEmpty()">
+                and
+                <foreach collection="dto.caseIds" item="caseId" open="(" separator="and" close=")">
+                    JSON_CONTAINS(case_ids, CAST(#{caseId} AS JSON))
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <resultMap id="ChainRequestMap" type="com.lmj.platformserver.entity.ChainRequest" autoMapping="true">
+        <id column="id" property="id"/>
+        <result property="caseIds" column="case_ids" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
+    </resultMap>
+
+    <select id="findChainRequestByInterfaceTestcaseIds" resultMap="ChainRequestMap">
+        select id,
+               name,
+               case_ids,
+               is_deleted,
+               version,
+               create_user,
+               created_time,
+               update_user,
+               updated_time
+        from chain_requests
+        where is_deleted = 0
+        <if test="ids != null and !ids.isEmpty()">
+            AND JSON_OVERLAPS(
+                case_ids,
+                JSON_ARRAY(
+                    <foreach collection="ids" item="id" separator=",">
+                        #{id}
+                    </foreach>
+                )
+            )
+        </if>
+    </select>
+
+</mapper>
