@@ -8,12 +8,12 @@ import com.lmj.platformserver.entity.InterfaceTestcase;
 import com.lmj.platformserver.vo.InterfaceTestcasePageVo;
 import org.apache.ibatis.annotations.Mapper;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Set;
 
 @Mapper
 public interface InterfaceTestcaseMapper extends BaseMapper<InterfaceTestcase> {
     IPage<InterfaceTestcasePageVo> getInterfaceTestcaseList(Page<InterfaceTestcasePageVo> page, InterfaceTestcaseListQueryDTO dto);
 
-    Set<Long> getInterfaceListByInterfaceIds(List<Long> ids);
+    Set<Long> getInterfaceListByInterfaceIds(Collection<Long> ids);
 }

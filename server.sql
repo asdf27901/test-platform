@@ -90,15 +90,29 @@ CREATE TABLE testcase_environments
 
 CREATE TABLE api_request_logs
 (
-    id               INT AUTO_INCREMENT PRIMARY KEY COMMENT 'ID',
-    interface_id     INT                  NULL COMMENT '接口ID',
-    testcase_id      INT                  NULL COMMENT '关联的用例ID',
-    chain_id         INT                  NULL COMMENT '链路ID',
-    steps            JSON                 NULL COMMENT '请求步骤',
-    request_type     TINYINT(1) DEFAULT 0 NOT NULL COMMENT '0: 单接口请求, 1:链路请求',
-    execute_result   TINYINT(1)           NULL COMMENT '执行结果, -1: 出错, 0:失败, 1:成功',
-    error_msg        TEXT                 NULL COMMENT '报错原因',
-    executor_id      INT                  NULL COMMENT '执行人ID',
-    executor_name    VARCHAR(100)         NULL COMMENT '执行人昵称',
-    execution_time   TIMESTAMP            NOT NULL COMMENT '执行时间'
+    id             INT AUTO_INCREMENT PRIMARY KEY COMMENT 'ID',
+    interface_id   INT                  NULL COMMENT '接口ID',
+    testcase_id    INT                  NULL COMMENT '关联的用例ID',
+    chain_id       INT                  NULL COMMENT '链路ID',
+    steps          JSON                 NULL COMMENT '请求步骤',
+    request_type   TINYINT(1) DEFAULT 0 NOT NULL COMMENT '0: 单接口请求, 1:链路请求',
+    execute_result TINYINT(1)           NULL COMMENT '执行结果, -1: 出错, 0:失败, 1:成功',
+    error_msg      TEXT                 NULL COMMENT '报错原因',
+    executor_id    INT                  NULL COMMENT '执行人ID',
+    executor_name  VARCHAR(100)         NULL COMMENT '执行人昵称',
+    execution_time TIMESTAMP            NOT NULL COMMENT '执行时间'
 ) COMMENT '接口请求记录表';
+
+CREATE TABLE chain_requests
+(
+    id                     INT AUTO_INCREMENT PRIMARY KEY COMMENT '主键ID',
+    name                   VARCHAR(255) NOT NULL COMMENT '链路请求名称',
+    case_ids               JSON         NOT NULL COMMENT '关联的用例ID数组, 主要用于保证执行顺序',
+    interface_and_case_ids JSON         Not NULL COMMENT '接口和用例ID',
+    is_deleted             TINYINT(1)   NOT NULL DEFAULT 0 COMMENT '逻辑删除标志，0表示未删除，1表示已删除',
+    version                INT          NOT NULL DEFAULT 0 COMMENT '乐观锁版本号',
+    create_user            INT          NOT NULL COMMENT '创建用户ID',
+    created_time           TIMESTAMP    NOT NULL COMMENT '创建时间',
+    update_user            INT          NOT NULL COMMENT '更新用户ID',
+    updated_time           TIMESTAMP    NOT NULL COMMENT '更新时间'
+) COMMENT '链路请求表';

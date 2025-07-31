@@ -12,4 +12,8 @@ public class InterfaceTestcaseErrorException extends BaseException {
     public InterfaceTestcaseErrorException(ResultCodeEnum resultCodeEnum) {
         super(resultCodeEnum);
     }
+
+    public InterfaceTestcaseErrorException(String message) {
+        super(message);
+    }
 }
