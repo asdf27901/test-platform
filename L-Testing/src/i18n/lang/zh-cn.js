@@ -12,6 +12,7 @@ export default {
 		editInterfaceTestcase: '编辑用例',
 		config: '配置',
 		environmentVariable: '环境变量',
+		chainRequestList: '链路请求',
 		apiRequestLog: '请求记录',
 		apiRequestLogDetail: '请求记录详情'
 	},
