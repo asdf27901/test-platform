@@ -46,5 +46,12 @@ export const interfaceTestcaseApis = {
                 testcaseId
             }
         })
+    },
+    getInterfaceTestcaseById: params => {
+        return request({
+            url: '/interface/testcase/getInterfaceTestcaseById',
+            method: 'get',
+            params
+        })
     }
 }

@@ -157,7 +157,7 @@ export default {
         }
     },
     created() {
-        this.logId = this.$route.query.id + ""
+        this.logId = this.$route.query.id ? + this.$route.query.id + "" : null
         if (!this.logId) {
             Message.error("未提供日志ID")
             this.goBack()
@@ -166,7 +166,7 @@ export default {
         this.fetchLogDetail();
     },
     activated() {
-        const logId = this.$route.query.id + ""
+        const logId = this.$route.query.id ? + this.$route.query.id + "" : null
         if (!logId) {
             Message.error("未提供日志ID");
             this.goBack()

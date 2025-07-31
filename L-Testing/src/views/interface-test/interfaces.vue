@@ -121,12 +121,12 @@
 
                 <el-table-column label="操作" width="290" fixed="right" align="center">
                     <template #default="{row}">
+                        <el-button size="small" type="text" icon="el-icon-document-add" style="color: #5ec35f;"
+                                   @click="handleGenerateCase(row)">生成用例
+                        </el-button>
                         <el-button size="small" type="text" icon="el-icon-edit" @click="handleEdit(row)">编辑
                         </el-button>
                         <el-button size="small" type="text" icon="el-icon-delete" style="color: #F56C6C;" @click="handleDelete(row)">删除
-                        </el-button>
-                        <el-button size="small" type="text" icon="el-icon-document-add" style="color: #5ec35f;"
-                                   @click="handleGenerateCase(row)">生成用例
                         </el-button>
                     </template>
                 </el-table-column>

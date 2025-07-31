@@ -116,6 +116,21 @@ export const routerMap = [
                         }
                     },
                     {
+                        path: "/interfaces-test/chainRequestList",
+                        name: "ApiRequestLogList",
+                        component: () => import('@/views/interface-test/chainRequestList.vue'),
+                        meta: {
+                            title: "message.router.chainRequestList",
+                            isLink: "",
+                            isHide: false,
+                            isKeepAlive: true,
+                            isAffix: false,
+                            isIframe: false,
+                            isHideInTagsView: false,
+                            icon: 'fa fa-chain',
+                        }
+                    },
+                    {
                         path: "/interfaces-test/apiRequestLog",
                         name: "ApiRequestLogList",
                         component: () => import('@/views/interface-test/apiRequestLogList.vue'),
@@ -127,7 +142,7 @@ export const routerMap = [
                             isAffix: false,
                             isIframe: false,
                             isHideInTagsView: false,
-                            icon: 'fa fa-edit',
+                            icon: 'fa fa-pencil-square-o',
                         }
                     },
                     {
@@ -142,7 +157,7 @@ export const routerMap = [
                             isAffix: false,
                             isIframe: false,
                             isHideInTagsView: false,
-                            icon: 'fa fa-edit',
+                            icon: 'fa fa-newspaper-o',
                             activeMenu: "/interfaces-test/apiRequestLog"
                         }
                     }
