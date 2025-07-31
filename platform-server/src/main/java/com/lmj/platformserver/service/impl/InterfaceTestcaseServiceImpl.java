@@ -10,10 +10,7 @@ import com.lmj.platformserver.entity.*;
 import com.lmj.platformserver.exception.EnvironmentVariableErrorException;
 import com.lmj.platformserver.exception.InterfaceErrorException;
 import com.lmj.platformserver.exception.InterfaceTestcaseErrorException;
-import com.lmj.platformserver.mapper.EnvironmentVariableMapper;
-import com.lmj.platformserver.mapper.InterfaceMapper;
-import com.lmj.platformserver.mapper.InterfaceTestcaseMapper;
-import com.lmj.platformserver.mapper.TestcaseEnvironmentMapper;
+import com.lmj.platformserver.mapper.*;
 import com.lmj.platformserver.result.ResultCodeEnum;
 import com.lmj.platformserver.service.InterfaceTestcaseService;
 import com.lmj.platformserver.service.RunInterfaceTestcaseService;
@@ -27,10 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -53,6 +47,9 @@ public class InterfaceTestcaseServiceImpl implements InterfaceTestcaseService {
 
     @Autowired
     private RunInterfaceTestcaseService runInterfaceTestcaseService;
+
+    @Autowired
+    private ChainRequestMapper chainRequestMapper;
 
     @Override
     @Transactional
@@ -99,6 +96,21 @@ public class InterfaceTestcaseServiceImpl implements InterfaceTestcaseService {
 
     @Override
     public void deleteInterfaceTestcaseBatch(List<Long> ids) {
+        // 删除接口用例前，需要检查一下是否有关联的链路请求
+        HashSet<Long> idsSet = new HashSet<>(ids);
+        HashSet<Long> existChainRequestIds = new HashSet<>();
+        List<ChainRequest> chainRequestList = chainRequestMapper.findChainRequestByInterfaceTestcaseIds(idsSet);
+        for (Long id : idsSet) {
+            for (ChainRequest chainRequest : chainRequestList) {
+                if (chainRequest.getCaseIds().contains(id)) {
+                    existChainRequestIds.add(id);
+                    break;
+                }
+            }
+        }
+        if (!existChainRequestIds.isEmpty()) {
+            throw new InterfaceTestcaseErrorException(existChainRequestIds + "存在关联的链路请求，删除失败");
+        }
         interfaceTestcaseMapper.deleteByIds(ids);
     }
 

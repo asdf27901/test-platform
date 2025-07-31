@@ -73,7 +73,7 @@ public class InterfaceServiceImpl implements InterfaceService {
     @Override
     public void deleteBatch(List<Long> ids) {
         // 删除前，需要查找接口ID下是否存在测试用例
-        Set<Long> existTestcaseIds = interfaceTestcaseMapper.getInterfaceListByInterfaceIds(ids);
+        Set<Long> existTestcaseIds = interfaceTestcaseMapper.getInterfaceListByInterfaceIds(new HashSet<>(ids));
         if (existTestcaseIds != null && !existTestcaseIds.isEmpty()) {
             throw new InterfaceErrorException(existTestcaseIds + "存在未删除测试用例，删除接口失败");
         }
