@@ -165,7 +165,7 @@ public class InterfaceTestcaseServiceImpl implements InterfaceTestcaseService {
                             .eq(EnvironmentVariable::getId, envId)
             );
         }
-        return runInterfaceTestcaseService.runSingleRequest(api, environmentVariable, requestData);
+        return runInterfaceTestcaseService.runSingleRequest(api.getPath(), environmentVariable, requestData);
     }
 
     @Override
