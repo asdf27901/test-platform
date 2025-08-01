@@ -65,26 +65,32 @@
                         <div v-if="selectedStep" class="card-body">
                             <el-descriptions :column="1" border>
                                 <el-descriptions-item label="接口名称">
-                                    <span v-if="selectedStep.interfaceName"
+                                    <span v-if="selectedStep.interfaceId && selectedStep.interfaceName"
                                           class="clickable-link"
                                           @click="$router.push({
                                             name: 'InterfaceList',
                                             params: {interfaceId: selectedStep.interfaceId}
                                           })"
-                                          :title="`跳转到接口 (ID: ${selectedStep.interfaceId})`">
+                                    >
                                         {{ selectedStep.interfaceName }} (ID: {{ selectedStep.interfaceId }})
+                                    </span>
+                                    <span v-else-if="selectedStep.interfaceId">
+                                        接口已被删除
                                     </span>
                                     <span v-else>执行时未关联接口</span>
                                 </el-descriptions-item>
                                 <el-descriptions-item label="用例名称">
-                                    <span v-if="selectedStep.testcaseName"
+                                    <span v-if="selectedStep.testcaseId && selectedStep.testcaseName"
                                           class="clickable-link"
                                           @click="$router.push({
                                             path: '/interfaces-test/testcaseList/editTestcase',
                                             query: {testcaseId: selectedStep.testcaseId}
                                           })"
-                                          :title="`跳转到测试用例 (ID: ${selectedStep.testcaseId})`">
-                                        {{ selectedStep.testcaseName }} (ID: {{ selectedStep.testcaseId }})
+                                    >
+                                        {{ selectedStep.testcaseName || '用例已被删除' }} (ID: {{ selectedStep.testcaseId }})
+                                    </span>
+                                    <span v-else-if="selectedStep.testcaseId">
+                                        用例已被删除
                                     </span>
                                     <span v-else>执行时未关联用例</span>
                                 </el-descriptions-item>
@@ -199,6 +205,7 @@ export default {
         },
         getStepDisplayName(step) {
             if (step.testcaseName) return step.testcaseName
+            if (step.testcaseId) return '用例已被删除'
             return '执行时未关联测试用例'
         },
         goBack() {
