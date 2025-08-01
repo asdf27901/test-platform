@@ -117,7 +117,7 @@ export const routerMap = [
                     },
                     {
                         path: "/interfaces-test/chainRequestList",
-                        name: "ApiRequestLogList",
+                        name: "ChainRequestList",
                         component: () => import('@/views/interface-test/chainRequestList.vue'),
                         meta: {
                             title: "message.router.chainRequestList",
