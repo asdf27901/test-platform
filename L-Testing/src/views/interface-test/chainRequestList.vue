@@ -165,8 +165,15 @@ export default {
         };
     },
     created() {
+        Object.assign(this.searchForm, this.$route.params)
         this.fetchData();
         this.fetchActiveUser()
+    },
+    activated() {
+        if (Object.keys(this.$route.params).length > 0) {
+            Object.assign(this.searchForm, this.$route.params)
+            this.fetchData()
+        }
     },
     methods: {
         async fetchActiveUser() {

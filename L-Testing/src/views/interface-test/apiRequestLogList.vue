@@ -96,7 +96,12 @@
                     <!-- 情况1: 链路执行 (最高优先级) -->
                     <div v-if="scope.row.chainId" class="target-cell">
                         <el-tag size="small">链路</el-tag>
-                        <a @click="navigateTo(scope.row.chainId)" class="link-style target-id">
+                        <a @click="
+                            navigateTo({
+                                name: 'ChainRequestList',
+                                params: {id: scope.row.chainId}
+                            })"
+                           class="link-style target-id">
                             链路ID: {{ scope.row.chainId }}
                         </a>
                     </div>
