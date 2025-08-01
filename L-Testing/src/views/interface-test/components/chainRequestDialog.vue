@@ -241,7 +241,19 @@ export default {
             });
         },
         removeSelectedCase(index) {
-            this.selectedCases.splice(index, 1);
+            const removeCase = this.selectedCases[index]
+            if (Object.hasOwn(this.interfaceAndCaseIds, removeCase.apiId) && this.interfaceAndCaseIds[removeCase.apiId]) {
+                const caseIdList = this.interfaceAndCaseIds[removeCase.apiId]
+                if (caseIdList?.length > 0) {
+                    const i = caseIdList?.findIndex(id => id === removeCase.id)
+                    if (i > -1) caseIdList.splice(i, 1)
+                }
+            }
+            if (this.checkedCaseIds.length > 0) {
+                const i = this.checkedCaseIds.findIndex(id => id === removeCase.id)
+                if (i > -1) this.checkedCaseIds.splice(i, 1)
+            }
+            this.selectedCases.splice(index, 1)
         },
         handleSubmit() {
             this.$refs.form.validate(valid => {
@@ -336,6 +348,9 @@ export default {
 .case-panel .case-checkbox {
     display: block;
     margin: 5px 15px;
+}
+::v-deep .el-checkbox__label {
+    line-height: 30px;
 }
 .draggable-list {
     min-height: 360px;
