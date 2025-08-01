@@ -8,6 +8,7 @@ import com.lmj.platformserver.context.ApiRequestLogsContextHolder;
 import com.lmj.platformserver.context.UserContextHolder;
 import com.lmj.platformserver.entity.ApiRequestLogs;
 import com.lmj.platformserver.entity.User;
+import com.lmj.platformserver.exception.ChainRequestErrorException;
 import com.lmj.platformserver.exception.InterfaceErrorException;
 import com.lmj.platformserver.exception.InterfaceTestcaseErrorException;
 import com.lmj.platformserver.mapper.ApiRequestLogsMapper;
@@ -34,11 +35,16 @@ public class RequestLogAspect {
     private UserMapper userMapper;
 
     @Pointcut("@annotation(com.lmj.platformserver.annotation.SingleRequestCatchLog)")
-    public void requestLogPointCut() {
+    public void singleRequestLogPointCut() {
         // 切入点
     }
 
-    @Around("requestLogPointCut()")
+    @Pointcut("@annotation(com.lmj.platformserver.annotation.ChainRequestCatchLog)")
+    public void chainRequestLogPointCut() {
+
+    }
+
+    @Around("singleRequestLogPointCut()")
     public Object doSingleRequestAround(ProceedingJoinPoint joinPoint) throws Throwable {
         ApiRequestLogs apiRequestLogs = new ApiRequestLogs();
         apiRequestLogs.setExecutionTime(LocalDateTime.now());
@@ -65,7 +71,6 @@ public class RequestLogAspect {
 
             if (stepSize > 0) {
                 RequestSteps step = apiRequestLogs.getSteps().get(0);
-                step.setTestcaseId(testcaseId);
                 Byte dealt = dealWithStep(step);
                 apiRequestLogs.setExecuteResult(dealt);
                 step.setErrorMsg(apiRequestLogs.getErrorMsg());
@@ -73,6 +78,50 @@ public class RequestLogAspect {
 
             apiRequestLogs.setRequestType(ApiTestcaseRequestType.SINGLE.getValue());
             Long userId = UserContextHolder.getUserId();
+            User user = userMapper.selectById(userId);
+            apiRequestLogs.setExecutorId(userId);
+            apiRequestLogs.setExecutorName(user.getNickName());
+
+            apiRequestLogsMapper.insert(apiRequestLogs);
+            ApiRequestLogsContextHolder.remove();
+        }
+    }
+
+    @Around("chainRequestLogPointCut()")
+    public Object doChainRequestAround(ProceedingJoinPoint joinPoint) {
+        ApiRequestLogs apiRequestLogs = new ApiRequestLogs();
+        apiRequestLogs.setExecutionTime(LocalDateTime.now());
+        ApiRequestLogsContextHolder.set(apiRequestLogs);
+
+        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+        String[] parameterNames = signature.getParameterNames();
+        Object[] args = joinPoint.getArgs();
+        Long chainId = findParamValue("chainId", args, parameterNames, Long.class);
+        Long userId = findParamValue("userId", args, parameterNames, Long.class);
+        apiRequestLogs.setChainId(chainId);
+        try {
+            return joinPoint.proceed();
+        } catch (Throwable e) {
+            if (e instanceof ChainRequestErrorException) {
+                apiRequestLogs.setChainId(null);
+            }
+            apiRequestLogs.setErrorMsg(e.getMessage());
+            apiRequestLogs.setExecuteResult(RequestResultConstant.ERROR);
+            return null;
+        } finally {
+            int stepSize = apiRequestLogs.getSteps().size();
+            if (stepSize > 0) {
+                apiRequestLogs.getSteps().forEach(this::dealWithStep);
+                long count = apiRequestLogs.getSteps().stream()
+                        .filter(step -> step.getExecuteResult() != RequestResultConstant.SUCCESS).count();
+                if (count > 0) {
+                    apiRequestLogs.setExecuteResult(RequestResultConstant.FAIL);
+                } else {
+                    apiRequestLogs.setExecuteResult(RequestResultConstant.SUCCESS);
+                }
+            }
+
+            apiRequestLogs.setRequestType(ApiTestcaseRequestType.CHAIN.getValue());
             User user = userMapper.selectById(userId);
             apiRequestLogs.setExecutorId(userId);
             apiRequestLogs.setExecutorName(user.getNickName());

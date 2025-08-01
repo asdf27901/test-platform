@@ -1,5 +1,6 @@
 package com.lmj.platformserver.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lmj.platformserver.dto.ApiRequestLogsPageQueryDTO;
@@ -17,9 +18,8 @@ import com.lmj.platformserver.vo.ApiRequestLogsPageQueryVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ApiRequestLogsServiceImpl implements ApiRequestLogsService {
@@ -47,38 +47,51 @@ public class ApiRequestLogsServiceImpl implements ApiRequestLogsService {
         }
         List<RequestSteps> steps = logs.getSteps();
         if (steps != null) {
-            List<Long> testcaseIds = new ArrayList<>();
-            List<Long> interfaceIds = new ArrayList<>();
-            HashMap<Long, RequestSteps> testcaseIdStepsMap = new HashMap<>();
-            HashMap<Long, RequestSteps> interfaceIdStepsMap = new HashMap<>();
+            Set<Long> testcaseIds = new HashSet<>();
+            Set<Long> interfaceIds = new HashSet<>();
+
             for (RequestSteps step : steps) {
                 Long testcaseId = step.getTestcaseId();
                 if (testcaseId != null) {
                     testcaseIds.add(testcaseId);
-                    testcaseIdStepsMap.put(testcaseId, step);
                 }
                 Long interfaceId = step.getInterfaceId();
                 if (interfaceId != null) {
                     interfaceIds.add(step.getInterfaceId());
-                    interfaceIdStepsMap.put(interfaceId, step);
                 }
             }
+            Map<String, String> testcaseNameMap = null;
+            Map<String, String> interfaceNameMap = null;
             if (testcaseIds.size() > 0 ){
-                List<InterfaceTestcase> interfaceTestcases = interfaceTestcaseMapper.selectByIds(testcaseIds);
-                for (InterfaceTestcase testcase : interfaceTestcases) {
-                    RequestSteps step = testcaseIdStepsMap.get(testcase.getId());
-                    if (step != null) {
-                        step.setTestcaseName(testcase.getName());
-                    }
+                List<Map<String, Object>> testcaseMapList = interfaceTestcaseMapper.selectMaps(
+                        new LambdaQueryWrapper<InterfaceTestcase>()
+                                .select(InterfaceTestcase::getId, InterfaceTestcase::getName)
+                                .in(InterfaceTestcase::getId, testcaseIds)
+                );
+                if (!testcaseMapList.isEmpty()) {
+                    testcaseNameMap = testcaseMapList.stream()
+                            .collect(Collectors.toMap(t -> t.get("id").toString(), t -> (String) t.get("name")));
                 }
             }
             if (interfaceIds.size() > 0) {
-                List<Interface> interfaces = interfaceMapper.selectByIds(interfaceIds);
-                for (Interface i : interfaces) {
-                    RequestSteps step = interfaceIdStepsMap.get(i.getId());
-                    if (step != null) {
-                        step.setInterfaceName(i.getName());
-                    }
+                List<Map<String, Object>> interfaceMapList = interfaceMapper.selectMaps(
+                        new LambdaQueryWrapper<Interface>()
+                                .select(Interface::getId, Interface::getName)
+                                .in(Interface::getId, interfaceIds)
+                );
+                if (!interfaceMapList.isEmpty()) {
+                    interfaceNameMap = interfaceMapList.stream()
+                            .collect(Collectors.toMap(t -> t.get("id").toString(), t -> (String) t.get("name")));
+                }
+            }
+            for (RequestSteps step : steps) {
+                Long testcaseId = step.getTestcaseId();
+                if (testcaseId != null && testcaseNameMap != null) {
+                    step.setTestcaseName(testcaseNameMap.get(testcaseId.toString()));
+                }
+                Long interfaceId = step.getInterfaceId();
+                if (interfaceId != null && interfaceNameMap != null) {
+                    step.setInterfaceName(interfaceNameMap.get(interfaceId.toString()));
                 }
             }
         }

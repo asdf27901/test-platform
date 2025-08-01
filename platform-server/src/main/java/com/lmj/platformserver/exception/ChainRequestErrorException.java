@@ -11,4 +11,8 @@ public class ChainRequestErrorException extends BaseException{
     public ChainRequestErrorException(ResultCodeEnum resultCodeEnum) {
         super(resultCodeEnum);
     }
+
+    public ChainRequestErrorException(String message) {
+        super(message);
+    }
 }
