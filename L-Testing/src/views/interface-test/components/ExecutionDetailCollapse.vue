@@ -131,7 +131,7 @@
                     <pre class="script-code-viewer">{{ stepData.request.preScript }}</pre>
                 </div>
                 <!-- 执行日志 -->
-                <div v-if="hasData(stepData.preScript.logs) || hasData(stepData.preScript.error)" class="sub-section">
+                <div v-if="hasData(stepData.preScript) && (hasData(stepData.preScript.logs) || hasData(stepData.preScript.error))" class="sub-section">
                     <h3 class="sub-section-title">执行终端日志 (Execution Terminal)</h3>
                     <!-- 新增：终端风格的日志查看器 -->
                     <div class="terminal-viewer">
@@ -144,7 +144,7 @@
                     </div>
                 </div>
                 <!-- 测试断言结果 -->
-                <div v-if="hasData(stepData.preScript.results)" class="sub-section">
+                <div v-if="hasData(stepData.preScript) && stepData.preScript.results.length > 0" class="sub-section">
                     <h3 class="sub-section-title">测试断言 (Test Assertions)</h3>
                     <ul class="assertion-list">
                         <li v-for="(assertion, index) in stepData.preScript.results" :key="index" class="assertion-item">
@@ -180,7 +180,7 @@
                     <pre class="script-code-viewer">{{ stepData.request.postScript }}</pre>
                 </div>
                 <!-- 执行日志 -->
-                <div v-if="hasData(stepData.postScript.logs) || hasData(stepData.postScript.error)" class="sub-section">
+                <div v-if="hasData(stepData.postScript) && (hasData(stepData.postScript.logs) || hasData(stepData.postScript.error))" class="sub-section">
                     <h3 class="sub-section-title">执行终端日志 (Execution Terminal)</h3>
                     <!-- 新增：终端风格的日志查看器 -->
                     <div class="terminal-viewer">
@@ -193,7 +193,7 @@
                     </div>
                 </div>
                 <!-- 测试断言结果 -->
-                <div v-if="hasData(stepData.postScript.results)" class="sub-section">
+                <div v-if="hasData(stepData.postScript) && stepData.postScript.results.length > 0" class="sub-section">
                     <h3 class="sub-section-title">测试断言 (Test Assertions)</h3>
                     <ul class="assertion-list">
                         <li v-for="(assertion, index) in stepData.postScript.results" :key="index" class="assertion-item">
