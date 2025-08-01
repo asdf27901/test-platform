@@ -121,6 +121,13 @@
             :submit-loading="isDialogSubmitting"
             @submit="handleSave"
         />
+
+        <execute-chain-request-dialog
+            :visible.sync="executeDialogVisible"
+            :chain="currentChainForExecution"
+            :loading="executeChainRequestLoading"
+            @execute="handleConfirmExecute"
+        />
     </div>
 </template>
 
@@ -129,11 +136,13 @@ import ChainRequestDialog from "@/views/interface-test/components/chainRequestDi
 import {chainRequestApis} from "@/api/interface/chainRequest";
 import {Message} from "element-ui";
 import {userApis} from "@/api/user";
+import ExecuteChainRequestDialog from "@/views/interface-test/components/executeChainRequestDialog.vue";
 
 export default {
     name: 'ChainRequestList',
     components: {
-        ChainRequestDialog
+        ChainRequestDialog,
+        ExecuteChainRequestDialog
     },
     data() {
         return {
@@ -161,7 +170,10 @@ export default {
             dialogVisible: false,
             dialogTitle: '',
             dialogFormData: null,
-            isDialogSubmitting: false
+            isDialogSubmitting: false,
+            executeDialogVisible: false,
+            currentChainForExecution: null,
+            executeChainRequestLoading: false
         };
     },
     created() {
@@ -318,9 +330,22 @@ export default {
         },
         // 点击执行
         handleExecute(row) {
-            this.$message.info(`开始执行链路: ${row.name}`);
-            // 此处可以添加调用执行接口的逻辑
-            console.log('执行:', row);
+            this.currentChainForExecution = row;
+            this.executeDialogVisible = true;
+        },
+        async handleConfirmExecute(data) {
+            this.executeChainRequestLoading = true
+            try {
+                await chainRequestApis.executeChainRequest(data)
+                Message.success("执行成功，请等待执行通知")
+                this.executeDialogVisible = false
+            } catch (e) {
+                if (e.code) {
+                    Message.error(e.message)
+                }
+            } finally {
+                this.executeChainRequestLoading = false
+            }
         },
         async handleSave(v) {
             this.isDialogSubmitting = true
