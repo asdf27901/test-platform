@@ -35,5 +35,12 @@ export const chainRequestApis = {
             method: 'post',
             data
         })
+    },
+    executeChainRequest: params => {
+        return request({
+            url: '/chainRequest/executeChainRequest',
+            method: 'post',
+            params
+        })
     }
 }
