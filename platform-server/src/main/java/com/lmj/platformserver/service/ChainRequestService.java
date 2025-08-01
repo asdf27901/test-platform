@@ -19,4 +19,6 @@ public interface ChainRequestService {
     ChainRequestDetailVo getChainRequestDetail(Long id);
 
     void updateChainRequest(ChainRequestDTO dto);
+
+    void executeChainRequest(Long chainId, Long envId, Long userId);
 }

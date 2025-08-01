@@ -1,6 +1,7 @@
 package com.lmj.platformserver.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.lmj.platformserver.context.UserContextHolder;
 import com.lmj.platformserver.dto.ChainRequestDTO;
 import com.lmj.platformserver.dto.ChainRequestPageQueryDTO;
 import com.lmj.platformserver.dto.DeleteChainRequestDTO;
@@ -56,6 +57,13 @@ public class ChainRequestController {
     public Response<?> updateChainRequest(@RequestBody @Validated(Update.class) ChainRequestDTO dto) {
         log.info("更新链路请求：{}", dto);
         chainRequestService.updateChainRequest(dto);
+        return Response.success();
+    }
+
+    @PostMapping("/executeChainRequest")
+    public Response<?> executeChainRequest(@RequestParam Long chainId, @RequestParam(required = false) Long envId) {
+        log.info("执行链路请求：{}, 关联全局环境为：{}", chainId, envId);
+        chainRequestService.executeChainRequest(chainId, envId, UserContextHolder.getUserId());
         return Response.success();
     }
 }
