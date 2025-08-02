@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lmj.platformserver.mapper.DataBoardMapper">
+
+    <select id="getBasicData" resultType="com.lmj.platformserver.vo.DataBoardVo$BasicData">
+        with rc as (select count(*)
+                    from api_request_logs),
+             u as (select count(*)
+                   from users
+                   where is_deleted = 0),
+             tc as (select count(*)
+                    from interface_testcases
+                    where is_deleted = 0),
+             i as (select count(*)
+                   from interfaces
+                   where is_deleted = 0)
+        select (select * from rc) as total_requests,
+               (select * from u)  as total_users,
+               (select * from tc) as total_interface_testcases,
+               (select * from i)  as total_interfaces
+    </select>
+
+    <select id="getRequestRatios" resultType="com.lmj.platformserver.vo.DataBoardVo$NameValueVo">
+        SELECT
+            CASE execute_result
+                WHEN 1 THEN '成功'
+                WHEN -1 THEN '异常'
+                WHEN 0 THEN '失败'
+                ELSE '异常'
+                END AS name,
+            COUNT(*) AS value
+        FROM
+            api_request_logs
+        GROUP BY
+            name
+    </select>
+
+    <select id="getTestCaseCreationTop5" resultType="com.lmj.platformserver.vo.DataBoardVo$NameValueVo">
+        select (select u.nickname from users u where create_user = u.id) as name,
+               count(*)                                                  as value
+        from interface_testcases
+        group by create_user
+    </select>
+
+    <select id="getDailyRequestDetails" resultType="com.lmj.platformserver.vo.DataBoardVo$DailyRequestDetail">
+        with recursive recent_days (dt) as (
+            select curdate()
+            union all
+            select dt - interval '1' DAY
+            from recent_days
+            where dt > curdate() - interval '11' DAY
+        ),
+       daily_status as (
+           select
+               cast(execution_time as DATE) as execution_date,
+               sum(if(request_type = 0, 1, 0)) as single,
+               sum(if(request_type = 1, 1, 0)) as chain,
+               sum(if(execute_result = 1, 1, 0)) as success,
+               sum(if(execute_result = 0, 1, 0)) as fail,
+               sum(if(execute_result != 1 and execute_result != 0, 1, 0)) as error
+           from api_request_logs
+           WHERE
+               execution_time >= CURDATE() - INTERVAL 11 DAY
+           group by execution_date
+       )
+        SELECT
+            dt AS date_time ,
+            ifnull(ds.single, 0) as single_request_count,
+            ifnull(ds.chain, 0) as chain_request_count,
+            ifnull(ds.success, 0) as success_count,
+            ifnull(ds.fail, 0) as fail_count,
+            ifnull(ds.error, 0) as error_count
+        FROM recent_days rd
+                 left join daily_status ds on rd.dt = ds.execution_date
+        ORDER BY dt;
+    </select>
+
+</mapper>

@@ -1,0 +1,229 @@
+.home {
+	width: 100%;
+	overflow: hidden;
+	.home-card-more {
+		float: right;
+		padding: 3px 0;
+		font-size: 13px;
+	}
+	.home-card-time {
+		float: right;
+		font-size: 13px;
+		width: 130px;
+		margin-top: -4px;
+	}
+	.user-item {
+		height: 198px;
+		display: flex;
+		align-items: center;
+		.user-item-left {
+			width: 150px;
+			height: 150px;
+			border-radius: 4px;
+			overflow: hidden;
+			img {
+				width: 100%;
+				height: 100%;
+			}
+		}
+		.user-item-right {
+			flex: 1;
+			padding: 15px;
+			.right-title {
+				font-size: 20px;
+			}
+			.right-l-v {
+				font-size: 13px;
+				display: flex;
+				.right-label {
+					color: var(--prev-color-text-regular);
+					width: 40px;
+				}
+				.right-value {
+					flex: 1;
+				}
+			}
+		}
+	}
+	.info {
+		height: 198px;
+		.info-scroll {
+			height: 100%;
+			overflow: hidden;
+			.info-ul {
+				list-style: none;
+				.info-item {
+					display: flex;
+					font-size: 13px;
+					color: var(--prev-color-text-regular);
+					height: 28px;
+					line-height: 28px;
+					&:hover {
+						color: var(--prev-color-primary);
+						cursor: pointer;
+					}
+					.info-item-left {
+						flex: 1;
+						flex-shrink: 0;
+						text-overflow: ellipsis;
+						white-space: nowrap;
+						overflow: hidden;
+					}
+					.info-item-right {
+						width: 60px;
+						text-align: right;
+					}
+				}
+			}
+		}
+	}
+	.home-recommend-row {
+		.home-recommend {
+			position: relative;
+			height: 100px;
+			color: var(--prev-color-text-white);
+			border-radius: 4px;
+			overflow: hidden;
+			cursor: pointer;
+			&:hover {
+				i {
+					right: 0px !important;
+					bottom: 0px !important;
+					transition: all ease 0.3s;
+				}
+			}
+			i {
+				position: absolute;
+				right: -10px;
+				bottom: -10px;
+				font-size: 70px;
+				transform: rotate(-30deg);
+				transition: all ease 0.3s;
+			}
+			.home-recommend-auto {
+				padding: 15px;
+				position: absolute;
+				left: 0;
+				top: 5%;
+				.home-recommend-msg {
+					font-size: 12px;
+					margin-top: 10px;
+				}
+			}
+		}
+	}
+	.charts {
+		width: 100%;
+		height: 282.6px;
+		display: flex;
+		padding: 12px 15px;
+		.charts-left {
+			flex: 1;
+			height: 100%;
+		}
+		.charts-right {
+			flex: 1;
+			height: 100%;
+		}
+	}
+	.home-charts {
+		height: 282.6px;
+		.home-charts-item {
+			background-color: var(--prev-bg-main-color);
+			padding: 19px 15px;
+			border-radius: 2px;
+			display: flex;
+			align-items: center;
+			margin-bottom: 12px;
+			cursor: pointer;
+			&:last-of-type {
+				margin-bottom: 0;
+			}
+			&:hover {
+				.home-charts-item-right {
+					i {
+						transform: rotate(45deg);
+						transition: all ease 0.3s;
+					}
+				}
+			}
+			.home-charts-item-left {
+				flex: 1;
+				.home-charts-item-title {
+					font-size: 13px;
+				}
+				.home-charts-item-num {
+					font-size: 20px;
+					margin-top: 5px;
+				}
+			}
+			.home-charts-item-right {
+				i {
+					font-size: 20px;
+					padding: 8px;
+					border-radius: 100%;
+					transition: all ease 0.3s;
+				}
+			}
+		}
+	}
+
+	.stat-card {
+		display: flex;
+		align-items: center;
+		padding: 20px;
+		background-color: #f9f9f9;
+		border-radius: 8px;
+		cursor: pointer;
+		transition: all 0.3s ease;
+
+		&:hover {
+			transform: translateY(-5px);
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+		}
+	}
+
+	.stat-card-icon {
+		font-size: 40px;
+		// 保持图标和文字的间距
+		margin-right: 15px;
+	}
+
+	.stat-card-content {
+		// 关键：让这个容器占据所有剩余空间
+		flex: 1;
+		// 关键：让容器内的所有文本内容右对齐
+		text-align: right;
+	}
+
+	.stat-card-title {
+		font-size: 14px;
+		color: #8c8c8c;
+		margin-bottom: 8px;
+	}
+
+	.stat-card-value {
+		font-size: 26px; // 稍微加大字号，更醒目
+		font-weight: bold;
+		color: #333;
+		// 使用等宽字体，数字滚动时不会晃动
+		font-family: 'DIN Alternate', 'Helvetica Neue', Arial, sans-serif;
+	}
+
+	// 暗黑模式下的适配
+	.theme-dark {
+		.stat-card {
+			background-color: #2c2c2c;
+			&:hover {
+				background-color: #383838;
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+			}
+		}
+		.stat-card-value {
+			color: #f0f0f0;
+		}
+		.stat-card-title {
+			color: #a0a0a0;
+		}
+	}
+}
