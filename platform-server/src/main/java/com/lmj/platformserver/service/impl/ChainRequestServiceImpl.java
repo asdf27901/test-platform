@@ -115,7 +115,7 @@ public class ChainRequestServiceImpl implements ChainRequestService {
 
     @Override
     @ChainRequestCatchLog
-    @Async
+    @Async("chainRequestExecutor")
     public void executeChainRequest(Long chainId, Long envId, Long userId) {
         ChainRequest chainRequest = chainRequestMapper.selectById(chainId);
         if (chainRequest == null) {
