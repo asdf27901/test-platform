@@ -22,6 +22,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
+import java.util.concurrent.RejectedExecutionException;
 
 @RestControllerAdvice
 @Slf4j
@@ -154,5 +155,11 @@ public class GlobalExceptionHandler {
             return Response.fail(e.getMessage());
         }
         return Response.fail(e.getResultCodeEnum());
+    }
+
+    @ExceptionHandler(RejectedExecutionException.class)
+    public Response<?> exceptionHandler(RejectedExecutionException e) {
+        log.error("异步执行被拒绝", e);
+        return Response.fail("系统当前等待执行请求过多，请稍后重试");
     }
 }
