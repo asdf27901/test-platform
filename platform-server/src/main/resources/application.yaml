@@ -13,16 +13,31 @@ spring:
     password: ${server.datasource.password}
     url: jdbc:mysql://${server.datasource.host}:${server.datasource.port}/${server.datasource.database}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
     hikari:
-      connection-test-query: SELECT 1 # 指定一个 SQL 查询，用于测试连接的有效性。在从连接池中获取连接之前，HikariCP 会执行这个查询以确认连接是否有效。
+#      connection-test-query: SELECT 1 # 指定一个 SQL 查询，用于测试连接的有效性。在从连接池中获取连接之前，HikariCP 会执行这个查询以确认连接是否有效。
       connection-timeout: 10000 # 指定获取连接的最大等待时间（以毫秒为单位）。如果在指定的时间内无法获取连接，则会抛出异常。
-      validation-timeout: 1000 # 验证连接是否可以用超时时间
+#      validation-timeout: 1000 # 验证连接是否可以用超时时间
       pool-name: Hikari-Pool
       idle-timeout: ${server.datasource.idle-timeout}  # 指定连接在池中保持闲置的最大时间（以毫秒为单位）。超过这个时间未被使用的连接会被释放。
       max-lifetime: ${server.datasource.max-lifetime}   # 指定连接的最大存活时间（以毫秒为单位）。无论连接的闲置状态如何，一旦达到这个时间，连接会被关闭。
       minimum-idle: ${server.datasource.minimum-idle}   # 指定连接池中保持的最小闲置连接数。
       maximum-pool-size: ${server.datasource.maximum-pool-size}  # 指定连接池中允许的最大连接数。
+      keepalive-time: 60000  # 每 60 秒发送一次心跳
   jackson:
     time-zone: GMT+8
+  data:
+    redis:
+      host: ${redis.host}
+      port: ${redis.port}
+      password: ${redis.password}
+      database: ${redis.database}
+      timeout: ${redis.timeout}
+      connect-timeout: ${redis.connect-timeout}
+      lettuce:
+        pool:
+          max-active: ${redis.lettuce.pool.max-active}
+          max-idle: ${redis.lettuce.pool.max-idle}
+          min-idle: ${redis.lettuce.pool.min-idle}
+          max-wait: ${redis.lettuce.pool.max-wait}
 
 mybatis-plus:
   global-config:

@@ -17,16 +17,24 @@ import com.lmj.platformserver.service.ChainRequestService;
 import com.lmj.platformserver.service.RunInterfaceTestcaseService;
 import com.lmj.platformserver.vo.ChainRequestDetailVo;
 import com.lmj.platformserver.vo.ChainRequestPageQueryVo;
+import lombok.SneakyThrows;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
 public class ChainRequestServiceImpl implements ChainRequestService {
-    
+
+    private static final String LOCK_PREFIX = "lock:chain_request:";
+    private static final String REDIS_COUNT_KEY = "api_chain_request_count:";
+
     @Autowired
     private ChainRequestMapper chainRequestMapper;
 
@@ -41,7 +49,13 @@ public class ChainRequestServiceImpl implements ChainRequestService {
 
     @Autowired
     private InterfaceMapper interfaceMapper;
-    
+
+    @Autowired
+    private RedissonClient redissonClient;
+
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
+
     @Override
     public void saveChainRequest(ChainRequestDTO dto) {
         List<Long> caseIds = dto.getCaseIds();
@@ -64,8 +78,34 @@ public class ChainRequestServiceImpl implements ChainRequestService {
     }
 
     @Override
+    @SneakyThrows
     public void deleteChainRequest(List<Long> ids) {
-        chainRequestMapper.deleteByIds(ids);
+        Set<Long> idsSet = new HashSet<>(ids);
+        RLock[] locks = idsSet.stream()
+                .map(id -> redissonClient.getLock(LOCK_PREFIX + id))
+                .toArray(RLock[]::new);
+        RLock multiLock = redissonClient.getMultiLock(locks);
+
+        if (multiLock.tryLock(3, -1, TimeUnit.SECONDS)) {
+            try {
+                List<Long> executingIds = new ArrayList<>();
+                idsSet.forEach(id -> {
+                    Integer i = (Integer) redisTemplate.opsForValue().get(REDIS_COUNT_KEY + id);
+                    if (i != null && i > 0) {
+                        executingIds.add(id);
+                    }
+                });
+                if (!executingIds.isEmpty()) {
+                    throw new ChainRequestErrorException("以下id" + executingIds + "正在执行，请稍后重试");
+                }
+                chainRequestMapper.deleteByIds(ids);
+            } finally {
+                multiLock.unlock();
+            }
+        } else {
+            // 3秒内没有拿到分布式锁，说明别事务还在处理中
+            throw new ChainRequestErrorException("系统繁忙，请稍后重试");
+        }
     }
 
     @Override
@@ -95,7 +135,7 @@ public class ChainRequestServiceImpl implements ChainRequestService {
                         .last("ORDER BY FIELD(id, " + idOrderString + ")")
         );
 
-        List<Map<String, Object>> list = interfaceTestcaseList.stream().map(i ->  Map.<String, Object>of("id", i.getId(), "name", i.getName(), "apiId", i.getInterfaceId())).toList();
+        List<Map<String, Object>> list = interfaceTestcaseList.stream().map(i -> Map.<String, Object>of("id", i.getId(), "name", i.getName(), "apiId", i.getInterfaceId())).toList();
         chainRequestDetailVo.setSelectedCaseNameList(list);
         return chainRequestDetailVo;
     }
@@ -117,6 +157,9 @@ public class ChainRequestServiceImpl implements ChainRequestService {
     @ChainRequestCatchLog
     @Async("chainRequestExecutor")
     public void executeChainRequest(Long chainId, Long envId, Long userId) {
+        if (chainId == null) {
+            throw new ChainRequestErrorException(ResultCodeEnum.CHAIN_REQUEST_ID_NOT_FOUND);
+        }
         ChainRequest chainRequest = chainRequestMapper.selectById(chainId);
         if (chainRequest == null) {
             throw new ChainRequestErrorException(ResultCodeEnum.CHAIN_REQUEST_ID_NOT_FOUND);
@@ -138,7 +181,7 @@ public class ChainRequestServiceImpl implements ChainRequestService {
         }
         EnvironmentVariable environmentVariable = null;
         if (envId != null) {
-             environmentVariable = environmentVariableMapper.selectOne(
+            environmentVariable = environmentVariableMapper.selectOne(
                     new LambdaQueryWrapper<EnvironmentVariable>()
                             .eq(EnvironmentVariable::getId, envId)
                             .eq(EnvironmentVariable::getCreateUser, userId)

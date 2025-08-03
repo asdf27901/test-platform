@@ -158,6 +158,15 @@
             <artifactId>dec</artifactId>
             <version>0.1.2</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson-spring-boot-starter</artifactId>
+            <version>3.50.0</version>
+        </dependency>
     </dependencies>
 
     <build>

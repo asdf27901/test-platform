@@ -8,24 +8,33 @@ import com.lmj.platformserver.context.ApiRequestLogsContextHolder;
 import com.lmj.platformserver.context.UserContextHolder;
 import com.lmj.platformserver.entity.ApiRequestLogs;
 import com.lmj.platformserver.entity.User;
-import com.lmj.platformserver.exception.ChainRequestErrorException;
-import com.lmj.platformserver.exception.InterfaceErrorException;
-import com.lmj.platformserver.exception.InterfaceTestcaseErrorException;
+import com.lmj.platformserver.exception.*;
 import com.lmj.platformserver.mapper.ApiRequestLogsMapper;
 import com.lmj.platformserver.mapper.UserMapper;
 import com.lmj.platformserver.pojo.RequestSteps;
 import com.lmj.platformserver.vo.ScriptExecutionResultVo;
+import io.lettuce.core.RedisException;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.RedisSystemException;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.concurrent.TimeUnit;
 
 @Aspect
 @Component
+@Slf4j
 public class RequestLogAspect {
 
     @Autowired
@@ -33,6 +42,30 @@ public class RequestLogAspect {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
+
+    @Autowired
+    private RedissonClient redissonClient;
+
+    private static final String LOCK_PREFIX = "lock:chain_request:";
+    private static final String REDIS_COUNT_KEY = "api_chain_request_count:";
+    private static final Long EXPIRE_TIME = 3600L;
+
+    private static final String INCR_AND_EXPIRE_NO_RETURN_SCRIPT =
+            "local key = KEYS[1]\n" +
+                    "local ttl = ARGV[1]\n" +
+                    "redis.call('INCR', key)\n" +
+                    "redis.call('EXPIRE', key, ttl)";
+
+    private static final String DECR_OR_DELETE_SCRIPT =
+            "if redis.call('EXISTS', KEYS[1]) == 1 then\n" +
+                    "  local new_value = redis.call('DECR', KEYS[1])\n" +
+                    "  if new_value <= 0 then\n" +
+                    "    redis.call('DEL', KEYS[1])\n" +
+                    "  end\n" +
+                    "end";
 
     @Pointcut("@annotation(com.lmj.platformserver.annotation.SingleRequestCatchLog)")
     public void singleRequestLogPointCut() {
@@ -59,6 +92,7 @@ public class RequestLogAspect {
         try {
             return joinPoint.proceed();
         } catch (Throwable e) {
+            log.error("出现异常：", e);
             if (e instanceof InterfaceErrorException || e instanceof InterfaceTestcaseErrorException) {
                 apiRequestLogs.setInterfaceId(null);
                 apiRequestLogs.setTestcaseId(null);
@@ -88,7 +122,7 @@ public class RequestLogAspect {
     }
 
     @Around("chainRequestLogPointCut()")
-    public Object doChainRequestAround(ProceedingJoinPoint joinPoint) {
+    public Object doChainRequestAround(ProceedingJoinPoint joinPoint) throws Throwable {
         ApiRequestLogs apiRequestLogs = new ApiRequestLogs();
         apiRequestLogs.setExecutionTime(LocalDateTime.now());
         ApiRequestLogsContextHolder.set(apiRequestLogs);
@@ -100,15 +134,28 @@ public class RequestLogAspect {
         Long userId = findParamValue("userId", args, parameterNames, Long.class);
         apiRequestLogs.setChainId(chainId);
         try {
+            setChainRequestCount(chainId, EXPIRE_TIME);
             return joinPoint.proceed();
         } catch (Throwable e) {
+            log.error("出现异常：", e);
+            apiRequestLogs.setErrorMsg(e.getMessage());
             if (e instanceof ChainRequestErrorException) {
                 apiRequestLogs.setChainId(null);
+            } else if (
+                    e instanceof RedisException
+                            || e instanceof org.redisson.client.RedisException
+                            || e instanceof RedisSystemException
+            ) {
+                apiRequestLogs.setErrorMsg("redis服务异常");
+                throw new BaseException("系统服务异常");
+            } else if (e instanceof GetLockTimeout) {
+                throw e;
             }
-            apiRequestLogs.setErrorMsg(e.getMessage());
             apiRequestLogs.setExecuteResult(RequestResultConstant.ERROR);
             return null;
         } finally {
+            rollbackChainRequestCount(chainId);
+
             int stepSize = apiRequestLogs.getSteps().size();
             if (stepSize > 0) {
                 apiRequestLogs.getSteps().forEach(this::dealWithStep);
@@ -185,5 +232,39 @@ public class RequestLogAspect {
         }
         step.setExecuteResult(RequestResultConstant.SUCCESS);
         return RequestResultConstant.SUCCESS;
+    }
+
+    @SneakyThrows
+    private void setChainRequestCount(Long chainId, Long expireTime) {
+        if (chainId == null) {
+            return;
+        }
+        RLock lock = redissonClient.getLock(LOCK_PREFIX + chainId);
+        if (!lock.tryLock(10, TimeUnit.SECONDS)) {
+            // 在10秒内没有获取到锁，说明有其他操作（很可能是删除）正在进行
+            throw new ChainRequestErrorException("系统繁忙，请稍后重试。");
+        }
+        try {
+            DefaultRedisScript<Void> redisScript = new DefaultRedisScript<>(INCR_AND_EXPIRE_NO_RETURN_SCRIPT, Void.class);
+            redisTemplate.execute(
+                    redisScript,
+                    Collections.singletonList(REDIS_COUNT_KEY + chainId), // KEYS[1]
+                    expireTime                    // ARGV[1]
+            );
+        } finally {
+            lock.unlock();
+        }
+
+    }
+
+    private void rollbackChainRequestCount(Long chainId) {
+        if (chainId == null) {
+            return;
+        }
+        DefaultRedisScript<Void> redisScript = new DefaultRedisScript<>(DECR_OR_DELETE_SCRIPT, Void.class);
+        redisTemplate.execute(
+                redisScript,
+                Collections.singletonList(REDIS_COUNT_KEY + chainId)
+        );
     }
 }
