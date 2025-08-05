@@ -96,8 +96,8 @@ export default {
 				loading: false,
 			},
 			ruleForm: {
-				username: '',
-				password: '',
+				username: 'admin',
+				password: '123456',
 				captcha: '',
 			},
 			time: {
