@@ -1,7 +1,7 @@
 CREATE DATABASE IF NOT EXISTS `test_platform`;
 USE `test_platform`;
 
-CREATE TABLE Users
+CREATE TABLE users
 (
     id           INT AUTO_INCREMENT PRIMARY KEY COMMENT '用户ID',
     username     VARCHAR(50)          NOT NULL UNIQUE COMMENT '用户名',
@@ -37,7 +37,7 @@ CREATE TABLE environment_variables
 
 CREATE INDEX idx_environment_variables_create_user_is_deleted ON environment_variables (create_user, is_deleted); -- 方便查询某个用户创建的未删除环境
 
-CREATE TABLE Interfaces
+CREATE TABLE interfaces
 (
     id           INT AUTO_INCREMENT PRIMARY KEY COMMENT '接口ID',
     name         VARCHAR(100)         NOT NULL COMMENT '接口名称',
@@ -54,7 +54,7 @@ CREATE TABLE Interfaces
 
 CREATE INDEX idx_interfaces_create_user_is_deleted ON Interfaces (create_user, is_deleted); -- 方便查询某个用户创建的未删除接口
 
-CREATE TABLE Interface_testcases
+CREATE TABLE interface_testcases
 (
     id                     INT AUTO_INCREMENT PRIMARY KEY COMMENT '接口测试用例ID',
     interface_id           INT                  NOT NULL COMMENT '关联的接口ID',
