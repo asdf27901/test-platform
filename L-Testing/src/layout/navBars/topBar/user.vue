@@ -76,6 +76,7 @@ import UserNews from '@/layout/navBars/topBar/userNews.vue';
 import Search from '@/layout/navBars/topBar/search.vue';
 import {mapActions, mapState} from "vuex";
 import userFormDrawer from "@/views/user/components/userFormDrawer.vue";
+import webSocketService from "@/utils/webSocketService";
 
 export default {
 	name: 'layoutBreadcrumbUser',
@@ -216,6 +217,7 @@ export default {
 								.then(() => {
 									// 清除缓存/token等
 									Local.clear();
+									webSocketService.disconnect()
 									// 使用 reload 时，不需要调用 resetRoute() 重置路由
 									// window.location.reload();
 									this.$router.push({ path: '/login', query: { redirect: this.$route.fullPath } });

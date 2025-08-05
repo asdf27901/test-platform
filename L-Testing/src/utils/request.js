@@ -3,6 +3,7 @@ import { Message } from 'element-ui';
 import { Local } from '@/utils/storage';
 import router from "@/router";
 import qs from 'qs'
+import webSocketService from "@/utils/webSocketService";
 
 // 创建 axios 实例
 const service = axios.create({
@@ -77,7 +78,14 @@ service.interceptors.response.use(
 				isRedirecting = true
 				clearAllPending()
 				Local.remove('token')
-				router.push('/login').finally(() => {isRedirecting = false})
+				webSocketService.disconnect()
+				const redirect = router.currentRoute.fullPath
+				router.push({
+					path: '/login',
+					query: {
+						redirect
+					}
+				}).finally(() => {isRedirecting = false})
 			}
 			return Promise.reject(res);
 		} else {

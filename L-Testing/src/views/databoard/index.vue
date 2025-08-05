@@ -55,11 +55,11 @@
 						<span>消息通知</span>
 					</div>
 					<div class="info">
-						<Scroll :data="newsInfoList" class="info-scroll" :class-option="optionSingleHeight">
+						<Scroll :data="newsInfoLis" class="info-scroll" :class-option="optionSingleHeight">
 							<ul class="info-ul">
-								<li v-for="(v, k) in newsInfoList" :key="k" class="info-item" @click="onNewsInfoListClick(v)">
-									<div class="info-item-left" v-text="v.title"></div>
-									<div class="info-item-right" v-text="v.date"></div>
+								<li v-for="(v, k) in newsInfoLis" :key="k" class="info-item" @click="onNewsInfoListClick(v)">
+									<div class="info-item-left" v-text="v.content"></div>
+									<div class="info-item-right" v-text="v.createdTime"></div>
 								</li>
 							</ul>
 						</Scroll>
@@ -135,9 +135,11 @@ import * as echarts from 'echarts';
 import Scroll from 'vue-seamless-scroll';
 import { CountUp } from 'countup.js';
 import { formatAxis, formatDate } from '@/utils/formatTime';
-import { recommendList, newsInfoList, dailyMessage } from './mock';
+import { recommendList, dailyMessage } from './mock';
 import {dataBoardApis} from "@/api/dataBoard";
 import {Message} from "element-ui";
+import {messageApis} from "@/api/message";
+import {mapActions} from "vuex";
 export default {
 	name: 'DataBoard',
 	components: { Scroll },
@@ -145,7 +147,6 @@ export default {
 		return {
 			loading: false,
 			recommendList,
-			newsInfoList,
 			dataOverviewList: [
 				{ id: 'titleNum1', title: '总请求次数', value: 0, icon: 'el-icon-data-line', color: '#409EFF' },
 				{ id: 'titleNum2', title: '用户数量', value: 0, icon: 'el-icon-user-solid', color: '#67C23A' },
@@ -194,22 +195,29 @@ export default {
 		},
 		getUserInfos() {
 			return this.$store.state.userInfos.userInfos;
+		},
+		newsInfoLis() {
+			return this.$store.state.message.recentMessageList
 		}
 	},
 	methods: {
 		async fetchDataBoardData() {
 			this.loading = true
 			try {
-				const {data} = await dataBoardApis.getData()
-				const basicDataKeys = Object.keys(data.basicData)
+				const [{data: charData}, {data: messageList}] = await Promise.all([
+					dataBoardApis.getData(),
+					messageApis.getRecentMessageList()
+				])
+				this.setRecentMessageList(messageList)
+				const basicDataKeys = Object.keys(charData.basicData)
 				if (basicDataKeys.length > 0) {
 					for (let i = 0; i < this.dataOverviewList.length; i++) {
-						this.dataOverviewList[i].value = data.basicData[basicDataKeys[i]] || 0
+						this.dataOverviewList[i].value = charData.basicData[basicDataKeys[i]] || 0
 					}
 				}
-				this.requestRatioData = data.requestRatios
-				this.testCaseCreationTop5 = data.testCaseCreationTop5
-				this.requestDailyDetails = data.dailyRequestDetails
+				this.requestRatioData = charData.requestRatios
+				this.testCaseCreationTop5 = charData.testCaseCreationTop5
+				this.requestDailyDetails = charData.dailyRequestDetails
 			} catch (e) {
 				if (e.code) {
 					Message.error(e.message)
@@ -398,6 +406,7 @@ export default {
 		onNewsInfoListClick(v) {
 			window.open(v.link);
 		},
+		...mapActions('message', ['setRecentMessageList'])
 	},
 	watch: {
 		// 监听 vuex 数据变化

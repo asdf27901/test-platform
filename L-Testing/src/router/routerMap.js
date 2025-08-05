@@ -37,7 +37,6 @@ export const routerMap = [
                 path: "/interfaces-test",
                 name: "interfaces-test",
                 component: () => import('@/layout/routerView/parent.vue'),
-                // redirect: "/interfaces-test/interfaces",
                 meta: {
                     title: "message.router.interfacesTest",
                     isLink: "",
