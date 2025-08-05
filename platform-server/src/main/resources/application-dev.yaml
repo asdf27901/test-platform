@@ -10,10 +10,8 @@ server:
     minimum-idle: 2
     maximum-pool-size: 10
 
-mybatis-plus:
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 logging:
   level:
+    org.lmj.platformserver: debug
     org.apache.ibatis: debug
     com.baomidou.mybatisplus: debug

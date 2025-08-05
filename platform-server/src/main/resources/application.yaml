@@ -46,6 +46,12 @@ mybatis-plus:
       logic-delete-value: 1  # 1表示已经被逻辑删除
       logic-not-delete-value: 0 # 0 表示没有被逻辑删除
 
+logging:
+  level:
+    org.lmj.platformserver: ${logging.level.org.lmj.platformserver}
+    org.apache.ibatis: ${logging.level.org.apache.ibatis}
+    com.baomidou.mybatisplus: ${logging.level.com.baomidou.mybatisplus}
+
 AliOss:
   access-key-id: ${AliOss.access-key-id}
   access-key-secret: ${AliOss.access-key-secret}
