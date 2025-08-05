@@ -46,7 +46,7 @@ class WebSocketService {
             return;
         }
 
-        const socket = new SockJS('http://localhost:8080/ws-notify');
+        const socket = new SockJS(process.env.VUE_APP_BASE_API + 'ws-notify');
         this.stompClient = Stomp.over(socket);
 
         // 禁止 stomp.js 在内部打印 debug 信息
