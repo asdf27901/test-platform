@@ -19,6 +19,7 @@ Vue.use(VueRouter);
 // 加载静态路由
 const createRouter = () =>
 	new VueRouter({
+		mode: 'history',
 		routes: routerMap,
 	});
 
