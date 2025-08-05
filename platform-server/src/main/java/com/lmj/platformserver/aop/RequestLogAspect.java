@@ -3,6 +3,7 @@ package com.lmj.platformserver.aop;
 import cn.hutool.core.util.ArrayUtil;
 import com.lmj.platformserver.assertion.AssertionResult;
 import com.lmj.platformserver.constant.ApiTestcaseRequestType;
+import com.lmj.platformserver.constant.MessageTypeConstant;
 import com.lmj.platformserver.constant.RequestResultConstant;
 import com.lmj.platformserver.context.ApiRequestLogsContextHolder;
 import com.lmj.platformserver.context.UserContextHolder;
@@ -12,6 +13,7 @@ import com.lmj.platformserver.exception.*;
 import com.lmj.platformserver.mapper.ApiRequestLogsMapper;
 import com.lmj.platformserver.mapper.UserMapper;
 import com.lmj.platformserver.pojo.RequestSteps;
+import com.lmj.platformserver.service.MessageService;
 import com.lmj.platformserver.vo.ScriptExecutionResultVo;
 import io.lettuce.core.RedisException;
 import lombok.SneakyThrows;
@@ -48,6 +50,9 @@ public class RequestLogAspect {
 
     @Autowired
     private RedissonClient redissonClient;
+
+    @Autowired
+    private MessageService messageService;
 
     private static final String LOCK_PREFIX = "lock:chain_request:";
     private static final String REDIS_COUNT_KEY = "api_chain_request_count:";
@@ -172,8 +177,23 @@ public class RequestLogAspect {
             User user = userMapper.selectById(userId);
             apiRequestLogs.setExecutorId(userId);
             apiRequestLogs.setExecutorName(user.getNickName());
-
             apiRequestLogsMapper.insert(apiRequestLogs);
+
+            if (apiRequestLogs.getChainId() == null) {
+                messageService.sendChainRequestExecuteNotify(
+                        "您有一个请求出错了！",
+                        userId,
+                        MessageTypeConstant.ERROR,
+                        "/interfaces-test/apiRequestLog"
+                );
+            } else {
+                messageService.sendChainRequestExecuteNotify(
+                        "链路请求ID：" + chainId + "已执行完成",
+                        userId,
+                        MessageTypeConstant.SUCCESS,
+                        "/interfaces-test/apiRequestLog/apiRequestLogDetail?id=" + apiRequestLogs.getId()
+                );
+            }
             ApiRequestLogsContextHolder.remove();
         }
     }

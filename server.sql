@@ -116,3 +116,14 @@ CREATE TABLE chain_requests
     update_user            INT          NOT NULL COMMENT '更新用户ID',
     updated_time           TIMESTAMP    NOT NULL COMMENT '更新时间'
 ) COMMENT '链路请求表';
+
+CREATE TABLE messages
+(
+    id           INT AUTO_INCREMENT PRIMARY KEY COMMENT '主键ID',
+    content      VARCHAR(255) NOT NULL COMMENT '消息内容',
+    recipient_id INT          NOT NULL COMMENT '接收用户ID',
+    is_read      TINYINT(1)   NOT NULL DEFAULT 0 COMMENT '是否已读，0:未读，1:已读',
+    type         VARCHAR(50)  NOT NULL COMMENT '消息状态类型',
+    path         VARCHAR(255) NULL COMMENT '跳转路径',
+    created_time TIMESTAMP    NOT NULL COMMENT '创建时间'
+) COMMENT '消息通知表'
