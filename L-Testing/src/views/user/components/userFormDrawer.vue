@@ -38,7 +38,7 @@
                 <el-form-item label="用户头像" prop="avatarUrl">
                     <el-upload
                         class="avatar-uploader"
-                        action="http://localhost:8080/file/uploadImage"
+                        :action=" uploadHost + 'file/uploadImage'"
                         :headers="uploadHeaders"
                         :show-file-list="false"
                         :on-success="handleAvatarSuccess"
@@ -99,6 +99,9 @@ export default {
         };
     },
     computed: {
+        uploadHost() {
+            return process.env.VUE_APP_BASE_API
+        },
         drawerVisible: {
             get() { return this.visible; },
             set(val) { this.$emit('update:visible', val); }

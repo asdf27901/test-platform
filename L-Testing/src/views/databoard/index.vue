@@ -1,7 +1,7 @@
 <template>
-	<div class="home">
+	<div class="home" v-loading="loading">
 		<!-- 用户信息 -->
-		<el-card shadow="hover" style="margin-bottom: 10px" v-loading="loading">
+		<el-card shadow="hover" style="margin-bottom: 10px">
 			<div slot="header">
 				<span>数据概览</span>
 			</div>

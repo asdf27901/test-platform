@@ -1,6 +1,6 @@
 module.exports = {
 	productionSourceMap: false,
-	publicPath: process.env.NODE_ENV === 'production' ? './' : '/',
+	publicPath: '/',
 	lintOnSave: false,
 	devServer: {
 		open: JSON.parse(process.env.VUE_APP_OPEN), // 自动打开浏览器
