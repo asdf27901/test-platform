@@ -16,7 +16,7 @@
 </div>
 
 #### 🌈 介绍
-基于Springboot3.4.6 + vue2.x + element-ui + mybatis-plus + redis + Redisson + WebSocket + Maven 开发的接口自动化测试平台
+基于Springboot3.4.6 + vue2.x + element-ui + mybatis + mybatis-plus + GraalVm + redis + Redisson + WebSocket + Maven 开发的接口自动化测试平台
 
 ---
 #### ⚡ 使用说明
