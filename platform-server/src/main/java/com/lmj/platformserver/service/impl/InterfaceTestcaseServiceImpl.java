@@ -140,13 +140,14 @@ public class InterfaceTestcaseServiceImpl implements InterfaceTestcaseService {
 
     @Override
     @SingleRequestCatchLog
-    public RequestResultVo sendInterfaceTestcaseRequest(Map<String, Object> requestData, Long envId, Long testcaseId) {
+    public RequestResultVo sendInterfaceTestcaseRequest(Map<String, Object> requestData, Long envId) {
 
         Long interfaceId = (Long) requestData.get("interfaceId");
         Interface api = interfaceMapper.selectById(interfaceId);
         if (api == null) {
             throw new InterfaceErrorException(ResultCodeEnum.INTERFACE_ID_NOT_FOUND);
         }
+        Long testcaseId = (Long) requestData.get("id");
         if (testcaseId != null) {
             InterfaceTestcase interfaceTestcase = interfaceTestcaseMapper.selectById(testcaseId);
             if (interfaceTestcase == null) {

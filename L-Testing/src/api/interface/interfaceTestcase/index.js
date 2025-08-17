@@ -42,8 +42,7 @@ export const interfaceTestcaseApis = {
             method: 'post',
             data: requestData,
             params: {
-                envId,
-                testcaseId
+                envId
             }
         })
     },

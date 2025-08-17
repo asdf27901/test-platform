@@ -20,7 +20,7 @@ public interface InterfaceTestcaseService {
 
     InterfaceTestcaseVo getInterfaceTestcaseDetail(Long id);
 
-    RequestResultVo sendInterfaceTestcaseRequest(Map<String, Object> requestData, Long envId, Long testcaseId);
+    RequestResultVo sendInterfaceTestcaseRequest(Map<String, Object> requestData, Long envId);
 
     List<InterfaceTestcaseUlVo> getInterfaceTestcaseById(Long interfaceId);
 }
