@@ -144,7 +144,7 @@
                     </div>
                 </div>
                 <!-- 测试断言结果 -->
-                <div v-if="hasData(stepData.preScript) && stepData.preScript.results.length > 0" class="sub-section">
+                <div v-if="hasData(stepData.preScript) && stepData.preScript.results && stepData.preScript.results.length > 0" class="sub-section">
                     <h3 class="sub-section-title">测试断言 (Test Assertions)</h3>
                     <ul class="assertion-list">
                         <li v-for="(assertion, index) in stepData.preScript.results" :key="index" class="assertion-item">
@@ -193,7 +193,7 @@
                     </div>
                 </div>
                 <!-- 测试断言结果 -->
-                <div v-if="hasData(stepData.postScript) && stepData.postScript.results.length > 0" class="sub-section">
+                <div v-if="hasData(stepData.postScript) && stepData.postScript.results && stepData.postScript.results.length > 0" class="sub-section">
                     <h3 class="sub-section-title">测试断言 (Test Assertions)</h3>
                     <ul class="assertion-list">
                         <li v-for="(assertion, index) in stepData.postScript.results" :key="index" class="assertion-item">
