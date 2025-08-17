@@ -44,7 +44,7 @@ function removePending(config) {
 
 // 清空所有 pending 的请求
 export function clearAllPending() {
-	for (const [cancel] of pendingRequests) {
+	for (const [key, cancel] of pendingRequests) {
 		cancel();
 	}
 	pendingRequests.clear();
