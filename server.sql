@@ -63,7 +63,7 @@ CREATE TABLE interface_testcases
     host                   varchar(100)         not null comment '域名地址',
     request_method         VARCHAR(10)          NOT NULL COMMENT '请求方法',
     request_body_type      VARCHAR(30) COMMENT '请求体类型',
-    request_path_variables JSON COMMENT '请求路径参数',
+    request_path_variables VARCHAR(100) COMMENT '请求路径参数',
     request_query_params   JSON COMMENT '请求查询参数',
     request_headers        JSON COMMENT '特定于此用例的请求头',
     request_body           JSON COMMENT '特定于此用例的请求体数据',
