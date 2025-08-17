@@ -16,7 +16,7 @@
 </div>
 
 #### 🌈 介绍
-基于Springboot3.4.6 + vue2.x + element-ui + mybatis-plus + redis + Redisson + WebSocket + Maven 开发的接口自动化测试平台
+基于Springboot3.4.6 + vue2.x + element-ui + mybatis + mybatis-plus + GraalVm + redis + Redisson + WebSocket + Maven 开发的接口自动化测试平台
 
 ---
 #### ⚡ 使用说明
@@ -54,6 +54,7 @@ npm i --legacy-peer-deps
 - 💯 后端通过http客户端发送http请求，避免跨域问题
 - 💯  测试用例支持前置脚本、后置脚本、脚本断言，前置脚本支持修改请求体、请求头、query参数，后置脚本支持获取响应头、响应体、cookies
 - 💯  每个用户独立的环境变量
+- 💯  能够根据参数类型、自定义限定条件自动生成测试用例
 - 💯  前后置脚本支持新增、修改、删除环境变量
 - 💯  环境变量可以通过`{{params}}`进行参数引用
 - 💯  支持多接口、多测试用例、自定义链路请求
