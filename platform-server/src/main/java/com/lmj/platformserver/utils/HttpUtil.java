@@ -9,6 +9,7 @@ import com.alibaba.fastjson2.JSONException;
 import com.lmj.platformserver.exception.BaseException;
 import com.lmj.platformserver.exception.JsonParseException;
 import com.lmj.platformserver.result.ResultCodeEnum;
+import lombok.Cleanup;
 import lombok.SneakyThrows;
 import org.brotli.dec.BrotliInputStream;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
+import java.util.zip.ZipException;
 
 @Component
 public class HttpUtil {
@@ -276,11 +278,18 @@ public class HttpUtil {
                 res.put("body", bodyAsString);
             }
 
-        } catch (IOException e) {
+        } catch (ZipException e) {
             // 如果解压或转换失败，记录错误并存储原始的（可能是乱码的）字符串
 //            res.put("body", "Error processing response body: " + e.getMessage());
             // 或者存储原始字节的Base64编码，避免乱码
-             res.put("body_base64", Base64.getEncoder().encodeToString(responseBodyBytes));
+            String contentType = httpResponse.header(Header.CONTENT_TYPE);
+            if (contentType != null && contentType.toLowerCase().contains("application/json")) {
+                res.put("body", JSON.parse(new String(responseBodyBytes)));
+            } else {
+                res.put("body", new String(responseBodyBytes));
+            }
+        } catch (Exception e) {
+            res.put("body", Base64.getEncoder().encodeToString(responseBodyBytes));
         }
 
         return res;
@@ -295,8 +304,8 @@ public class HttpUtil {
             return compressedBody; // 没有压缩，直接返回
         }
 
-        ByteArrayInputStream bis = new ByteArrayInputStream(compressedBody);
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        @Cleanup ByteArrayInputStream bis = new ByteArrayInputStream(compressedBody);
+        @Cleanup ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
         switch (contentEncoding.toLowerCase()) {
             case "br" -> {
