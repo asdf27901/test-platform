@@ -218,16 +218,17 @@ export default {
 				this.requestRatioData = charData.requestRatios
 				this.testCaseCreationTop5 = charData.testCaseCreationTop5
 				this.requestDailyDetails = charData.dailyRequestDetails
+
+				this.initNumCountUp()
+				this.initRequestRatios();
+				this.initTestCaseCreationTop5();
+				this.initRequestDailyDetail()
 			} catch (e) {
 				if (e.code) {
 					Message.error(e.message)
 				}
 			} finally {
 				this.loading = false
-				this.initNumCountUp()
-				this.initRequestRatios();
-				this.initTestCaseCreationTop5();
-				this.initRequestDailyDetail()
 			}
 		},
 		// 初始化数字滚动
@@ -251,7 +252,7 @@ export default {
 		// 请求结果占比
 		initRequestRatios() {
 			if (!this.global.dispose.some((b) => b === this.global.homeChartOne)) this.global.homeChartOne.dispose();
-			this.global.homeChartOne = echarts.init(this.$refs.requestRatios, this.charts.theme);
+			this.global.homeChartOne = this.$refs.requestRatios && echarts.init(this.$refs.requestRatios, this.charts.theme);
 			const option = {
 				backgroundColor: this.charts.bgColor,
 				color: ['#F56C6C', '#67C23A', '#E6A23C'],
@@ -283,15 +284,17 @@ export default {
 					},
 				],
 			};
-			this.global.homeChartOne.setOption(option);
-			window.addEventListener('resize', () => {
-				this.global.homeChartOne.resize();
-			});
+			if (this.global.homeChartOne) {
+				this.global.homeChartOne.setOption(option);
+				window.addEventListener('resize', () => {
+					this.global.homeChartOne.resize();
+				});
+			}
 		},
 
 		initTestCaseCreationTop5() {
 			if (!this.global.dispose.some((b) => b === this.global.homeChartTwo)) this.global.homeChartTwo.dispose();
-			this.global.homeChartTwo = echarts.init(this.$refs.testCaseCreationTop5, this.charts.theme);
+			this.global.homeChartTwo = this.$refs.testCaseCreationTop5 && echarts.init(this.$refs.testCaseCreationTop5, this.charts.theme);
 			const option = {
 				backgroundColor: this.charts.bgColor,
 				dataset: [
@@ -331,15 +334,17 @@ export default {
 					datasetIndex: 1
 				}
 			};
-			this.global.homeChartTwo.setOption(option);
-			window.addEventListener('resize', () => {
-				this.global.homeChartTwo.resize();
-			});
+			if (this.global.homeChartTwo) {
+				this.global.homeChartTwo.setOption(option);
+				window.addEventListener('resize', () => {
+					this.global.homeChartTwo.resize();
+				});
+			}
 		},
 		// 缺货监控
 		initRequestDailyDetail() {
 			if (!this.global.dispose.some((b) => b === this.global.homeChartThree)) this.global.homeChartThree.dispose();
-			this.global.homeChartThree = echarts.init(this.$refs.requestDailyDetail, this.charts.theme);
+			this.global.homeChartThree = this.$refs.requestDailyDetail && echarts.init(this.$refs.requestDailyDetail, this.charts.theme);
 			const option = {
 				backgroundColor: this.charts.bgColor,
 				grid: {
@@ -393,10 +398,12 @@ export default {
 					},
 				],
 			};
-			this.global.homeChartThree.setOption(option);
-			window.addEventListener('resize', () => {
-				this.global.homeChartThree.resize();
-			});
+			if (this.global.homeChartThree) {
+				this.global.homeChartThree.setOption(option);
+				window.addEventListener('resize', () => {
+					this.global.homeChartThree.resize();
+				});
+			}
 		},
 		// 随机语录
 		initDailyMessage() {
