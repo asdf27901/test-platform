@@ -7,6 +7,7 @@
 
 <script>
 import { Local } from '@/utils/storage.js';
+import webSocketService from "@/utils/webSocketService";
 export default {
 	name: 'layout',
 	components: {
@@ -22,6 +23,13 @@ export default {
 		},
 	},
 	created() {
+		while (true) {
+			if (webSocketService.isConnected) break
+			if (!webSocketService.isConnected && !webSocketService.isConnecting) {
+				webSocketService.connect()
+				break
+			}
+		}
 		this.onLayoutResize();
 		window.addEventListener('resize', this.onLayoutResize);
 	},
