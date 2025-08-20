@@ -85,6 +85,7 @@ import { PrevLoading } from '@/utils/loading.js';
 import { quotationsList } from './mock';
 import { useLoginApis } from "@/api/login";
 import {Message} from "element-ui";
+import webSocketService from "@/utils/webSocketService";
 export default {
 	name: 'login',
 	data() {
@@ -159,6 +160,7 @@ export default {
 								Local.set('token', data)
 							}
 							Message.success('登录成功')
+							webSocketService.connect()
 							PrevLoading.start()
 							setTimeout(() => {
 								this.$router.push({
