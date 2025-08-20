@@ -45,7 +45,7 @@ function removePending(config) {
 // 清空所有 pending 的请求
 export function clearAllPending() {
 	for (const [key, cancel] of pendingRequests) {
-		cancel();
+		cancel(`取消所有 pending 中的请求: ${key}`);
 	}
 	pendingRequests.clear();
 }
@@ -97,7 +97,10 @@ service.interceptors.response.use(
 			if (error.config) {
 				removePending(error.config);
 			}
-			return new Promise(() => {});
+			if (isRedirecting) {
+				return new Promise(() => {})
+			}
+			return Promise.reject(error);
 		}
 		if (error.config) {
 			removePending(error.config)
