@@ -18,6 +18,12 @@
 #### 🌈 介绍
 基于Springboot3.4.6 + vue2.x + element-ui + mybatis + mybatis-plus + GraalVm + redis + Redisson + WebSocket + Maven 开发的接口自动化测试平台
 
+<img width="1920" height="911" alt="image" src="https://github.com/user-attachments/assets/17b283ef-9f12-4b8a-905f-e9e022c77a1f" />
+<img width="1920" height="909" alt="image" src="https://github.com/user-attachments/assets/2d4e875c-278b-455e-bbbf-de0f7fbbf794" />
+<img width="1918" height="910" alt="image" src="https://github.com/user-attachments/assets/5118b04a-8fee-4cc1-a4e2-8bfdcb52e04f" />
+
+
+
 ---
 #### ⚡ 使用说明
 推荐使用nvm管理node.js版本
